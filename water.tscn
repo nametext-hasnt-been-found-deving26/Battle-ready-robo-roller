@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://c0qih05ea5b7r"]
+
+[ext_resource type="Script" uid="uid://dyr33niq8m32e" path="res://water.gd" id="1_3tvro"]
+[ext_resource type="Texture2D" uid="uid://2h8e3mabuj8q" path="res://water.png" id="2_ni24v"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6h0xc"]
+size = Vector2(1023, 1023)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7wcun"]
+size = Vector2(355.55527, 20)
+
+[node name="water" type="Area2D"]
+script = ExtResource("1_3tvro")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_6h0xc")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_ni24v")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(0, -502)
+scale = Vector2(2.8800023, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource("RectangleShape2D_7wcun")
+one_way_collision = true
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]

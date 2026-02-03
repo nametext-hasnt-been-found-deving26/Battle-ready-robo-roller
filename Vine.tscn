@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://chm78itt256id"]
+
+[ext_resource type="Script" path="res://Vine.gd" id="1_5tpbh"]
+[ext_resource type="Texture2D" uid="uid://wh3trbj6d5bv" path="res://vine_handle.png" id="2_dpci6"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_rhe2k"]
+
+[node name="vine" type="Node2D" groups=["Vine"]]
+texture_filter = 1
+script = ExtResource("1_5tpbh")
+
+[node name="Handle" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Handle"]
+position = Vector2(0, 4)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_dpci6")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_rhe2k")
+
+[node name="Line2D" type="Line2D" parent="."]
+width = 2.0
+default_color = Color(0.407843, 0.486275, 0.0941176, 1)

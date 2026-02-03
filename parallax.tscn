@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://ck2ko6su5s81d"]
+
+[ext_resource type="Texture2D" uid="uid://cyn8r84m3tvvw" path="res://desert_a.png" id="1_1g1u5"]
+[ext_resource type="PackedScene" uid="uid://7qsog2ljagsn" path="res://player.tscn" id="2_ur60c"]
+[ext_resource type="PackedScene" uid="uid://bft5tela22vqs" path="res://ui.tscn" id="3_2l8q6"]
+
+[node name="parallax" type="Node2D"]
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+show_behind_parent = true
+motion_scale = Vector2(0, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer"]
+show_behind_parent = true
+position = Vector2(-66, -217)
+scale = Vector2(8.09766, 8.85938)
+texture = ExtResource("1_1g1u5")
+centered = false
+
+[node name="CharacterBody2D" parent="." instance=ExtResource("2_ur60c")]
+
+[node name="Control" parent="CharacterBody2D" instance=ExtResource("3_2l8q6")]
+
+[editable path="CharacterBody2D/Control"]
