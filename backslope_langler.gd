@@ -27,7 +27,6 @@ func _on_body_entered(body):
 		player.no_slope_launch  = true
 		if player.velocity.y < 0 and not Input.is_action_pressed("jump") and disable_switch_H == false and player.can_wallrun_left == true:###
 			if player.direction_change == false:
-				player_upspeed = player.velocity.y
 				player.switch_starting_location = switch_starter.global_position
 			player.direction_change = true
 			player.direction_change_timer.start()
@@ -35,10 +34,6 @@ func _on_body_entered(body):
 			player.walldive_starting_location = dive_starter.global_position
 			player.can_walldive = true
 					
-		if player.direction_change == true:
-			player.switch_speed = player_upspeed
-		#if player.can_walldive == true:
-			#player.switch_speed = player_downspeed
 		
 
 

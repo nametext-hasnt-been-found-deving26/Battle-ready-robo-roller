@@ -150,7 +150,7 @@ texture = ExtResource("3_ofmmg")
 centered = false
 
 [node name="CharacterBody2D" parent="parallax" node_paths=PackedStringArray("current_tilemap") instance=ExtResource("4_jo7k4")]
-position = Vector2(3362.9998, -3218.9998)
+position = Vector2(189.99994, 274)
 slope_uproll_adjuster = 1.15
 current_tilemap = NodePath("../../TileMap")
 

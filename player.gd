@@ -569,11 +569,11 @@ func _physics_process(delta):
 				animated_sprite_2d.flip_h = true
 			imnContact = true
 			if slope_launched == false:
-				if can_downroll == true and angler_dir != 0:
+				if can_downroll == true and angler_dir != 0 and is_on_floor():
 					velocity.x = move_toward(velocity.x + rolling + ((angle + (store_y/54)) * angler_dir * (180 / 3.141592)/5) , (skating_SPEED - delta) * direction  , accel )
 					velocity.y += store_y/8 * (angle * (180 / 3.141592)) 
 					skating_SPEED = skating_SPEED + (angle * (180 / 3.141592))/2 if velocity.x >= 900 or velocity.x <= -900 else 900
-				elif can_downroll == false and angler_dir != 0:
+				elif can_downroll == false and angler_dir != 0 and is_on_floor():
 					velocity.x = move_toward(velocity.x + rolling + (angle * angler_dir * 25) , (skating_SPEED - delta) * direction  , accel)
 					store_y = 0
 					velocity.y += (gravity * delta) * (angle * (180 / 3.141592))
@@ -1155,11 +1155,11 @@ func _physics_process(delta):
 			direction_change_timer.start()
 		global_position = switch_starting_location
 		if angler_dir == 1:
-			velocity.x = switch_speed
+			velocity.x = abs(velocity.y) * -1
 			velocity.y = 100
 			#print(velocity.x)
 		elif angler_dir == -1:
-			velocity.x = switch_speed * -1
+			velocity.x = abs(velocity.y) 
 			velocity.y = 100
 			
 			velocity.y = 0
