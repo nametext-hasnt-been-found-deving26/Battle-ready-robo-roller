@@ -793,7 +793,8 @@ wall_run_gravity_multiplier = 15.0
 run_direction_gravity_multiplier = 5.0
 wall_dive_gravity_multiplier = 1.0
 dive_direction_gravity_multiplier = 0.5
-dive_counterdirection_gravity_multiplier = 4.0
+dive_counterdirection_gravity_multiplier = 400.0
+walldive_switch_window = 0.4
 run_buffer_duration = 0.1
 afterimages_buffer_time_duration = 0.05
 afterimages = ExtResource("2_42shm")
@@ -931,11 +932,11 @@ wait_time = 0.16
 one_shot = true
 
 [node name="wallkicklock1" type="RayCast2D" parent="."]
-scale = Vector2(1, 22)
+scale = Vector2(1, 25)
 target_position = Vector2(20, 0)
 
 [node name="wallkicklock2" type="RayCast2D" parent="."]
-scale = Vector2(1, 22)
+scale = Vector2(1, 25)
 target_position = Vector2(-20, 0)
 
 [node name="wallkicklockTimer" type="Timer" parent="."]
@@ -999,6 +1000,7 @@ wait_time = 0.5
 
 [node name="wallrunning_wallchecker" type="RayCast2D" parent="."]
 target_position = Vector2(0, 24.117647)
+collision_mask = 2
 
 [connection signal="body_entered" from="jump_ball" to="." method="_on_jump_ball_body_entered"]
 [connection signal="timeout" from="DashDurationTimer" to="." method="_on_dash_duration_timer_timeout"]

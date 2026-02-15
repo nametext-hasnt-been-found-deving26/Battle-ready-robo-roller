@@ -99,6 +99,7 @@ separation = Vector2i(1, 1)
 0:3/0/physics_layer_0/polygon_0/one_way = true
 0:3/0/physics_layer_0/polygon_0/one_way_margin = 12.0
 15:7/0 = 0
+15:7/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 6:1/0 = 0
 6:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, 8, -7.020294, 4.097558, -5.9314327, 1.0028992, -5.014496, -0.8882828, -3.9829426, -2.8940802, -3.0660057, -3.9256334, -2.1490688, -5.014496, -0.945591, -6.046049, 0.2578888, -7.0776024, 3.8683243, -8, 8, -8, 8, 8)
 6:1/0/custom_data_0 = true
@@ -149,7 +150,7 @@ texture = ExtResource("3_ofmmg")
 centered = false
 
 [node name="CharacterBody2D" parent="parallax" node_paths=PackedStringArray("current_tilemap") instance=ExtResource("4_jo7k4")]
-position = Vector2(3329.9998, -3261.9998)
+position = Vector2(3362.9998, -3218.9998)
 slope_uproll_adjuster = 1.15
 current_tilemap = NodePath("../../TileMap")
 
@@ -257,7 +258,7 @@ polygon = PackedVector2Array(78, 28, 122, 12, 171, -10, 197, -58, 211, -109, 237
 position = Vector2(3240, -3078)
 
 [node name="CollisionPolygon2D" parent="slopeRanglers/backslopes/BackslopeRangler" index="0"]
-polygon = PackedVector2Array(-14, -19, 3, -31, 32, -36, 39, 15, 40, 55, -26, 55, -25, -3)
+polygon = PackedVector2Array(-14, -19, 3, -31, 5, 42, 16, 23, 34, 20, 40, 55, -26, 55, -25, -3)
 
 [node name="dive_starter" parent="slopeRanglers/backslopes/BackslopeRangler" index="1"]
 position = Vector2(-26, 61)
@@ -450,7 +451,7 @@ position = Vector2(3371, -3071)
 
 [node name="CollisionPolygon2D" parent="slopeLanglers/backslopes/BackslopeLangler3" index="0"]
 position = Vector2(-14, 1)
-polygon = PackedVector2Array(-9, -61, 56, -56, 119, -41, 257, -2, 312, 75, 316, 162, 166, 155, 166, 89, 129, 48, -16, 48, -16, 20)
+polygon = PackedVector2Array(-16, -5, 138, -4, 257, -2, 312, 75, 316, 162, 166, 155, 166, 89, 129, 48, -16, 48, -16, 20)
 
 [node name="dive_starter" parent="slopeLanglers/backslopes/BackslopeLangler3" index="1"]
 position = Vector2(38, 62)

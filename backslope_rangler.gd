@@ -29,16 +29,12 @@ func _on_body_entered(body):
 				player.switch_starting_location = switch_starter.global_position
 			player.direction_change = true
 			player.direction_change_timer.start()
-		if player.velocity.x < 0 and not Input.is_action_pressed("jump") and disable_switch_V == false:
+		if disable_switch_V == false:
 			#print("engaging walldive")
-			player.velocity.y = abs(player.velocity.x)
-			player_downspeed = abs(player.velocity.x)
 			player.walldive_starting_location = dive_starter.global_position
 			player.can_walldive = true
 			
 			
-			if player.can_walldive == true:
-				player.velocity.y = player_downspeed
 					
 		if player.direction_change == true:
 			player.switch_speed = player_upspeed

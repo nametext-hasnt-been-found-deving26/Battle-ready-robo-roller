@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dcnkkclo0ds1i"]
 
-[ext_resource type="Script" path="res://slope_langler.gd" id="1_myts0"]
+[ext_resource type="Script" uid="uid://lm1xfosolwk7" path="res://slope_langler.gd" id="1_myts0"]
 
 [node name="slopeLangler" type="Area2D"]
 script = ExtResource("1_myts0")
