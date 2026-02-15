@@ -38,8 +38,8 @@ func _on_body_entered(body):
 					
 		if player.direction_change == true:
 			player.switch_speed = player_upspeed
-		if player.can_walldive == true:
-			player.switch_speed = player_downspeed
+		#if player.can_walldive == true:
+			#player.switch_speed = player_downspeed
 		
 
 

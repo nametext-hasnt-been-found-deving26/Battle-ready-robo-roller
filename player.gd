@@ -1153,26 +1153,24 @@ func _physics_process(delta):
 	if direction_change == true  :
 		if direction_change_timer.is_stopped():
 			direction_change_timer.start()
-		global_position = switch_starting_location
 		if angler_dir == 1:
-			velocity.x = abs(velocity.y) * -1
-			velocity.y = 100
+			velocity.x = abs(switch_speed) * -1
 			#print(velocity.x)
 		elif angler_dir == -1:
-			velocity.x = abs(velocity.y) 
-			velocity.y = 100
-			
-			velocity.y = 0
-		direction_change = false
+			velocity.x = abs(switch_speed)
+		global_position = switch_starting_location
+		velocity.y = 0
+		#direction_change = false
 		
 
 #wall runs
 	if can_wallrun_right == true:
 		jump_ball = false
 		rotation_degrees = -90
+		#switch_speed = abs(velocity.y)
 		#f angler_dir == -1:
 			#irection_change = true
-		if wallrunning_wallchecker.is_colliding() and not is_on_ceiling():
+		if wallrunning_wallchecker.is_colliding():
 			if not possiblewallrun_timer.is_stopped():
 				possiblewallrun_timer.stop()
 			velocity.x = move_toward(velocity.x, 0 , 1)
@@ -1188,7 +1186,7 @@ func _physics_process(delta):
 				$Camera2D.offset.y = 0
 		else:
 			if not is_on_ceiling():
-				velocity.x = move_toward(velocity.x, 100, walking_accel)
+				velocity.x =  100
 			can_disable_wallrun = true
 		if Input.is_action_just_pressed("jump"):
 			velocity.x = move_toward(velocity.x + (JUMP_VELOCITY*2) + (angle * angler_dir * 40), skating_SPEED  * direction, accel)
@@ -1202,10 +1200,11 @@ func _physics_process(delta):
 	if can_wallrun_left == true:
 		jump_ball = false
 		rotation_degrees = 90
-		if wallrunning_wallchecker.is_colliding() and not is_on_ceiling():
+		#switch_speed = abs(velocity.y)
+		if wallrunning_wallchecker.is_colliding():
 			if not possiblewallrun_timer.is_stopped():
 				possiblewallrun_timer.stop()
-			velocity.x = move_toward(velocity.x, 0 , 1)
+			velocity.x = 0 
 			can_disable_wallrun = false
 			if Input.is_action_pressed("left"):
 				wallrun_dive_gravity_multipier =(wall_run_gravity_multiplier + run_direction_gravity_multiplier)
@@ -1217,7 +1216,7 @@ func _physics_process(delta):
 				$Camera2D.offset.y = 0
 		else:
 			if not is_on_ceiling():
-				velocity.x = move_toward(velocity.x, -100, walking_accel)
+				velocity.x = -100
 			can_disable_wallrun = true
 		if Input.is_action_just_pressed("jump"):
 			velocity.x = move_toward(velocity.x - (JUMP_VELOCITY*2) + (angle * angler_dir * 40), skating_SPEED  * direction, accel)
@@ -1235,7 +1234,7 @@ func _physics_process(delta):
 		#f angler_dir == -1:
 			#irection_change = true
 		if wallrunning_wallchecker.is_colliding():
-			velocity.x = move_toward(velocity.x, 0 , walking_accel)
+			velocity.x = 0
 			can_disable_wallrun = false
 			if Input.is_action_pressed("right"):
 				wallrun_dive_gravity_multipier = dive_direction_gravity_multiplier * wall_dive_gravity_multiplier
@@ -1776,7 +1775,7 @@ func _on_fallingmomentum_timer_timeout():
 
 
 func _on_possiblewallrun_timer_timeout():
-	if not wallrunning_wallchecker.is_colliding() or is_on_ceiling():
+	if not wallrunning_wallchecker.is_colliding():
 		wallrun_dive_gravity_multipier = skates_normal_gravity_multiplier
 		can_wallrun_left = false
 		can_wallrun_right = false

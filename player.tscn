@@ -999,7 +999,7 @@ one_shot = true
 wait_time = 0.5
 
 [node name="wallrunning_wallchecker" type="RayCast2D" parent="."]
-target_position = Vector2(0, 24.117647)
+target_position = Vector2(0, 22.941177)
 collision_mask = 2
 
 [connection signal="body_entered" from="jump_ball" to="." method="_on_jump_ball_body_entered"]
