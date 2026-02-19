@@ -1,0 +1,102 @@
+[gd_scene load_steps=8 format=3 uid="uid://d2y7gdugrtp55"]
+
+[ext_resource type="Script" uid="uid://ch76ccjh1epn2" path="res://ui/touch_controls.gd" id="1_1gcqp"]
+[ext_resource type="Texture2D" uid="uid://d2m40srddsbnl" path="res://ui/touch_controls.tres" id="2_ojhyh"]
+[ext_resource type="Texture2D" uid="uid://6g66kniuptsa" path="res://ui/touch_controls_on.tres" id="3_qpxdh"]
+[ext_resource type="Texture2D" uid="uid://c7tqi7khr8jfq" path="res://ui/touch_controls_pressed.tres" id="4_qpxdh"]
+[ext_resource type="Texture2D" uid="uid://dn3magg47my16" path="res://ui/touch_controls_pressed_on.tres" id="5_rq6v7"]
+
+[sub_resource type="ExternalTexture" id="ExternalTexture_5q4ah"]
+
+[sub_resource type="ExternalTexture" id="ExternalTexture_qpxdh"]
+
+[node name="touch controls" type="CanvasLayer"]
+script = ExtResource("1_1gcqp")
+skate_icon_off = ExtResource("2_ojhyh")
+skate_icon_on = ExtResource("3_qpxdh")
+skate_icon_pressed_off = ExtResource("4_qpxdh")
+skate_icon_pressed_on = ExtResource("5_rq6v7")
+
+[node name="AspectRatioContainer2" type="AspectRatioContainer" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
+offset_right = 40.0
+grow_vertical = 0
+
+[node name="left" type="TouchScreenButton" parent="AspectRatioContainer2"]
+position = Vector2(22, -368)
+scale = Vector2(0.8828125, 0.71806335)
+texture_normal = SubResource("ExternalTexture_5q4ah")
+passby_press = true
+action = "left"
+visibility_mode = 1
+
+[node name="right" type="TouchScreenButton" parent="AspectRatioContainer2"]
+position = Vector2(275, -358)
+scale = Vector2(0.873758, 0.7180636)
+texture_normal = SubResource("ExternalTexture_5q4ah")
+passby_press = true
+action = "right"
+visibility_mode = 1
+
+[node name="up" type="TouchScreenButton" parent="AspectRatioContainer2"]
+position = Vector2(166, -588)
+scale = Vector2(0.5495392, 0.71806335)
+texture_normal = SubResource("ExternalTexture_5q4ah")
+passby_press = true
+action = "up"
+visibility_mode = 1
+
+[node name="down" type="TouchScreenButton" parent="AspectRatioContainer2"]
+position = Vector2(181.99998, -166)
+scale = Vector2(0.5495392, 0.71806335)
+texture_normal = SubResource("ExternalTexture_5q4ah")
+passby_press = true
+action = "down"
+visibility_mode = 1
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="."]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="jump" type="TouchScreenButton" parent="AspectRatioContainer"]
+position = Vector2(-308, -152)
+scale = Vector2(0.5546875, 0.58203125)
+texture_normal = SubResource("ExternalTexture_5q4ah")
+passby_press = true
+action = "jump"
+visibility_mode = 1
+
+[node name="dash" type="TouchScreenButton" parent="AspectRatioContainer"]
+position = Vector2(-488, -285)
+scale = Vector2(0.51562494, 0.49999988)
+texture_normal = SubResource("ExternalTexture_5q4ah")
+passby_press = true
+action = "dash"
+visibility_mode = 1
+
+[node name="switch_mode" type="TouchScreenButton" parent="AspectRatioContainer"]
+position = Vector2(-195, -269)
+scale = Vector2(4, 4)
+texture_normal = ExtResource("3_qpxdh")
+texture_pressed = ExtResource("5_rq6v7")
+passby_press = true
+action = "skates_on off"
+visibility_mode = 1
+
+[node name="pause" type="TouchScreenButton" parent="AspectRatioContainer"]
+position = Vector2(-308, -403)
+scale = Vector2(0.5390625, 0.22265609)
+texture_normal = SubResource("ExternalTexture_qpxdh")
+passby_press = true
+action = "pause"
+visibility_mode = 1

@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://dyix4utm1xmd4"]
+
+[ext_resource type="Script" uid="uid://dxpptl4lwep4r" path="res://slope_anglers/Back L/backslope_langler.gd" id="1_5gkpi"]
+
+[node name="BackslopeLangler" type="Area2D"]
+script = ExtResource("1_5gkpi")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(0, 0, 20, 0, 39, 0, 39, 15, 39, 29, 20, 29, 0, 29, 0, 15)
+
+[node name="dive_starter" type="Marker2D" parent="."]
+
+[node name="switch_starter" type="Marker2D" parent="."]
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]
