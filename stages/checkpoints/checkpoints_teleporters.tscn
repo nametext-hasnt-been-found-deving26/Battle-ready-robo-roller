@@ -51,7 +51,7 @@ region = Rect2(155.00804, 58.969887, 67.96393, 47.043037)
 [node name="checkpoints_teleporters" type="Marker2D"]
 position = Vector2(186, 142)
 script = ExtResource("1_oqnpe")
-non_active_accel = 0.1
+non_active_accel = 1.2
 
 [node name="Area2D" type="Area2D" parent="."]
 position = Vector2(0.5, 24)

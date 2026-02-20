@@ -23,17 +23,20 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if not activated():
-		if post_bulb.rotation_degrees > 195:
-			head_towards = 164
-		if post_bulb.rotation_degrees < 165:
-			head_towards = 196
+		#if post_bulb.rotation_degrees > 195:
+			#head_towards = 164
+		#if post_bulb.rotation_degrees < 165:
+			#head_towards = 196
 			
-		post_bulb.rotation_degrees = move_toward(post_bulb.rotation_degrees, head_towards, current_accel)
-		if post_bulb.rotation_degrees < 195 and post_bulb.rotation_degrees > 165 :
-			current_accel -= delta
-			print("stoped")
+		post_bulb.rotation_degrees += current_accel
+		if post_bulb.rotation_degrees > 195:
+			current_accel -= delta * non_active_accel
+		elif post_bulb.rotation_degrees < 165:
+			current_accel += delta * non_active_accel
 		else:
-			current_accel+= delta
+			if abs(current_accel) > 1:
+				print("stoped")
+				current_accel = move_toward(current_accel, 0, 0.1)
 			
 			
 	if Input.is_action_just_pressed("ui_accept"):
