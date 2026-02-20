@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://c1m7wvncjej4a"]
+[gd_scene load_steps=29 format=3 uid="uid://c1m7wvncjej4a"]
 
 [ext_resource type="Script" uid="uid://bxb6ubtvgace4" path="res://stages/test_stage.gd" id="1_wf2lb"]
 [ext_resource type="AudioStream" uid="uid://cymhj7fxf5trd" path="res://stages/stage_music/teststageplaceholder.mp3" id="2_hjq3q"]
@@ -12,8 +12,6 @@
 [ext_resource type="PackedScene" uid="uid://dyix4utm1xmd4" path="res://slope_anglers/Back L/backslope_langler.tscn" id="10_xro35"]
 [ext_resource type="PackedScene" uid="uid://cyy0bvywcu1kb" path="res://enemies/enemi.tscn" id="11_lnaim"]
 [ext_resource type="PackedScene" uid="uid://c0qih05ea5b7r" path="res://stage gimmicks/water bodies/water.tscn" id="12_qv0s7"]
-[ext_resource type="Script" uid="uid://c5iae0a3ukk7p" path="res://stages/water_bodies.gd" id="13_nlxau"]
-[ext_resource type="Script" uid="uid://dovunpmpr23b1" path="res://stages/stage_gimmicks.gd" id="13_x4sk3"]
 [ext_resource type="PackedScene" uid="uid://chm78itt256id" path="res://stage gimmicks/grapple vines/Vine.tscn" id="13_xs3dc"]
 [ext_resource type="PackedScene" uid="uid://dacw4lid41yu5" path="res://stage gimmicks/rails/grind_rail.tscn" id="14_dnvph"]
 [ext_resource type="PackedScene" uid="uid://dwjxwlx5t7qok" path="res://stage gimmicks/rails/grind_rail_child.tscn" id="15_eol6t"]
@@ -930,33 +928,28 @@ position = Vector2(1247, -10218)
 position = Vector2(1304, -10219)
 
 [node name="stage_gimmicks" type="Node" parent="."]
-script = ExtResource("13_x4sk3")
 
 [node name="water_bodies" type="Node" parent="stage_gimmicks"]
-script = ExtResource("13_nlxau")
 
 [node name="water" parent="stage_gimmicks/water_bodies" instance=ExtResource("12_qv0s7")]
 position = Vector2(5674, 1493)
 rotation = -3.1415927
 scale = Vector2(4.55313, -2.18979)
 
-[node name="water2" parent="stage_gimmicks/water_bodies" node_paths=PackedStringArray("player") instance=ExtResource("12_qv0s7")]
+[node name="water2" parent="stage_gimmicks/water_bodies" instance=ExtResource("12_qv0s7")]
 position = Vector2(-1973, 2903)
 rotation = -3.1415927
 scale = Vector2(2.96964, -0.92287)
-player = NodePath("")
 
-[node name="water3" parent="stage_gimmicks/water_bodies" node_paths=PackedStringArray("player") instance=ExtResource("12_qv0s7")]
+[node name="water3" parent="stage_gimmicks/water_bodies" instance=ExtResource("12_qv0s7")]
 position = Vector2(1275.0001, -10747)
 rotation = 3.1415925
 scale = Vector2(1.796956, -0.7049468)
-player = NodePath("")
 
-[node name="water4" parent="stage_gimmicks/water_bodies" node_paths=PackedStringArray("player") instance=ExtResource("12_qv0s7")]
+[node name="water4" parent="stage_gimmicks/water_bodies" instance=ExtResource("12_qv0s7")]
 position = Vector2(-154, -9835)
 rotation = 3.1415925
 scale = Vector2(1.7931302, -0.70979)
-player = NodePath("")
 
 [node name="Grapple_vines" type="Node" parent="stage_gimmicks"]
 

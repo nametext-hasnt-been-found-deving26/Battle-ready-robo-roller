@@ -1,6 +1,6 @@
 extends Node
 @onready var stage_gimmicks: Node = $stage_gimmicks
-@export var player: PackedScene
+var player: PackedScene
 @onready var player_position_handler: Marker2D = $player_position_handler
 
 

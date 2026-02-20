@@ -16,5 +16,4 @@ func spawn_player():
 	var current_player = player.instantiate()
 	current_player.current_tilemap = tile_map
 	get_parent().add_child(current_player)
-	stage_gimmicks.player = true
 	current_player.global_position = global_position
