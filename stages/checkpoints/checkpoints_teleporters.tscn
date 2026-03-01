@@ -1,0 +1,128 @@
+[gd_scene load_steps=16 format=3 uid="uid://cxjxo5y63x2yg"]
+
+[ext_resource type="Texture2D" uid="uid://col2on2cc2ay4" path="res://stages/checkpoints/teleporters.png" id="1_lajoj"]
+[ext_resource type="Script" uid="uid://ch0gfdillp7iv" path="res://stages/checkpoints/checkpoints_teleporters.gd" id="1_oqnpe"]
+[ext_resource type="Shader" uid="uid://cu5makgf5bdmr" path="res://stages/checkpoints/bulb_lighting.gdshader" id="2_axx7l"]
+[ext_resource type="PackedScene" uid="uid://dj0s7inesajpv" path="res://stages/checkpoints/teleporter_rings.tscn" id="2_yxhow"]
+[ext_resource type="Shader" uid="uid://cg43qtvl828vy" path="res://stages/checkpoints/bulb_post_lighting.gdshader" id="3_yxhow"]
+[ext_resource type="PackedScene" uid="uid://blhaepagb6loq" path="res://slope_anglers/R/slope_rangler.tscn" id="6_h7bml"]
+[ext_resource type="PackedScene" uid="uid://dcnkkclo0ds1i" path="res://slope_anglers/L/slope_langler.tscn" id="7_fwwgk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oqnpe"]
+size = Vector2(67, 78)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_e6xc6"]
+shader = ExtResource("3_yxhow")
+shader_parameter/target_color = Color(0.22352941, 0.09411765, 0.27450982, 1)
+shader_parameter/replacement_color = Color(0.22352941, 0.09411765, 0.27450982, 1)
+shader_parameter/target_color2 = Color(0.47843137, 0.101960786, 0.61960787, 1)
+shader_parameter/replacement_color2 = Color(0.47843137, 0.101960786, 0.61960787, 1)
+shader_parameter/target_color3 = Color(0.7254902, 0, 1, 1)
+shader_parameter/replacement_color3 = Color(0.7254902, 0, 1, 1)
+shader_parameter/tolerance = 0.1
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e6xc6"]
+atlas = ExtResource("1_lajoj")
+region = Rect2(289.98877, 86.93608, 15.027527, 52.10742)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_h7bml"]
+shader = ExtResource("2_axx7l")
+shader_parameter/target_color = Color(0.09019608, 0.039215688, 0.10980392, 1)
+shader_parameter/replacement_color = Color(0.09019608, 0.039215688, 0.10980392, 1)
+shader_parameter/target_color2 = Color(0.38039216, 0.05490196, 0.5019608, 1)
+shader_parameter/replacement_color2 = Color(0.38039216, 0.05490196, 0.5019608, 1)
+shader_parameter/target_color3 = Color(0.54901963, 0.13333334, 0.7058824, 1)
+shader_parameter/replacement_color3 = Color(0.54901963, 0.13333334, 0.7058824, 1)
+shader_parameter/tolerance = 0.1
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fwwgk"]
+atlas = ExtResource("1_lajoj")
+region = Rect2(253.99467, 57.011677, 9.026321, 34.97488)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ajsmq"]
+atlas = ExtResource("1_lajoj")
+region = Rect2(278.0591, 33.886875, 35.894928, 28.156933)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jpuqh"]
+atlas = ExtResource("1_lajoj")
+region = Rect2(155.00804, 58.969887, 67.96393, 47.043037)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxhow"]
+atlas = ExtResource("1_lajoj")
+region = Rect2(150.85403, 134.93329, 76.36502, 5.1022186)
+
+[node name="checkpoints_teleporters" type="Marker2D"]
+script = ExtResource("1_oqnpe")
+ring_buffer_time_duration = 0.3
+rings = ExtResource("2_yxhow")
+post_base_color1 = Color(0.22352941, 0.09411765, 0.27450982, 1)
+post_base_color2 = Color(0.47843137, 0.101960786, 0.61960787, 1)
+post_base_color3 = Color(0.7254902, 0, 1, 1)
+bulb_base_color1 = Color(0.09019608, 0.039215688, 0.10980392, 1)
+bulb_base_color2 = Color(0.38039216, 0.05490196, 0.5019608, 1)
+bulb_base_color3 = Color(0.54901963, 0.13333334, 0.7058824, 1)
+non_active_accel = 1.2
+active_drag = 0.1
+
+[node name="Area2D" type="Area2D" parent="."]
+position = Vector2(0.5, 24)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(0, -41)
+shape = SubResource("RectangleShape2D_oqnpe")
+
+[node name="post" type="Sprite2D" parent="."]
+z_index = -2
+material = SubResource("ShaderMaterial_e6xc6")
+position = Vector2(-35.5, 0)
+texture = SubResource("AtlasTexture_e6xc6")
+
+[node name="post_bulb" type="Sprite2D" parent="post"]
+material = SubResource("ShaderMaterial_h7bml")
+position = Vector2(0.5, -24)
+texture = SubResource("AtlasTexture_fwwgk")
+offset = Vector2(0, -15)
+
+[node name="interface" type="Sprite2D" parent="post/post_bulb"]
+visible = false
+position = Vector2(-0.5, -28)
+texture = SubResource("AtlasTexture_ajsmq")
+offset = Vector2(-18, -10)
+
+[node name="glow" type="Sprite2D" parent="."]
+z_index = 1
+position = Vector2(0.5, -1.8)
+texture = SubResource("AtlasTexture_jpuqh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="base" type="Sprite2D" parent="StaticBody2D"]
+z_index = 1
+position = Vector2(0.5, 24)
+texture = SubResource("AtlasTexture_yxhow")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
+position = Vector2(1.0166703, 23.5)
+scale = Vector2(1.0333333, 1.09375)
+polygon = PackedVector2Array(39.66129, 2.285715, 31.919353, -1.3714275, -32.91936, -1.3714275, -39.693558, 2.285715)
+one_way_collision = true
+one_way_collision_margin = 10.0
+
+[node name="ring_spawner" type="Marker2D" parent="."]
+position = Vector2(0.5, 20)
+
+[node name="slopeRangler" parent="." instance=ExtResource("6_h7bml")]
+
+[node name="CollisionPolygon2D" parent="slopeRangler" index="0"]
+polygon = PackedVector2Array(-33, 20, -41, 26, -33, 26)
+
+[node name="slopeLangler" parent="." instance=ExtResource("7_fwwgk")]
+
+[node name="CollisionPolygon2D" parent="slopeLangler" index="0"]
+polygon = PackedVector2Array(34, 20, 43, 26, 34, 26)
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="Area2D" to="." method="_on_area_2d_body_exited"]
+
+[editable path="slopeRangler"]
+[editable path="slopeLangler"]

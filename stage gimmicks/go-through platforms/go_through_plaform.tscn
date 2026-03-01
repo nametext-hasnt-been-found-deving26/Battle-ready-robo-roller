@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://14mncy6rf0nx"]
+
+[ext_resource type="Texture2D" uid="uid://bfuthc868q1kk" path="res://stage gimmicks/go-through platforms/go through platform.png" id="1_ekeqr"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2gegu"]
+size = Vector2(32, 23.8696)
+
+[node name="StaticBody2D" type="StaticBody2D"]
+collision_layer = 3
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+light_mask = 3
+visibility_layer = 3
+shape = SubResource("RectangleShape2D_2gegu")
+one_way_collision = true
+one_way_collision_margin = 3.0
+
+[node name="Sprite2D" type="Sprite2D" parent="CollisionShape2D"]
+position = Vector2(0, -1)
+texture = ExtResource("1_ekeqr")

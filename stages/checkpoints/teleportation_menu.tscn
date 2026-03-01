@@ -1,0 +1,52 @@
+[gd_scene load_steps=4 format=3 uid="uid://becmuif6ldbcy"]
+
+[ext_resource type="Script" uid="uid://yolaqqvfrp6f" path="res://stages/checkpoints/teleportation_menu.gd" id="1_2jfqg"]
+[ext_resource type="PackedScene" uid="uid://bmrhj8pgljip6" path="res://stages/checkpoints/checkpoint_slot.tscn" id="2_qo2yg"]
+[ext_resource type="PackedScene" uid="uid://crpiax7vrcu8b" path="res://stages/checkpoints/teleport_trail.tscn" id="3_xj5qw"]
+
+[node name="Teleportation menu" type="Control" groups=["teleportation menu"]]
+modulate = Color(1, 1, 1, 0.5294118)
+top_level = true
+custom_minimum_size = Vector2(200, 120)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_2jfqg")
+checkpoint_slot_scene = ExtResource("2_qo2yg")
+teleport_trail = ExtResource("3_xj5qw")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="CenterContainer"]
+custom_minimum_size = Vector2(600, 200)
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+vertical_scroll_mode = 0
+
+[node name="SlotsContainer" type="HBoxContainer" parent="CenterContainer/Panel/ScrollContainer"]
+custom_minimum_size = Vector2(400, 200)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+theme_override_constants/separation = 8
+
+[node name="teletransport_trail_buffer_Timer" type="Timer" parent="."]
+wait_time = 0.1
+
+[connection signal="timeout" from="teletransport_trail_buffer_Timer" to="." method="_on_teletransport_trail_buffer_timer_timeout"]
