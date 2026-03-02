@@ -1111,6 +1111,8 @@ func _physics_process(delta):
 
 	if downrolling == true and is_on_floor():
 		#print("true")
+		can_walldive_left = false
+		can_walldive_right = false
 		fallingmomentum_timer.start()
 		downrolling = false
 
@@ -1276,7 +1278,7 @@ func _physics_process(delta):
 		#switch_speed = abs(velocity.y)
 		#f angler_dir == -1:
 			#irection_change = true
-		if wallrunning_wallchecker.is_colliding():
+		if wallrunning_wallchecker.is_colliding() and not is_on_ceiling():
 			if is_on_wall():
 				velocity.x = -10
 			else:
@@ -1287,9 +1289,10 @@ func _physics_process(delta):
 			can_disable_waldive = false
 			if Input.is_action_pressed("right"):
 				wallrun_dive_gravity_multipier = (wall_run_gravity_multiplier + run_direction_gravity_multiplier)
+				velocity.y -= 11 / abs(velocity.y)
 			else:
 				wallrun_dive_gravity_multipier = wall_run_gravity_multiplier 
-			if Input.is_action_pressed("left") or velocity.y > 0:
+			if Input.is_action_pressed("left") or velocity.y >= 0:
 				wallrun_dive_gravity_multipier = skates_normal_gravity_multiplier
 				can_wallrun_right = false
 				print("wall right exit")
@@ -1311,7 +1314,7 @@ func _physics_process(delta):
 		jump_ball = false
 		rotation_degrees = 90
 		#switch_speed = abs(velocity.y)
-		if wallrunning_wallchecker.is_colliding():
+		if wallrunning_wallchecker.is_colliding() and not is_on_ceiling():
 			if is_on_wall():
 				velocity.x = 10
 			else:
@@ -1321,9 +1324,10 @@ func _physics_process(delta):
 			can_disable_wallrun = false
 			if Input.is_action_pressed("left"):
 				wallrun_dive_gravity_multipier =(wall_run_gravity_multiplier + run_direction_gravity_multiplier)
+				velocity.y -= 11 / abs(velocity.y)
 			else:
 				wallrun_dive_gravity_multipier = wall_run_gravity_multiplier 
-			if Input.is_action_pressed("right") or velocity.y > 0:
+			if Input.is_action_pressed("right") or velocity.y >= 0:
 				wallrun_dive_gravity_multipier = skates_normal_gravity_multiplier
 				print("wall left exit")
 				can_wallrun_left = false
@@ -1492,6 +1496,9 @@ func _handle_rotation():
 	if is_on_floor():
 		if skates_on == true or grindin == true:
 			rotation_degrees = (angle * (180 / 3.141592)) * angler_dir   
+			if Input.is_action_just_pressed("jump"):
+				rotation_degrees = 0
+				print("ball jumpin")
 		else:
 			if do_dodgeslide == true:
 				if angler_dir != 0:
