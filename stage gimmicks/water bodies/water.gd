@@ -28,4 +28,6 @@ func _on_body_entered(body):
 func _on_body_exited(body):
 	if body.is_in_group("player"):
 		body.in_water = false
+		if body.can_dash <= 0:
+			body.can_dash = 1
 		body.velocity = body.velocity * 2.25

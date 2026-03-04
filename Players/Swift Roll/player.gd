@@ -110,6 +110,8 @@ var wallrun_dive_gravity_multipier: float = skates_normal_gravity_multiplier
 @export var run_direction_gravity_multiplier: float
 @export var wallrerun_window: float = 0.15
 @export var wallrun_switch_window: float = 0.3
+@export var wallrun_assist: float = 11.0
+@export var max_help_speed: float = -100
 @export_group("wall dive")
 @export var wall_dive_gravity_multiplier: float
 @export var dive_direction_gravity_multiplier: float
@@ -154,6 +156,8 @@ var can_cayote_jump = false
 var dir2 = 0
 var can_jump = true
 var jump_buffer = false
+var jumping = false
+var jumping_off = false
 
 var slope_launched = false
 var no_slope_launch: bool
@@ -203,9 +207,14 @@ var eat_my_dust : bool = false
 @export_group("rotation")
 @export var rotation_accel : float = 2
 @export_group("squash and strech")
+@export_subgroup("Xs and Ys")
 @export var base_scale = Vector2(0.6, 0.578)
 @export var base_position = Vector2(0.0, -5.882)
 @export var return_to_form_accel: float
+@export_subgroup("on dash")
+@export var dash_squash: float = 0.2
+@export_subgroup("on jump")
+@export var jump_strech: float = 0.4
 
 
 
@@ -369,11 +378,12 @@ func _physics_process(delta):
 		if angle != 0:
 			fixed_angle = angle * (180 / 3.141592)
 			target_angle = fixed_angle
+			#print(fixed_angle)
 			smoothed_angle = lerp(smoothed_angle, target_angle, 0.15)
 		if angler_dir == 0:
 			no_slope_launch = false
 			can_uproll = false
-			#print(fixed_angle)
+			
 		#print(angle)
 		#wallcling/shot stuff --------------------------------------------------------------------------------
 		if not wallcling_cooldown.is_stopped():
@@ -532,7 +542,7 @@ func _physics_process(delta):
 			jump_buffer = false
 			if can_dash == 0:
 				can_dash = 1
-				
+			jumping = true
 	elif jump_buffer == true and skates_on == true and can_jump == true:
 		if is_on_floor() or can_cayote_jump == true:
 			dodash = false
@@ -543,13 +553,16 @@ func _physics_process(delta):
 			$jump_ball.set_monitoring(true)
 			$jump_ball.set_monitorable(true)
 			imnContact = true
-			if was_on_slope == false:
+			if was_on_slope == false or abs(rotation_degrees)  < 1:
 				velocity.y = JUMP_VELOCITY
 			else:
-				#slope jumps
+				
 				if angler_dir * velocity.x < 0:
+					var counter_jump_calculation = (JUMP_VELOCITY * (angle * counter_velocity_influence_adjust) )
 					velocity.y = (slope_launch_direction / (fixed_angle /25) * abs(velocity.x/900)) + (JUMP_VELOCITY/ counter_angle_influence_adjust) 
-					velocity.x -=  (JUMP_VELOCITY * (angle * counter_velocity_influence_adjust) + (velocity.x / 900)) * angler_dir
+					velocity.x -=  counter_jump_calculation  * store_angler_dir 
+					if abs(velocity.x) - counter_jump_calculation  < -1000:
+						velocity.x = 1000 * store_angler_dir
 				elif angler_dir * velocity.x > 0:
 					velocity.y = slope_launch_direction + (JUMP_VELOCITY * inward_angle_influence_adjust)
 					#print(velocity.y)
@@ -562,7 +575,7 @@ func _physics_process(delta):
 			direction_change = false
 			if can_dash == 0:
 				can_dash = 1
-
+			jumping = true
 
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
@@ -656,7 +669,6 @@ func _physics_process(delta):
 					skating_SPEED = skating_SPEED + (angle * (180 / 3.141592))/2 if velocity.x >= Base_Skates_SPEED or velocity.x <= -Base_Skates_SPEED else Base_Skates_SPEED
 				elif can_downroll == false and angler_dir != 0 and is_on_floor():
 					velocity.x = move_toward(velocity.x + rolling + (angle * angler_dir * 25) , (skating_SPEED - delta) * direction  , accel)
-					store_y = 0
 					#velocity.y += (gravity * delta) * (angle * (180 / 3.141592))
 					skating_SPEED = skating_SPEED + (angle * (180 / 3.141592))/4 if velocity.x >= Base_Skates_SPEED or velocity.x <= -Base_Skates_SPEED else Base_Skates_SPEED
 					#print (rolling)
@@ -665,7 +677,7 @@ func _physics_process(delta):
 			#print (velocity.x)
 			#print(angle)
 		#main control line for skates mode -------------------------------------------------------------
-		velocity.x = move_toward(velocity.x + (angle * angler_dir * 15), skating_SPEED  * direction, accel) if is_on_floor() else move_toward(velocity.x , skating_SPEED  * direction, accel)
+		velocity.x = move_toward(velocity.x + (angle * angler_dir * 15), skating_SPEED  * direction, accel) if is_on_floor() else move_toward(velocity.x , Base_Skates_SPEED  * direction, accel)
 		#manage exeed mach
 		skating_SPEED = skating_SPEED + (angle * (180 / 3.141592))/4 if abs(velocity.x) >= Base_Skates_SPEED and is_on_floor() else move_toward(skating_SPEED, Base_Skates_SPEED, accel)
 		if dodash == true:
@@ -1288,8 +1300,9 @@ func _physics_process(delta):
 			can_disable_wallrun = false
 			can_disable_waldive = false
 			if Input.is_action_pressed("right"):
-				wallrun_dive_gravity_multipier = (wall_run_gravity_multiplier + run_direction_gravity_multiplier)
-				velocity.y -= 11 / abs(velocity.y)
+				wallrun_dive_gravity_multipier =(wall_run_gravity_multiplier + run_direction_gravity_multiplier)  
+				velocity.y -= wallrun_assist * clamp(1.0 - abs(velocity.y) / max_help_speed, 0.0, 1.0) * delta
+				#print(wallrun_assist * clamp(1.0 - abs(velocity.y) / max_help_speed, 0.0, 1.0) * delta)
 			else:
 				wallrun_dive_gravity_multipier = wall_run_gravity_multiplier 
 			if Input.is_action_pressed("left") or velocity.y >= 0:
@@ -1302,7 +1315,9 @@ func _physics_process(delta):
 				velocity.x =  100
 			can_disable_wallrun = true
 		if Input.is_action_just_pressed("jump"):
-			velocity.x = move_toward(velocity.x + (JUMP_VELOCITY*2) + (angle * angler_dir * 40), skating_SPEED  * direction, accel)
+			jumping_off = true
+			velocity.x = -1000
+			#print(velocity.x)
 			can_disable_wallrun = false
 			wallrun_switchL = true
 			jump_ball = true
@@ -1323,8 +1338,8 @@ func _physics_process(delta):
 				possiblewallrun_timer.stop()
 			can_disable_wallrun = false
 			if Input.is_action_pressed("left"):
-				wallrun_dive_gravity_multipier =(wall_run_gravity_multiplier + run_direction_gravity_multiplier)
-				velocity.y -= 11 / abs(velocity.y)
+				wallrun_dive_gravity_multipier =(wall_run_gravity_multiplier + run_direction_gravity_multiplier) 
+				velocity.y -= wallrun_assist * clamp(1.0 - abs(velocity.y) / max_help_speed, 0.0, 1.0) * delta
 			else:
 				wallrun_dive_gravity_multipier = wall_run_gravity_multiplier 
 			if Input.is_action_pressed("right") or velocity.y >= 0:
@@ -1337,7 +1352,8 @@ func _physics_process(delta):
 				velocity.x = -100
 			can_disable_wallrun = true
 		if Input.is_action_just_pressed("jump"):
-			velocity.x = move_toward(velocity.x - (JUMP_VELOCITY*2) + (angle * angler_dir * 40), skating_SPEED  * direction, accel)
+			jumping_off = true
+			velocity.x = 1000
 			wallrun_switchR = true
 			can_disable_wallrun = false
 			jump_ball = true
@@ -1372,12 +1388,13 @@ func _physics_process(delta):
 			can_disable_waldive = true
 			velocity.x = -100
 		if Input.is_action_just_pressed("jump"):
-				velocity.x = (JUMP_VELOCITY*-2)
-				walldive_switchL = true
-				can_disable_waldive = false
-				jump_ball = true
-				can_walldive_right = false
-				$Camera2D.offset.y = 0
+			jumping_off = true
+			velocity.x = (JUMP_VELOCITY*-2)
+			walldive_switchL = true
+			can_disable_waldive = false
+			jump_ball = true
+			can_walldive_right = false
+			$Camera2D.offset.y = 0
 
 	if can_walldive_left == true:
 		rotation_degrees = -90
@@ -1404,12 +1421,13 @@ func _physics_process(delta):
 			can_disable_waldive = true
 			velocity.x = 100
 		if Input.is_action_just_pressed("jump"):
-				velocity.x = (JUMP_VELOCITY*2)
-				walldive_switchR = true
-				can_disable_waldive = false
-				jump_ball = true
-				can_walldive_left = false
-				$Camera2D.offset.y = 0
+			jumping_off = true
+			velocity.x = (JUMP_VELOCITY*2)
+			walldive_switchR = true
+			can_disable_waldive = false
+			jump_ball = true
+			can_walldive_left = false
+			$Camera2D.offset.y = 0
 
 	
 	if dash_recharge == true:
@@ -1498,25 +1516,25 @@ func _handle_rotation():
 			rotation_degrees = (angle * (180 / 3.141592)) * angler_dir   
 			if Input.is_action_just_pressed("jump"):
 				rotation_degrees = 0
-				print("ball jumpin")
+				#print("ball jumpin")
 		else:
 			if do_dodgeslide == true:
 				if angler_dir != 0:
 					if abs(velocity.x)/velocity.x != angler_dir:
 						rotation_degrees = (90 +(angle * (180 / 3.141592)))* angler_dir
-						print("upwards")
+						#print("upwards")
 					else:
 						rotation_degrees = (90 -(angle * (180 / 3.141592)))* angler_dir*-1
-						print("downwards")
+						#print("downwards")
 				else:
 					rotation_degrees = -90 * dashDirection
-					print("no angle")
+					#print("no angle")
 			else:
 				rotation_degrees = 0
 	else:
 		if do_dodgeslide == false:
 			rotation_degrees = move_toward(rotation_degrees, 0 , 2)
-			if dodash == true:
+			if dodash == true or direction_change == true:
 				rotation_degrees = 0
 
 func _handle_accel():
@@ -1628,16 +1646,49 @@ func set_animation():
 			animation_to_play = "idle_skates"
 
 func _handle_squash_and_strech(delta):
-	if fallingmomentum_timer.is_stopped():
-		animated_sprite_2d.scale.y = move_toward(animated_sprite_2d.scale.y, base_scale.y, delta * (return_to_form_accel ))
-		animated_sprite_2d.position.y = move_toward(animated_sprite_2d.position.y, base_position.y, delta * (return_to_form_accel * 5))
-
-		
-		#print(animated_sprite_2d.scale.y)
-	else:
+	if not fallingmomentum_timer.is_stopped() and jumping == false:
+		#if animated_sprite_2d.position.y = (base_position.y * 20):
 		animated_sprite_2d.scale.y -= (store_y/120000) 
 		animated_sprite_2d.position.y += store_y/80000 + (base_scale.y - animated_sprite_2d.scale.y) * 2
-		#print("yes")
+		#print(store_y)
+		#return
+	elif Input.is_action_just_pressed("dash") and wall_cling == false:
+		if dodash == true:
+			animated_sprite_2d.scale.y -= (dash_squash) 
+			animated_sprite_2d.position.y += dash_squash + (base_scale.y - animated_sprite_2d.scale.y) * 2
+		if do_dodgeslide == true:
+			animated_sprite_2d.scale.x -= (dash_squash) 
+			animated_sprite_2d.position.x += dash_squash + (base_scale.x - animated_sprite_2d.scale.x) * 2
+		#print("dash squash")
+		
+	
+		
+	
+	elif jumping == true and  animated_sprite_2d.position.y > (base_position.y * 1.5):
+		animated_sprite_2d.scale.y += (jump_strech) 
+		animated_sprite_2d.position.y -= jump_strech + (base_scale.y - animated_sprite_2d.scale.y) * 3
+		jumping = false
+	elif jumping_off == true:
+		#if Input.is_action_just_pressed("jump") :
+		animated_sprite_2d.scale.x += (jump_strech) 
+		animated_sprite_2d.position.x -= jump_strech + (base_scale.y - animated_sprite_2d.scale.x) * 2 * dir
+		jumping_off = false
+		print("yeah")
+	else:
+		animated_sprite_2d.scale.y = move_toward(animated_sprite_2d.scale.y, base_scale.y, delta * (return_to_form_accel ))
+		animated_sprite_2d.position.y = move_toward(animated_sprite_2d.position.y, base_position.y, delta * (return_to_form_accel * 5))
+		animated_sprite_2d.scale.x = move_toward(animated_sprite_2d.scale.x, base_scale.x, delta * (return_to_form_accel ))
+		animated_sprite_2d.position.x = move_toward(animated_sprite_2d.position.x, base_position.x, delta * (return_to_form_accel * 5))
+	if not wallrunning_wallchecker.is_colliding() or in_water == true:
+		if animated_sprite_2d.scale.x > (base_scale.x /1.2):
+			animated_sprite_2d.scale.x -=   abs(velocity.y / 1000) * delta
+			if abs(velocity.y) > abs(velocity.x):
+				animated_sprite_2d.scale.y +=   abs(velocity.y / 1000) * delta  
+		if animated_sprite_2d.scale.y > (base_scale.y /1.2):
+			animated_sprite_2d.scale.y -=  abs(velocity.x / 1000)  * delta
+			if abs(velocity.y) < abs(velocity.x):
+				animated_sprite_2d.scale.x +=   abs(velocity.x / 950) * delta 
+		#print("YES")
 		
 
 func get_player_cell() -> Vector2i:
@@ -1764,6 +1815,7 @@ func create_dust_cloud(delta):
 		cloud_velocity_size_multiplier = (store_y / 2000)
 	elif eat_my_dust == true:
 		cloud_velocity_size_multiplier = (velocity.x / 1000)
+		
 	else:
 		cloud_velocity_size_multiplier = (velocity.x / 2000)
 	if dust_clouds_buffer_timer >= 0:
@@ -1987,6 +2039,7 @@ func _on_wallcling_cooldown_timeout():
 
 func _on_fallingmomentum_timer_timeout():
 	can_downroll = false
+	store_y = 0
 
 
 func _on_possiblewallrun_timer_timeout():
