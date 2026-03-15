@@ -11,7 +11,6 @@ var was_teleporting := false
 var base_position
 @export var teleport_trail: PackedScene
 
-
 func _ready() -> void:
 	visible = false
 func open(p: CharacterBody2D, current_checkpoint_id: String ):
@@ -105,6 +104,19 @@ func create_trail( int_position, end_position):
 	trail.int_position = int_position
 	trail.end_position = end_position
 	get_tree().current_scene.add_child(trail)
+	
+var start_pos = Vector2.ZERO
+func _input(event):
+	if event is InputEventScreenTouch and player.teleporting == true:
+		if event.pressed:
+			start_pos = event.position
+								
+	if event is InputEventScreenDrag and player.teleporting == true and $scroll_buffer_timer.is_stopped():
+		var drag_vector = event.position - start_pos
+		current_index = clamp(current_index + 1 * (drag_vector.x/abs(drag_vector.x)), 0, slots.size() - 1)
+		update_selection()
+		$scroll_buffer_timer.start()
+		print("Dragging at: ", event.position)
 
 
 func _on_teletransport_trail_buffer_timer_timeout() -> void:

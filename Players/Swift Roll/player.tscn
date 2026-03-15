@@ -255,6 +255,9 @@ ground_brake_accel = 60.0
 air_brake_accel = 10.0
 air_brake_over_time_multiplier = 1.8
 smoothed_angle = 0.2
+normal_jump_mutiplier = 1.0
+no_skates_bounce_jump_mutiplier = 1.55
+skates_bounce_jump_mutiplier = 1.2
 jump_multiplier = 1.2
 counter_velocity_influence_adjust = 3.0
 counter_angle_influence_adjust = 1.8
@@ -266,10 +269,11 @@ Up_past_mach_accel = 7.5
 normal_ground_accel = 6.0
 Air_normal_accel = 4.0
 up_accel = 6.7
+wall_cling_drag = 500.0
 inwall_gravity_limit = 1.0
 wall_run_gravity_multiplier = 25.0
 run_direction_gravity_multiplier = 10.0
-wallrun_assist = 600.0
+wallrun_assist = 525.0
 max_help_speed = -300.0
 wall_dive_gravity_multiplier = 1.0
 dive_direction_gravity_multiplier = 0.5
@@ -472,6 +476,7 @@ wait_time = 0.5
 one_shot = true
 
 [node name="wallrunning_wallchecker" type="RayCast2D" parent="."]
+exclude_parent = false
 target_position = Vector2(0, 21.764708)
 collision_mask = 2
 
@@ -490,7 +495,7 @@ collision_mask = 2
 
 [node name="wallkicklockR3" type="RayCast2D" parent="wallkick_lockR"]
 scale = Vector2(1.7, 1.7)
-target_position = Vector2(15, 10)
+target_position = Vector2(11, 9)
 collision_mask = 2
 
 [node name="wallkick_lockL" type="Node2D" parent="."]
@@ -508,7 +513,7 @@ collision_mask = 2
 
 [node name="wallkicklockL3" type="RayCast2D" parent="wallkick_lockL"]
 scale = Vector2(1.7, 1.7)
-target_position = Vector2(-15, 10)
+target_position = Vector2(-11, 9)
 collision_mask = 2
 
 [node name="dust_cloud_setter" type="Node2D" parent="."]

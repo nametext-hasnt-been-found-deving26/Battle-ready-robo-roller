@@ -25,7 +25,7 @@ func _on_knockback_timer_timeout():
 
 func _on_area_2d_body_entered(body):
 	if body.is_in_group("player"):
-		if body.imnContact == false or can_die == false:
+		if body.imnContact == false or can_die == false and body.jump_ball == true:
 			body.currentHP = body.currentHP - 1
 			body.recovery_frames = true
 			body.knockedback = true

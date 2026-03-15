@@ -1,4 +1,4 @@
-extends Control
+extends Button
 
 @onready var texture_rect = $TextureRect
 

@@ -37,6 +37,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+follow_focus = true
+horizontal_scroll_mode = 2
 vertical_scroll_mode = 0
 
 [node name="SlotsContainer" type="HBoxContainer" parent="CenterContainer/Panel/ScrollContainer"]
@@ -48,5 +50,9 @@ theme_override_constants/separation = 8
 
 [node name="teletransport_trail_buffer_Timer" type="Timer" parent="."]
 wait_time = 0.1
+
+[node name="scroll_buffer_timer" type="Timer" parent="."]
+wait_time = 0.25
+one_shot = true
 
 [connection signal="timeout" from="teletransport_trail_buffer_Timer" to="." method="_on_teletransport_trail_buffer_timer_timeout"]
