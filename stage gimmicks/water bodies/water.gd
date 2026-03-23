@@ -10,7 +10,7 @@ func _physics_process(delta):
 		player = get_tree().get_first_node_in_group("player")
 		return
 	
-	if not player.can_water_run:
+	if not player.can_water_run and not player.in_water :
 		$StaticBody2D/CollisionShape2D.disabled = true
 	else:
 		$StaticBody2D/CollisionShape2D.disabled = false

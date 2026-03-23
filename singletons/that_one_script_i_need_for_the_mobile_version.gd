@@ -15,10 +15,13 @@ func _process(delta: float) -> void:
 		
 	if not player:
 		return
+	mobile_input = get_tree().current_scene.get_node("touch/touch controls")
+	if not mobile_input:
+		return
 	await get_tree().process_frame
 
 	
-	mobile_input = get_tree().current_scene.get_node("touch/touch controls")
+	
 	if mobile_input.switch_mode.visible:
 		player.skates_on_off_button.visible = true
 	else:

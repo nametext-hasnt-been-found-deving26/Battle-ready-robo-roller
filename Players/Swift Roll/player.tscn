@@ -1,6 +1,6 @@
 [gd_scene load_steps=44 format=3 uid="uid://7qsog2ljagsn"]
 
-[ext_resource type="Script" uid="uid://d1sdisl8l3l5q" path="res://Players/Swift Roll/player.gd" id="1_ejbkl"]
+[ext_resource type="Script" uid="uid://bwne4bcnao3mo" path="res://Players/Swift Roll/player(statemachinetest).gd" id="1_w3hjy"]
 [ext_resource type="PackedScene" uid="uid://bccoccqeyvrg3" path="res://Players/Swift Roll/afterimages SR/afterimages.tscn" id="2_42shm"]
 [ext_resource type="SpriteFrames" uid="uid://cqc54b0dbeeem" path="res://Players/Swift Roll/Swift_Roll.tres" id="3_op7ga"]
 [ext_resource type="PackedScene" uid="uid://dd5bflc6ja565" path="res://Players/Shared stuff/dust_cloud.tscn" id="3_pbfsw"]
@@ -21,12 +21,12 @@
 [ext_resource type="Script" uid="uid://bvun0nhvs38g2" path="res://Players/Swift Roll/wallkick_lock_r.gd" id="18_pylmc"]
 [ext_resource type="Script" uid="uid://drqtsc3mbdm7q" path="res://Players/Swift Roll/wallkick_lock_l.gd" id="19_pbfsw"]
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7l80f"]
+radius = 7.06
+height = 36.47
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_4plqc"]
 radius = 23.0
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7l80f"]
-radius = 7.64706
-height = 36.47059
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_l30vj"]
 atlas = ExtResource("6_85s51")
@@ -250,7 +250,7 @@ floor_block_on_wall = false
 floor_max_angle = 1.55334
 platform_floor_layers = 4294967041
 platform_wall_layers = 1
-script = ExtResource("1_ejbkl")
+script = ExtResource("1_w3hjy")
 ground_brake_accel = 60.0
 air_brake_accel = 10.0
 air_brake_over_time_multiplier = 1.8
@@ -258,9 +258,9 @@ smoothed_angle = 0.2
 normal_jump_mutiplier = 1.0
 no_skates_bounce_jump_mutiplier = 1.55
 skates_bounce_jump_mutiplier = 1.2
-jump_multiplier = 1.2
 counter_velocity_influence_adjust = 3.0
-counter_angle_influence_adjust = 1.8
+counter_angle_influence_adjust = 20.0
+jump_degrade_limit = -50.0
 inward_velocity_influence_adjust = 2.0
 inward_angle_influence_adjust = 1.5
 running_accel = 50.0
@@ -282,53 +282,166 @@ run_buffer_duration = 0.1
 afterimages = ExtResource("2_42shm")
 dust_clouds_buffer_time_duration = 0.008
 dust_clouds = ExtResource("3_pbfsw")
-return_to_form_accel = 3.0
-water_pull = 5.0
+base_position = Vector2(0, 18.235)
+return_to_form_accel = 1.5
+water_pull = 300.0
 
-[node name="jump_ball" type="Area2D" parent="."]
-visible = false
-position = Vector2(1, 0)
-metadata/_edit_group_ = true
+[node name="state_machines" type="Node" parent="."]
 
-[node name="jump_ball_collision" type="CollisionShape2D" parent="jump_ball"]
-shape = SubResource("CircleShape2D_4plqc")
-debug_color = Color(1, 1, 1, 0.419608)
+[node name="states" type="Node" parent="state_machines"]
+
+[node name="selected_weapon" type="Node" parent="state_machines"]
+
+[node name="Timers" type="Node" parent="."]
+
+[node name="dash_timers" type="Node" parent="Timers"]
+
+[node name="DashDurationTimer" type="Timer" parent="Timers/dash_timers"]
+wait_time = 0.3
+one_shot = true
+
+[node name="dodgeslide_timers" type="Node" parent="Timers/dash_timers"]
+
+[node name="dodgeslideTimer" type="Timer" parent="Timers/dash_timers/dodgeslide_timers"]
+wait_time = 0.6
+one_shot = true
+
+[node name="dodgeslidecooldownTimer" type="Timer" parent="Timers/dash_timers/dodgeslide_timers"]
+wait_time = 0.5
+one_shot = true
+
+[node name="jump_timers" type="Node" parent="Timers"]
+
+[node name="cayoteTimer" type="Timer" parent="Timers/jump_timers"]
+wait_time = 0.2
+one_shot = true
+
+[node name="jumpbufferTimer" type="Timer" parent="Timers/jump_timers"]
+wait_time = 0.3
+one_shot = true
+
+[node name="wall_kick_timers" type="Node" parent="Timers/jump_timers"]
+
+[node name="wallkickTimer" type="Timer" parent="Timers/jump_timers/wall_kick_timers"]
+wait_time = 0.16
+one_shot = true
+
+[node name="wallkicklockTimer" type="Timer" parent="Timers/jump_timers/wall_kick_timers"]
+wait_time = 0.13
+
+[node name="slidejumpTimer" type="Timer" parent="Timers/jump_timers"]
+wait_time = 0.15
+one_shot = true
+
+[node name="wall_cling or shot_timers" type="Node" parent="Timers"]
+
+[node name="wallshotTimer" type="Timer" parent="Timers/wall_cling or shot_timers"]
+wait_time = 0.5
+one_shot = true
+
+[node name="wallclingCooldown" type="Timer" parent="Timers/wall_cling or shot_timers"]
+wait_time = 0.001
+one_shot = true
+
+[node name="on_wall_timers" type="Node" parent="Timers"]
+
+[node name="wall_run_timers" type="Node" parent="Timers/on_wall_timers"]
+
+[node name="possiblewallrunTimer" type="Timer" parent="Timers/on_wall_timers/wall_run_timers"]
+wait_time = 0.15
+one_shot = true
+
+[node name="wall_dive_timers" type="Node" parent="Timers/on_wall_timers"]
+
+[node name="possibewalldiveTimer" type="Timer" parent="Timers/on_wall_timers/wall_dive_timers"]
+wait_time = 0.5
+one_shot = true
+
+[node name="direction_change" type="Node" parent="Timers/on_wall_timers"]
+
+[node name="direction_change_timer" type="Timer" parent="Timers/on_wall_timers/direction_change"]
+wait_time = 0.1
+one_shot = true
+
+[node name="buster_timers" type="Node" parent="Timers"]
+
+[node name="ChargeShotTimer" type="Timer" parent="Timers/buster_timers"]
+
+[node name="invunerability_timers" type="Node" parent="Timers"]
+
+[node name="on_hit" type="Node" parent="Timers/invunerability_timers"]
+
+[node name="KnockbackTimer" type="Timer" parent="Timers/invunerability_timers/on_hit"]
+wait_time = 0.1
+
+[node name="InvincebilityframesTimer" type="Timer" parent="Timers/invunerability_timers/on_hit"]
+one_shot = true
+
+[node name="fallingmomentumTimer" type="Timer" parent="Timers"]
+wait_time = 0.1
+one_shot = true
+
+[node name="pass_through_rails" type="Timer" parent="Timers"]
+wait_time = 0.3
+
+[node name="walldive_start_downroll_buffer_Timer" type="Timer" parent="Timers"]
+wait_time = 0.1
+one_shot = true
+
+[node name="sfx" type="Node" parent="."]
+
+[node name="jump_soundfx" type="AudioStreamPlayer" parent="sfx"]
+stream = ExtResource("5_80ayv")
+
+[node name="jump_grunt1sfx" type="AudioStreamPlayer" parent="sfx"]
+stream = ExtResource("6_2o4qy")
+volume_db = 5.0
+
+[node name="braking" type="AudioStreamPlayer" parent="sfx"]
+stream = ExtResource("9_p6lsp")
+
+[node name="enemybouncesfx" type="AudioStreamPlayer" parent="sfx"]
+stream = ExtResource("8_fi3wb")
+volume_db = 15.407
+
+[node name="rail_grind" type="AudioStreamPlayer" parent="sfx"]
+stream = ExtResource("11_lo3bv")
+
+[node name="rail_contact" type="AudioStreamPlayer" parent="sfx"]
+stream = ExtResource("12_tntrf")
+
+[node name="wall_kick" type="AudioStreamPlayer" parent="sfx"]
+stream = ExtResource("17_en47m")
+volume_db = 12.0
+pitch_scale = 0.8
+
+[node name="dashin" type="AudioStreamPlayer" parent="sfx"]
+stream = ExtResource("18_hkrpb")
+volume_db = 12.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 z_as_relative = false
 texture_repeat = 1
-position = Vector2(-1.26218e-29, -5.88235)
+position = Vector2(0, 18.235292)
 scale = Vector2(0.6, 0.578)
 sprite_frames = ExtResource("3_op7ga")
-animation = &"Running"
+animation = &"idle"
 autoplay = "idle"
+offset = Vector2(0, -42)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -1.1920929e-07)
 shape = SubResource("CapsuleShape2D_7l80f")
 
-[node name="DashDurationTimer" type="Timer" parent="."]
-wait_time = 0.3
-one_shot = true
+[node name="jump_ball" type="Area2D" parent="."]
+visible = false
+position = Vector2(1.0000001, 0)
+scale = Vector2(1.0000001, 1.0000001)
+metadata/_edit_group_ = true
 
-[node name="DashEffectTimer" type="Timer" parent="."]
-wait_time = 0.001
-
-[node name="wallshotTimer" type="Timer" parent="."]
-wait_time = 0.5
-one_shot = true
-
-[node name="wallclingCooldown" type="Timer" parent="."]
-wait_time = 0.001
-one_shot = true
-
-[node name="fallingmomentumTimer" type="Timer" parent="."]
-wait_time = 0.1
-one_shot = true
-
-[node name="possiblewallrunTimer" type="Timer" parent="."]
-wait_time = 0.15
-one_shot = true
+[node name="jump_ball_collision" type="CollisionShape2D" parent="jump_ball"]
+shape = SubResource("CircleShape2D_4plqc")
+debug_color = Color(1, 1, 1, 0.419608)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(5.96046e-08, 1.19209e-07)
@@ -360,24 +473,6 @@ scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_fpfa8")
 animation = &"damaged 1"
 
-[node name="jump_soundfx" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("5_80ayv")
-
-[node name="jump_grunt1sfx" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("6_2o4qy")
-volume_db = 5.0
-
-[node name="cayoteTimer" type="Timer" parent="."]
-wait_time = 0.2
-one_shot = true
-
-[node name="jumpbufferTimer" type="Timer" parent="."]
-wait_time = 0.3
-one_shot = true
-
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("9_p6lsp")
-
 [node name="detector" type="Area2D" parent="."]
 visible = false
 collision_mask = 2
@@ -386,20 +481,7 @@ collision_mask = 2
 position = Vector2(1.5, 0.5)
 shape = SubResource("RectangleShape2D_wbryl")
 
-[node name="enemybouncesfx" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("8_fi3wb")
-volume_db = 15.407
-
-[node name="rail_grind" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("11_lo3bv")
-
-[node name="rail_contact" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("12_tntrf")
-
-[node name="pass_through_rails" type="Timer" parent="."]
-wait_time = 0.3
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="star_dash_glow" type="Sprite2D" parent="."]
 visible = false
 modulate = Color(1, 1, 1, 0.529412)
 z_index = -4
@@ -411,43 +493,7 @@ scale = Vector2(0.9, 0.8)
 sprite_frames = SubResource("SpriteFrames_j5k8u")
 frame_progress = 0.167624
 
-[node name="wallkickTimer" type="Timer" parent="."]
-wait_time = 0.16
-one_shot = true
-
-[node name="wallkicklockTimer" type="Timer" parent="."]
-wait_time = 0.13
-
-[node name="wall_kick" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("17_en47m")
-volume_db = 12.0
-pitch_scale = 0.8
-
-[node name="dodgeslideTimer" type="Timer" parent="."]
-wait_time = 0.6
-one_shot = true
-
-[node name="dodgeslidecooldownTimer" type="Timer" parent="."]
-wait_time = 0.5
-one_shot = true
-
-[node name="slidejumpTimer" type="Timer" parent="."]
-wait_time = 0.15
-one_shot = true
-
-[node name="dashin" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("18_hkrpb")
-volume_db = 14.0
-
 [node name="Muzzle" type="Marker2D" parent="."]
-
-[node name="ChargeShotTimer" type="Timer" parent="."]
-
-[node name="KnockbackTimer" type="Timer" parent="."]
-wait_time = 0.1
-
-[node name="InvincebilityframesTimer" type="Timer" parent="."]
-one_shot = true
 
 [node name="Neck" type="Node2D" parent="."]
 position = Vector2(2.019484e-28, -2.9411764)
@@ -467,35 +513,22 @@ stretch_limit = 1.5
 extension_multiplier = 1.5
 velocity_influence = 0.001
 
-[node name="direction_change_timer" type="Timer" parent="."]
-wait_time = 0.1
-one_shot = true
-
-[node name="possibewalldiveTimer" type="Timer" parent="."]
-wait_time = 0.5
-one_shot = true
-
-[node name="wallrunning_wallchecker" type="RayCast2D" parent="."]
-exclude_parent = false
-target_position = Vector2(0, 21.764708)
-collision_mask = 2
-
 [node name="wallkick_lockR" type="Node2D" parent="."]
 script = ExtResource("18_pylmc")
 
 [node name="wallkicklockR1" type="RayCast2D" parent="wallkick_lockR"]
 scale = Vector2(1.7, 1.7)
-target_position = Vector2(15, 0)
+target_position = Vector2(10, 0)
 collision_mask = 2
 
 [node name="wallkicklockR2" type="RayCast2D" parent="wallkick_lockR"]
 scale = Vector2(1.7, 1.7)
-target_position = Vector2(15, -10)
+target_position = Vector2(10, -10)
 collision_mask = 2
 
 [node name="wallkicklockR3" type="RayCast2D" parent="wallkick_lockR"]
 scale = Vector2(1.7, 1.7)
-target_position = Vector2(11, 9)
+target_position = Vector2(7, 9)
 collision_mask = 2
 
 [node name="wallkick_lockL" type="Node2D" parent="."]
@@ -503,12 +536,12 @@ script = ExtResource("19_pbfsw")
 
 [node name="wallkicklockL1" type="RayCast2D" parent="wallkick_lockL"]
 scale = Vector2(1.7, 1.7)
-target_position = Vector2(-15, -10)
+target_position = Vector2(-10, -10)
 collision_mask = 2
 
 [node name="wallkicklockL2" type="RayCast2D" parent="wallkick_lockL"]
 scale = Vector2(1.7, 1.7)
-target_position = Vector2(-15, 0)
+target_position = Vector2(-10, 0)
 collision_mask = 2
 
 [node name="wallkicklockL3" type="RayCast2D" parent="wallkick_lockL"]
@@ -519,24 +552,45 @@ collision_mask = 2
 [node name="dust_cloud_setter" type="Node2D" parent="."]
 position = Vector2(0, 18)
 
+[node name="wallrunning_wallchecker" type="RayCast2D" parent="."]
+scale = Vector2(1.0000001, 1.0000001)
+exclude_parent = false
+target_position = Vector2(0, 21.764708)
+collision_mask = 2
+
+[node name="Ledge_titer_handler" type="Node2D" parent="."]
+position = Vector2(7.0588236, 0)
+scale = Vector2(1.0000001, 1.0000001)
+
+[node name="ledge_titer_L" type="RayCast2D" parent="Ledge_titer_handler"]
+position = Vector2(-14.117647, 0)
+scale = Vector2(1.0000001, 1.0000001)
+target_position = Vector2(0, 24.117647)
+collision_mask = 2
+
+[node name="ledge_titer_R" type="RayCast2D" parent="Ledge_titer_handler"]
+scale = Vector2(0.9999999, 0.9999999)
+target_position = Vector2(0, 24.117647)
+collision_mask = 2
+
+[connection signal="timeout" from="Timers/dash_timers/DashDurationTimer" to="." method="_on_dash_duration_timer_timeout"]
+[connection signal="timeout" from="Timers/dash_timers/dodgeslide_timers/dodgeslideTimer" to="." method="_on_dodgeslide_timer_timeout"]
+[connection signal="timeout" from="Timers/dash_timers/dodgeslide_timers/dodgeslidecooldownTimer" to="." method="_on_dodgeslidecooldown_timer_timeout"]
+[connection signal="timeout" from="Timers/jump_timers/cayoteTimer" to="." method="_on_cayote_timer_timeout"]
+[connection signal="timeout" from="Timers/jump_timers/jumpbufferTimer" to="." method="_on_jumpbuffer_timer_timeout"]
+[connection signal="timeout" from="Timers/jump_timers/wall_kick_timers/wallkickTimer" to="." method="_on_wallkick_timer_timeout"]
+[connection signal="timeout" from="Timers/jump_timers/wall_kick_timers/wallkicklockTimer" to="." method="_on_wallkicklock_timer_timeout"]
+[connection signal="timeout" from="Timers/jump_timers/slidejumpTimer" to="." method="_on_slidejump_timer_timeout"]
+[connection signal="timeout" from="Timers/wall_cling or shot_timers/wallshotTimer" to="." method="_on_wallshot_timer_timeout"]
+[connection signal="timeout" from="Timers/wall_cling or shot_timers/wallclingCooldown" to="." method="_on_wallcling_cooldown_timeout"]
+[connection signal="timeout" from="Timers/on_wall_timers/wall_run_timers/possiblewallrunTimer" to="." method="_on_possiblewallrun_timer_timeout"]
+[connection signal="timeout" from="Timers/on_wall_timers/wall_dive_timers/possibewalldiveTimer" to="." method="_on_possibewalldive_timer_timeout"]
+[connection signal="timeout" from="Timers/on_wall_timers/direction_change/direction_change_timer" to="." method="_on_direction_change_timer_timeout"]
+[connection signal="timeout" from="Timers/invunerability_timers/on_hit/KnockbackTimer" to="." method="_on_knockback_timer_timeout"]
+[connection signal="timeout" from="Timers/invunerability_timers/on_hit/InvincebilityframesTimer" to="." method="_on_invincebilityframes_timer_timeout"]
+[connection signal="timeout" from="Timers/fallingmomentumTimer" to="." method="_on_fallingmomentum_timer_timeout"]
+[connection signal="timeout" from="Timers/pass_through_rails" to="." method="_on_pass_through_rails_timeout"]
+[connection signal="timeout" from="Timers/walldive_start_downroll_buffer_Timer" to="." method="_on_walldive_start_downroll_buffer_timer_timeout"]
 [connection signal="body_entered" from="jump_ball" to="." method="_on_jump_ball_body_entered"]
-[connection signal="timeout" from="DashDurationTimer" to="." method="_on_dash_duration_timer_timeout"]
-[connection signal="timeout" from="DashEffectTimer" to="." method="_on_dash_effect_timer_timeout"]
-[connection signal="timeout" from="wallshotTimer" to="." method="_on_wallshot_timer_timeout"]
-[connection signal="timeout" from="wallclingCooldown" to="." method="_on_wallcling_cooldown_timeout"]
-[connection signal="timeout" from="fallingmomentumTimer" to="." method="_on_fallingmomentum_timer_timeout"]
-[connection signal="timeout" from="possiblewallrunTimer" to="." method="_on_possiblewallrun_timer_timeout"]
-[connection signal="timeout" from="cayoteTimer" to="." method="_on_cayote_timer_timeout"]
-[connection signal="timeout" from="jumpbufferTimer" to="." method="_on_jumpbuffer_timer_timeout"]
 [connection signal="area_entered" from="detector" to="." method="_on_detector_area_entered"]
 [connection signal="area_exited" from="detector" to="." method="_on_detector_area_exited"]
-[connection signal="timeout" from="pass_through_rails" to="." method="_on_pass_through_rails_timeout"]
-[connection signal="timeout" from="wallkickTimer" to="." method="_on_wallkick_timer_timeout"]
-[connection signal="timeout" from="wallkicklockTimer" to="." method="_on_wallkicklock_timer_timeout"]
-[connection signal="timeout" from="dodgeslideTimer" to="." method="_on_dodgeslide_timer_timeout"]
-[connection signal="timeout" from="dodgeslidecooldownTimer" to="." method="_on_dodgeslidecooldown_timer_timeout"]
-[connection signal="timeout" from="slidejumpTimer" to="." method="_on_slidejump_timer_timeout"]
-[connection signal="timeout" from="KnockbackTimer" to="." method="_on_knockback_timer_timeout"]
-[connection signal="timeout" from="InvincebilityframesTimer" to="." method="_on_invincebilityframes_timer_timeout"]
-[connection signal="timeout" from="direction_change_timer" to="." method="_on_direction_change_timer_timeout"]
-[connection signal="timeout" from="possibewalldiveTimer" to="." method="_on_possibewalldive_timer_timeout"]

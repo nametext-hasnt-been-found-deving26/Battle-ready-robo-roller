@@ -3,7 +3,6 @@ var player
 @export var no_uproll: bool
 @export var no_slope_launch: bool
 
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
@@ -19,9 +18,11 @@ func _on_body_entered(body):
 		body.angler_dir = 1
 		body.store_angler_dir = 1
 		player = body
+		player.can_walldive = false
 		player.no_slope_launch = no_slope_launch
 		player.can_uproll = no_uproll
 		player.floor_slope_disable = true
+		print("in slope")
 
 
 func _on_body_exited(body):

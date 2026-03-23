@@ -59,7 +59,7 @@ var skating_SPEED = 900.0
 
 @onready var jumpbuffer_timer: Timer = $Timers/jump_timers/jumpbufferTimer
 @onready var jump_soundfx: AudioStreamPlayer = $sfx/jump_soundfx
-@onready var jump_grunt_1_sfx: AudioStreamPlayer2D = $sfx/jump_grunt1sfx
+@onready var jump_grunt_1_sfx: AudioStreamPlayer = $sfx/jump_grunt1sfx
 @onready var slidejump_timer: Timer = $Timers/jump_timers/slidejumpTimer
 
 
@@ -99,7 +99,7 @@ var current_dash_mode := "drag"  # default
 var downdash_drag = 0
 var dashDirection : int
 var dodash = false
-@onready var dashin: AudioStreamPlayer2D = $sfx/dashin
+@onready var dashin: AudioStreamPlayer = $sfx/dashin
 
 
 @export_category("wall cling/ wall shot")
@@ -126,8 +126,12 @@ var floor_slope_disable = false
 var was_on_slope = false
 var rolling = 0
 @onready var fallingmomentum_timer = $Timers/fallingmomentumTimer
+@onready var walldive_start_downroll_buffer_timer: Timer = $Timers/walldive_start_downroll_buffer_Timer
+
 var can_downroll = true
 var downrolling = true
+var on_floor_slope = false
+var no_downroll = false
 var can_uproll = false
 var rollin = false
 var fixed_angle = 0
@@ -144,6 +148,7 @@ var jump_ball = false
 @export_category("wall run / dive settings")
 var wallrun_dive_gravity_multipier: float = skates_normal_gravity_multiplier
 @export var inwall_gravity_limit: float
+
 @export_group("wall run")
 @export var wall_run_gravity_multiplier: float
 @export var run_direction_gravity_multiplier: float
@@ -298,7 +303,7 @@ var star_dashing = false
 @onready var wallkick_lock_l: Node = $wallkick_lockL
 @onready var wallkick_timer: Timer = $Timers/jump_timers/wall_kick_timers/wallkickTimer
 @onready var wallkicklock_timer: Timer = $Timers/jump_timers/wall_kick_timers/wallkicklockTimer
-@onready var wall_kick: AudioStreamPlayer2D = $sfx/wall_kick
+@onready var wall_kick: AudioStreamPlayer = $sfx/wall_kick
 
 var could_wall_kick = false
 var can_wall_kickL = true
@@ -323,6 +328,9 @@ var dodgeslide_effect = false
 @export var fire_rate := 0.2 # seconds between shots
 var fire_timer := 0.0
 var chargelevel = 1
+
+@export_category("collision settings")
+@export var collision_normal_size = Vector2(7.06 , 36.47)
 
 @onready var muzzle: Marker2D = $Muzzle
 @onready var charge_shot_timer: Timer = $Timers/buster_timers/ChargeShotTimer
@@ -376,20 +384,66 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 func _physics_process(delta):
 	var direction = Input.get_axis("left", "right") 
+	match mode:
+		MovementMode.NORMAL:
+			apply_main_movement(delta, direction)
+
+		MovementMode.VINE:
+			apply_vine_pull(delta)
+
+		MovementMode.RAIL_GRINDING:
+			is_grinding()
+
+		MovementMode.WATER:
+			on_water(delta, direction)
+
+		MovementMode.TELEPORTING:
+			chosing_teleport_location(delta)
+		#scarf.anchor_offset = Vector2(15, -20
+	handle_camara_offset()
+	_handle_rotation()
+	_handle_squash_and_strech(delta)
+	animated_sprite_2d.play(animation_to_play)
+	if currentHP <= 0:
+		die()
+	health_bar()
+	set_animation()
+	if velocity.y > 0 and not is_on_floor():
+		if velocity.y > store_y and not floor_slope_disable:
+			store_y = velocity.y
+			#print(store_y)
+		if not walldive_start_downroll_buffer_timer.is_stopped():
+			#print("something")
+			can_downroll = false
+			downrolling = false
+			store_y = 0
+		else:
+			can_downroll = true
+			downrolling = true
+			can_walldive = false
+	elif velocity.y <= 0 and not is_on_floor():
+		store_y = 0
+	if can_walldive_right or can_walldive_left:
+		Player_collision.shape.radius = 18.24
+	elif fallingmomentum_timer.is_stopped():
+		Player_collision.shape.radius = collision_normal_size.x
+
+
+func apply_main_movement(delta, direction):
 	if get_tree().paused:
 		return
 	if can_teleport == true and Input.is_action_pressed("up") and Input.is_action_just_pressed("jump") and is_on_floor():
-		teleport_cancel_buffer_timer = teleport_cancel_buffer_duration
 		teleporting = true
 		jump_buffer = false
 	if teleporting == true and is_on_floor():
-		chosing_teleport_location(delta)
+		mode = MovementMode.TELEPORTING
 	if teleporting == false:
 		just_teleported = false
-	if floor_slope_disable == true and not possibewalldive_timer.is_stopped():
+	if floor_slope_disable == true and not possibewalldive_timer.is_stopped() or angle > 0.1 and not possibewalldive_timer.is_stopped() :
 		possibewalldive_timer.stop()
+		possibewalldive_timer.timeout.emit()
 	
-	animated_sprite_2d.play(animation_to_play)
+	
 	if grabbing and grabbed_vine:
 	# Let the player influence the swing
 		var input_vector = Vector2(
@@ -397,7 +451,7 @@ func _physics_process(delta):
 		0
 			)
 		grabbed_vine.apply_spin_input(input_vector, delta)
-		apply_vine_pull(delta)
+		mode = MovementMode.VINE
 	
 
 	if direction > 0 :
@@ -407,9 +461,7 @@ func _physics_process(delta):
 	if direction != 0  and grindin == false:
 		store_direction = direction 
 	if in_water == true:
-		on_water(delta, direction)
-		velocity.y -= water_accel /2.0
-		water_accel = water_accel + 0.05
+		mode = MovementMode.WATER
 	else:
 		water_accel = 0
 	var dashSpeedMultiplicator = 2.7
@@ -428,15 +480,34 @@ func _physics_process(delta):
 		if not is_on_floor() or grounded == true:
 			jump_bounce_multiplier = normal_jump_mutiplier
 
-
+	if angler_dir * velocity.x >= 0 and floor_slope_disable and store_y <= 0  and velocity.y >= 0:
+		floor_snap_length = 100
+		#print("something")
+	if angler_dir * velocity.x < 0 and floor_slope_disable :
+		floor_snap_length = 1
+		if not fallingmomentum_timer.is_stopped():
+			print("something else")
+	if store_y > 0 and velocity.y >= 0:
+		if angler_dir != 0 and floor_slope_disable or angle > 0.1:
+			if skates_on:
+				velocity.y += store_y * angle
+				if fallingmomentum_timer.is_stopped():
+					rotation_degrees = 0
+					print("something")
+			else:
+				velocity.y += (store_y * angle) /2
+			floor_snap_length = 250
+			#print(velocity.y)
 
 	if is_on_floor():
+		
 		did_vine_swinging = false
 		if Input.is_action_pressed("jump") == false:
 			can_jump = true
+		#if store_y > 0:
+			#velocity.y += store_y * angle
+			
 		if in_water == false and can_wallrun_left == false and can_wallrun_right == false:
-			if can_downroll == true:
-				velocity.y += store_y * angle
 			if skates_on == true and abs(velocity.x) > Base_Skates_SPEED and velocity.x * angler_dir > 0 and angle > 0.01 and can_downroll == false:
 				velocity.y = slope_launch_direction
 				#print("works")
@@ -485,13 +556,15 @@ func _physics_process(delta):
 			wallrun_switchL = false
 			wallrun_switchR = false
 		#walldiving stuff -----------------------------------------------------------------------------------
-		if velocity.y >= 0 and is_on_floor_only()  or not fallingmomentum_timer.is_stopped():
+		if velocity.y >= 0 and is_on_floor_only()  or can_downroll:
 			#print("yes")
 			can_walldive_left = false
 			can_walldive_right = false
 			can_disable_waldive = false
 			walldive_switchL = false
 			walldive_switchR = false
+			if not possibewalldive_timer.is_stopped():
+				possibewalldive_timer.stop()
 		
 		if abs(velocity.x) < 400:
 			braking = false
@@ -539,9 +612,11 @@ func _physics_process(delta):
 					#print("dodgeslide")
 				else:
 					floor_snap_length = 3
-			if skates_on == true:
+			if skates_on == true and angler_dir * velocity.x >= 0:
 				#if Input.is_action_pressed("down") == false:
 				floor_snap_length = 100
+			else:
+				floor_snap_length = 5
 				#if Input.is_action_pressed("down") == true and is_on_floor():
 					#floor_snap_length = 500 * 10
 					#print (floor_snap_length)
@@ -551,8 +626,7 @@ func _physics_process(delta):
 			floor_snap_length = 1
 	if no_skates_slope_jump == true :
 			floor_snap_length = 0
-	if not fallingmomentum_timer.is_stopped() and angler_dir != 0:
-		floor_snap_length = 100
+
 			#print(no_skates_slope_jump)
 	# for the main 4 directions
 	if Input.is_action_pressed("left"):
@@ -596,10 +670,7 @@ func _physics_process(delta):
 			imnContact = true
 			#capsule_shape.height = 16
 			#print("yes")
-		if velocity.y > 0:
-			store_y = velocity.y
-			can_downroll = true
-			downrolling = true
+
 	
 	if star_dashing == true:
 		jump_ball_collision.set_monitoring(true)
@@ -609,7 +680,7 @@ func _physics_process(delta):
 		store_velocity = velocity
 	# Handle jump.
 	if Input.is_action_just_released("jump") and velocity.y < 0 and did_vine_swinging == false:
-		if  not abs(rotation_degrees) == 90 and direction_change == false:
+		if  not abs(rotation_degrees) == 90 and direction_change == false and not can_wallrun_left and not can_wallrun_right:
 			velocity.y = JUMP_VELOCITY / 6
 			can_jump = true
 			#print(velocity.y)
@@ -633,6 +704,9 @@ func _physics_process(delta):
 				can_dash = 1
 			jumping = true
 	elif jump_buffer == true and skates_on == true and can_jump == true:
+		if not fallingmomentum_timer.is_stopped():
+			fallingmomentum_timer.stop()
+			fallingmomentum_timer.timeout.emit()
 		if is_on_floor() or can_cayote_jump == true:
 			dodash = false
 			can_walldive = false
@@ -641,7 +715,7 @@ func _physics_process(delta):
 			jump_ball = true
 			jump_ball_collision.set_monitoring(true)
 			jump_ball_collision.set_monitorable(true)
-			print(jump_bounce_multiplier)
+			#print(jump_bounce_multiplier)
 			imnContact = true
 			if was_on_slope == false or abs(rotation_degrees)  < 1:
 				velocity.y = JUMP_VELOCITY *  jump_bounce_multiplier
@@ -762,11 +836,12 @@ func _physics_process(delta):
 				animated_sprite_2d.flip_h = true
 			imnContact = true
 			if slope_launched == false:
-				if can_downroll == true and angler_dir != 0 and is_on_floor():
-					velocity.x +=  ((angle + (store_y/60)) * angler_dir * (180 / 3.141592)/6)
-					velocity.y += (gravity * delta) * (angle * (180 / 3.141592)) 
-					skating_SPEED = skating_SPEED + (angle * (180 / 3.141592))/2 if velocity.x >= Base_Skates_SPEED or velocity.x <= -Base_Skates_SPEED else Base_Skates_SPEED
-				elif can_downroll == false and angler_dir != 0 and is_on_floor():
+				if can_downroll == true  or can_walldive_left or can_walldive_right:
+					if angler_dir != 0 and is_on_floor():
+						velocity.x +=  ((angle + (store_y/60)) * angler_dir * (180 / 3.141592)/6)
+						velocity.y += (gravity * delta) * (angle * (180 / 3.141592)) 
+						skating_SPEED = skating_SPEED + (angle * (180 / 3.141592))/2 if velocity.x >= Base_Skates_SPEED or velocity.x <= -Base_Skates_SPEED else Base_Skates_SPEED
+				elif can_downroll == false and angler_dir != 0:
 					velocity.x = move_toward(velocity.x + (angle * angler_dir * 25) , (skating_SPEED - delta) * direction  , accel)
 					#velocity.y += (gravity * delta) * (angle * (180 / 3.141592))
 					skating_SPEED = skating_SPEED + (angle * (180 / 3.141592))/4 if velocity.x >= Base_Skates_SPEED or velocity.x <= -Base_Skates_SPEED else Base_Skates_SPEED
@@ -781,19 +856,32 @@ func _physics_process(delta):
 		skating_SPEED = skating_SPEED + (angle * (180 / 3.141592))/4 if abs(velocity.x) >= Base_Skates_SPEED and is_on_floor() else move_toward(skating_SPEED, Base_Skates_SPEED, accel)
 		if dodash == true:
 			create_dash_effect(delta)
-		if can_downroll == true and angler_dir != 0 and is_on_floor():
-			velocity.x += ((angle + (store_y/70)) * angler_dir * (180 / 3.141592)/8.0) / (accel /3.5)
-			velocity.y += (gravity * delta) * (angle * (180 / 3.141592)) 
-			skating_SPEED = skating_SPEED + (angle * (180 / 3.141592))/4 if velocity.x >= Base_Skates_SPEED or velocity.x <= -Base_Skates_SPEED else Base_Skates_SPEED
-			can_walldive_left = false
-			can_walldive_right = false
+		if can_downroll == true :
+			#if floor_slope_disable:
+				#can_walldive_left = false
+				#can_walldive_right = false
+			if angler_dir != 0 and is_on_floor() or not fallingmomentum_timer.is_stopped() or angle > 0.1: 
+				velocity.x += ((angle + (store_y/70)) * angler_dir * (180 / 3.141592)/8.0) 
+				#velocity.y += (gravity * delta) * (angle * (180 / 3.141592)) 
+				downrolling = false
+				if fallingmomentum_timer.is_stopped():
+					fallingmomentum_timer.start()
+					print("engage downroll ", velocity.x)
+				elif (angler_dir * velocity.x) <= (0)  and abs(velocity.x) > abs(velocity.y):
+					if angler_dir != 0:
+						velocity.x /= fixed_angle/25
+					print("downrolling ",velocity.x)
+					fallingmomentum_timer.stop()
+					fallingmomentum_timer.timeout.emit()
+					
+				
 		# exceeding mach after effects ---------------------------------------------------------------------------
 		if abs(velocity.x) > 2000 or can_wallrun_left == true and abs(velocity.y) > 2000 or can_wallrun_right == true and abs(velocity.y) > 2000 or can_walldive_left == true and abs(velocity.y) > 2000 or can_walldive_right == true and abs(velocity.y) > 2000:
 			advance_boost_mode = true
-			print("going too fast")
+			#print("going too fast")
 		if abs(velocity.x) < 2000  and is_on_floor() or can_wallrun_left == true and velocity.y > -2000 or can_wallrun_right == true and velocity.y > -2000 or can_walldive_left == true and abs(velocity.y) < 2000 or can_walldive_right == true and abs(velocity.y) < 2000:        
-			if advance_boost_mode == true:
-				print("exit boost mode")
+			#if advance_boost_mode == true:
+				#print("exit boost mode")
 			advance_boost_mode = false
 			
 			
@@ -1092,7 +1180,7 @@ func _physics_process(delta):
 				dashDirection = 1
 				wallshotTimer.start()
 				wallcling_cooldown.start()
-				print("Rup")
+				#print("Rup")
 			elif Input.is_action_pressed("jump") and Input.is_action_pressed("down") or Input.is_action_pressed("jump") and Input.is_action_pressed("down") and Input.is_action_pressed("right"):
 				wall_shotRDown = true
 				wall_cling = false
@@ -1246,19 +1334,26 @@ func _physics_process(delta):
 
 		
 
-	if downrolling == true and is_on_floor():
-		#print("true")
-		can_walldive_left = false
-		can_walldive_right = false
-		fallingmomentum_timer.start()
-		downrolling = false
+	if downrolling == true :
+		if is_on_floor()  :
+			#if floor_slope_disable == false :
+			if angle < 0.1:
+				fallingmomentum_timer.start()
+				print("start downroll",store_y)
+				downrolling = false
+			if not skates_on:
+				fallingmomentum_timer.start()
+				downrolling = false
+				print("yes")
+			
+			
 
 	if enemy_contact == true:
 		
 		Hitstopmanager.hit_stop_short()
 		camera_2d.trigger_shake()
 		enemybouncesfx.play()
-		if star_dashing:
+		if not jump_ball:
 			enemy_contact = false
 		if jump_ball == true:
 			if can_dash < 1:
@@ -1291,8 +1386,7 @@ func _physics_process(delta):
 		charge_shot_timer.stop()
 		#rotate(0)
 			
-	_handle_rotation()
-	_handle_squash_and_strech(delta)
+
 			
 	if grabbing:
 		# Skip movement while holding vine
@@ -1306,32 +1400,12 @@ func _physics_process(delta):
 		
 
 		
-	if velocity.x > 100 :
-		$Camera2D.offset.x = $Camera2D.offset.x + (1 + (velocity.x / 500)) if $Camera2D.offset.x <= 85 else 90
-		#print($Camera2D.offset.x)
-	if velocity.x < -100:
-		$Camera2D.offset.x = $Camera2D.offset.x - (1 - (velocity.x / 500))  if $Camera2D.offset.x >= -85 else -90
-		#print($Camera2D.offset.x)
-	if velocity.x > -100 and velocity.x <= 0  or velocity.x < 100 and velocity.x >= 0 :
-		if $Camera2D.offset.x >= 2:
-			$Camera2D.offset.x = $Camera2D.offset.x - 2  if $Camera2D.offset.x >= 2 else 2
-		elif $Camera2D.offset.x <= -2 :
-			$Camera2D.offset.x = $Camera2D.offset.x + 2  if $Camera2D.offset.x <= -2 else -2
-			
-	
-	if velocity.y > -850 and velocity.y < 1900 and can_wallrun_right == false and can_wallrun_right == false or is_on_floor_only() and can_wallrun_right == false and can_wallrun_right == false or grabbing == true:
-		if $Camera2D.offset.y >= 4:
-			$Camera2D.offset.y = $Camera2D.offset.y - 4 if $Camera2D.offset.y >= 4 else 4
-		if $Camera2D.offset.y <= -4 :
-			$Camera2D.offset.y = $Camera2D.offset.y + 4  if $Camera2D.offset.y <= -4 else -4
-	if velocity.y < -900   or can_wallrun_left == true and not is_on_floor() or can_wallrun_right == true  and not is_on_floor() :
-		#print("camara up")
-		$Camera2D.offset.y = $Camera2D.offset.y - (1 - (velocity.y / 500))  if $Camera2D.offset.y >= -245 else -250
-	if velocity.y > 2000 and not is_on_floor() and grabbing == false:
-		$Camera2D.offset.y = $Camera2D.offset.y + (1 + (velocity.y/ 250)) if $Camera2D.offset.y <= 295 else 300
-		#print("camara down")
+	if can_walldive and walldive_start_downroll_buffer_timer.is_stopped():
+		walldive_start_downroll_buffer_timer.start()
 
 	if can_walldive == true and not is_on_floor() and skates_on == true and can_engage_dive == true:
+		walldive_start_downroll_buffer_timer.start()
+		#can_downroll = false
 		jump_buffer = false
 		if angler_dir == 1:
 			print("engage walldive")
@@ -1493,6 +1567,7 @@ func _physics_process(delta):
 		#f angler_dir == -1:
 			#irection_change = true
 		if wallrunning_wallchecker.is_colliding():
+			
 			if is_on_wall():
 				velocity.x = 10
 			else:
@@ -1511,7 +1586,10 @@ func _physics_process(delta):
 				camera_2d.offset.y = 0
 		else:
 			can_disable_waldive = true
-			velocity.x = -100
+			if not is_on_floor():
+				velocity.x = -100
+			else:
+				velocity.x = move_toward(velocity.x, 0 , 1)
 		if Input.is_action_just_pressed("jump"):
 			jumping_off = true
 			velocity.x = (JUMP_VELOCITY*-2)
@@ -1544,7 +1622,10 @@ func _physics_process(delta):
 				camera_2d.offset.y = 0
 		else:
 			can_disable_waldive = true
-			velocity.x = 100
+			if not is_on_floor():
+				velocity.x = 100
+			else:
+				velocity.x = move_toward(velocity.x, 0 , 1)
 		if Input.is_action_just_pressed("jump"):
 			jumping_off = true
 			velocity.x = (JUMP_VELOCITY*2)
@@ -1592,10 +1673,7 @@ func _physics_process(delta):
 		grabbed_vine = vine_nearby
 		grabbed_vine.grab_handle(velocity)
 
-	if currentHP <= 0:
-		die()
-	health_bar()
-	set_animation()
+
 	
 	if angler_dir != 0:
 		set_launch_direction()
@@ -1604,11 +1682,11 @@ func _physics_process(delta):
 		invincibility_frames()
 
 	if was_on_floor and not is_on_floor() and velocity.y >= 0:
-		if skates_on == true  and was_on_slope == true and in_water == false and grind_off == false and slope_launched == false and no_slope_launch == false and not disable_slope_launch() and jump_buffer == false:
+		if skates_on == true  and was_on_slope == true and in_water == false and grind_off == false and slope_launched == false and no_slope_launch == false and not disable_slope_launch() and fallingmomentum_timer.is_stopped():
 			#if velocity.x > 2000  or velocity.x < -2000 :
 			velocity.y = slope_launch_direction
 			print("slope launch", velocity.y)
-			#slope_launched = true
+			slope_launched = true
 			#slope_launch_direction = 0
 			#print(velocity.y)
 		can_cayote_jump = true
@@ -1631,9 +1709,6 @@ func _physics_process(delta):
 		
 	if scarf:
 		scarf.update_dash_color(can_dash)
-		#scarf.anchor_offset = Vector2(15, -20
-
-
 
 func _handle_rotation():
 	if is_on_floor():
@@ -1658,6 +1733,7 @@ func _handle_rotation():
 				rotation_degrees = 0
 	else:
 		if do_dodgeslide == false:
+			#if floor_slope_disable == false:
 			rotation_degrees = move_toward(rotation_degrees, 0 , 2)
 			if dodash == true or direction_change == true:
 				rotation_degrees = 0
@@ -1773,33 +1849,34 @@ func set_animation():
 func _handle_squash_and_strech(delta):
 	if not fallingmomentum_timer.is_stopped() and jumping == false:
 		#if animated_sprite_2d.position.y = (base_position.y * 20):
-		animated_sprite_2d.scale.y -= (store_y/120000) 
-		animated_sprite_2d.position.y += store_y/80000 + (base_scale.y - animated_sprite_2d.scale.y) * 2
+		if animated_sprite_2d.scale.y > 0:
+			animated_sprite_2d.scale.y -= (store_y/120000) 
+		#animated_sprite_2d.position.y += store_y/80000 + (base_scale.y - animated_sprite_2d.scale.y) * 2
 		#print(store_y)
 		#return
 	elif Input.is_action_just_pressed("dash") and wall_cling == false:
 		if dodash == true:
 			animated_sprite_2d.scale.y -= (dash_squash) 
-			animated_sprite_2d.position.y += dash_squash + (base_scale.y - animated_sprite_2d.scale.y) * 2
+			#animated_sprite_2d.position.y += dash_squash + (base_scale.y - animated_sprite_2d.scale.y) * 2
 		if do_dodgeslide == true:
 			animated_sprite_2d.scale.x -= (dash_squash) 
-			animated_sprite_2d.position.x += dash_squash + (base_scale.x - animated_sprite_2d.scale.x) * 2
+			#animated_sprite_2d.position.x += dash_squash + (base_scale.x - animated_sprite_2d.scale.x) * 2
 		#print("dash squash")
-	elif jumping == true and  animated_sprite_2d.position.y > (base_position.y * 1.5):
+	elif jumping == true:
 		animated_sprite_2d.scale.y += (jump_strech) 
-		animated_sprite_2d.position.y -= jump_strech + (base_scale.y - animated_sprite_2d.scale.y) * 3
+		#animated_sprite_2d.position.y -= jump_strech + (base_scale.y - animated_sprite_2d.scale.y) * 3
 		jumping = false
 	elif jumping_off == true:
 		#if Input.is_action_just_pressed("jump") :
 		animated_sprite_2d.scale.x += (jump_strech) 
-		animated_sprite_2d.position.x -= jump_strech + (base_scale.y - animated_sprite_2d.scale.x) * 2 * dir
+		#animated_sprite_2d.position.x -= jump_strech + (base_scale.y - animated_sprite_2d.scale.x) * 2 * dir
 		jumping_off = false
 		print("yeah")
 	else:
 		animated_sprite_2d.scale.y = move_toward(animated_sprite_2d.scale.y, base_scale.y, delta * (return_to_form_accel ))
-		animated_sprite_2d.position.y = move_toward(animated_sprite_2d.position.y, base_position.y, delta * (return_to_form_accel * 5))
+		#animated_sprite_2d.position.y = move_toward(animated_sprite_2d.position.y, base_position.y, delta * (return_to_form_accel * 5))
 		animated_sprite_2d.scale.x = move_toward(animated_sprite_2d.scale.x, base_scale.x, delta * (return_to_form_accel ))
-		animated_sprite_2d.position.x = move_toward(animated_sprite_2d.position.x, base_position.x, delta * (return_to_form_accel * 5))
+		#animated_sprite_2d.position.x = move_toward(animated_sprite_2d.position.x, base_position.x, delta * (return_to_form_accel * 5))
 	if not wallrunning_wallchecker.is_colliding() or in_water == true:
 		if animated_sprite_2d.scale.x > (base_scale.x /1.2):
 			animated_sprite_2d.scale.x -=   abs(velocity.y / 1000) * delta
@@ -1811,6 +1888,32 @@ func _handle_squash_and_strech(delta):
 				animated_sprite_2d.scale.x +=   abs(velocity.x / 950) * delta 
 		#print("YES")
 		
+
+func handle_camara_offset():
+	if velocity.x > 100 :
+		$Camera2D.offset.x = $Camera2D.offset.x + (1 + (velocity.x / 500)) if $Camera2D.offset.x <= 85 else 90
+		#print($Camera2D.offset.x)
+	if velocity.x < -100:
+		$Camera2D.offset.x = $Camera2D.offset.x - (1 - (velocity.x / 500))  if $Camera2D.offset.x >= -85 else -90
+		#print($Camera2D.offset.x)
+	if velocity.x > -100 and velocity.x <= 0  or velocity.x < 100 and velocity.x >= 0 :
+		if $Camera2D.offset.x >= 2:
+			$Camera2D.offset.x = $Camera2D.offset.x - 2  if $Camera2D.offset.x >= 2 else 2
+		elif $Camera2D.offset.x <= -2 :
+			$Camera2D.offset.x = $Camera2D.offset.x + 2  if $Camera2D.offset.x <= -2 else -2
+			
+	
+	if velocity.y > -850 and velocity.y < 1900 and can_wallrun_right == false and can_wallrun_right == false or is_on_floor_only() and can_wallrun_right == false and can_wallrun_right == false or grabbing == true:
+		if $Camera2D.offset.y >= 4:
+			$Camera2D.offset.y = $Camera2D.offset.y - 4 if $Camera2D.offset.y >= 4 else 4
+		if $Camera2D.offset.y <= -4 :
+			$Camera2D.offset.y = $Camera2D.offset.y + 4  if $Camera2D.offset.y <= -4 else -4
+	if velocity.y < -900   or can_wallrun_left == true and not is_on_floor() or can_wallrun_right == true  and not is_on_floor() :
+		#print("camara up")
+		$Camera2D.offset.y = $Camera2D.offset.y - (1 - (velocity.y / 500))  if $Camera2D.offset.y >= -245 else -250
+	if velocity.y > 2000 and not is_on_floor() and grabbing == false:
+		$Camera2D.offset.y = $Camera2D.offset.y + (1 + (velocity.y/ 250)) if $Camera2D.offset.y <= 295 else 300
+		#print("camara down")
 
 func get_player_cell() -> Vector2i:
 	return tilemap.local_to_map(tilemap.to_local(global_position))
@@ -1984,23 +2087,43 @@ func apply_vine_pull(delta):
 		vine_swinging = false
 		if can_dash < 1:
 			can_dash = 1
+		mode = MovementMode.NORMAL
 
 
 var splash = false
 func on_water(delta, direction):
 	can_walldive_left = false
 	can_walldive_right = false
+	if is_on_floor() :
+		if angler_dir == 0:
+			velocity.y = JUMP_VELOCITY /2
+		mode = MovementMode.NORMAL
 	if splash == false:
 		velocity.x = velocity.x * 0.75
 		splash = true
 	else:
-		if abs(velocity.x) > in_water_SPEED:
-			velocity.x = move_toward(velocity.x, 0, water_drag)
-		velocity.x =  move_toward(velocity.x, in_water_SPEED * direction, delta)
-		if boost_mode > 0:
-			boost_mode = move_toward(boost_mode, 0, boost_mode_water_drag)
+		if in_water == true:
+			if abs(velocity.x) > in_water_SPEED:
+				velocity.x = move_toward(velocity.x, 0, water_drag)
+			velocity.x =  move_toward(velocity.x, in_water_SPEED * direction, walking_accel)
+			if boost_mode > 0:
+				boost_mode = move_toward(boost_mode, 0, boost_mode_water_drag)
 			#print(boost_mode)
-	velocity.y -=  delta * abs(velocity.y)/ water_pull if velocity.y > 0 else delta * water_pull
+			if velocity.y > 0:
+				velocity.y -=  delta  * abs(velocity.y) / water_pull
+
+			velocity.y -= delta * water_pull
+			print(velocity.y)
+			velocity.y -= water_accel /2.0
+			water_accel = water_accel + 0.05
+		else:
+			water_accel = 0
+			if skates_on == false:
+				velocity.x =  move_toward(velocity.x, Walking_SPEED * direction, walking_accel)
+			else:
+				velocity.x =  move_toward(velocity.x, Base_Skates_SPEED * direction, Air_normal_accel)
+			velocity.y += gravity * delta
+	move_and_slide()
 
 
 var wind_area_dir = Vector2.ZERO
@@ -2162,6 +2285,7 @@ func _on_wallcling_cooldown_timeout():
 func _on_fallingmomentum_timer_timeout():
 	can_downroll = false
 	store_y = 0
+	print("no more downrolling")
 
 
 func _on_possiblewallrun_timer_timeout():
@@ -2260,20 +2384,14 @@ func _on_possibewalldive_timer_timeout() -> void:
 
 
 func chosing_teleport_location(delta):
-	if teleport_cancel_buffer_timer > 0:
-		teleport_cancel_buffer_timer -= delta
-	else:
-		teleport_cancel_buffer_timer = 0
-	if Input.is_action_just_pressed("jump") and teleport_cancel_buffer_timer == 0 or Input.is_action_just_pressed("dash"):
+	if Input.is_action_just_pressed("jump") or Input.is_action_just_pressed("dash"):
 		teleporting = false
+		mode = MovementMode.NORMAL
 		#print("fuck me")
 	velocity.y = 0
-	if global_position.x > teleport_location_x + 2 and just_teleported == false: 
-		Input.action_press("left")
-	elif global_position.x < teleport_location_x - 2 and just_teleported == false:
-		Input.action_press("right")
-	else:
-		Input.action_release("right")
-		Input.action_release("left")
-		dir = -1
+	dir = -1
 		
+
+
+func _on_walldive_start_downroll_buffer_timer_timeout() -> void:
+	print("yes")
