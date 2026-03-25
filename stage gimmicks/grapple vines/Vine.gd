@@ -3,6 +3,8 @@ extends Node2D
 
 @onready var handle = $Handle
 @onready var line = $Line2D
+@onready var end_position: Marker2D = $"Handle/end position"
+
 
 @export var spring_strength := 200.0
 @export var damping := 10.0
@@ -16,15 +18,21 @@ extends Node2D
 var grabbed = false
 var porigin = origin
 var velocity := Vector2.ZERO
-
+var current_pos: Vector2
 
 
 func _physics_process(delta):
+	handle_spin()
+	if not grabbed:
+		handle.position.y = move_toward(handle.position.y, origin.y, 1)
+		handle.position.x = move_toward(handle.position.x, origin.x, 1 )
+		if handle.position != origin:
+			print("moving towards origin")
 	if grabbed:
 		var axis = swing_axis.normalized()
 
 		# Project handle onto axis
-		handle.position = axis * handle.position.dot(axis)
+		handle.global_position = current_pos
 		velocity = velocity.project(axis)
 
 		# Spring force along the axis
@@ -33,11 +41,11 @@ func _physics_process(delta):
 		var total_force = spring_force + damping_force
 
 		velocity += total_force * delta
-		handle.position += velocity * delta
+		#handle.position += velocity * delta
 
 		# Clamp stretch
 		if handle.position.length() > max_stretch:
-			handle.position = handle.position.normalized() * max_stretch
+			#handle.position = handle.position.normalized() * max_stretch
 			velocity = velocity.slide(handle.position.normalized())
 
 	# Draw the vine
@@ -48,19 +56,24 @@ func _physics_process(delta):
 
 
 
-func grab_handle(player_velocity: Vector2):
+func grab_handle(player_velocity: Vector2, ):
 	grabbed = true
 	velocity = player_velocity * 0.5
-	handle.position += velocity * 0.1  # displace the handle from center a little
+	#handle.position += velocity * 0.1  # displace the handle from center a little
 
 func release_handle():
 	grabbed = false
-	handle.position = origin
+	#handle.position = origin
 
 func get_handle_global_position() -> Vector2:
-	return handle.global_position
+	return global_position 
+	
 
-func apply_spin_input(input_vector: Vector2, delta: float):
+func get_handle_rotation():
+	return handle.rotation_degrees
+
+
+func apply_spin_input(input_vector: Vector2, delta: float, player_position: Vector2):
 	if not grabbed:
 		return
 
@@ -68,3 +81,11 @@ func apply_spin_input(input_vector: Vector2, delta: float):
 	var rotation_dir := input_vector.x  # right positive, left negative
 	if rotation_dir != 0:
 		swing_axis = swing_axis.rotated(rotation_dir * rotation_speed * delta)
+	current_pos = player_position
+
+func handle_spin():
+	if handle.position.x != 0 and handle.position.y != 0:
+		handle.rotation = atan2(-handle.position.x, handle.position.y)
+	if handle.position == origin:
+		handle.rotation = 0
+		

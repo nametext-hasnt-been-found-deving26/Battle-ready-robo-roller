@@ -278,6 +278,7 @@ max_help_speed = -300.0
 wall_dive_gravity_multiplier = 1.0
 dive_direction_gravity_multiplier = 0.5
 walldive_switch_window = 0.4
+vine_exceed_drag = 0.5
 run_buffer_duration = 0.1
 afterimages = ExtResource("2_42shm")
 dust_clouds_buffer_time_duration = 0.008

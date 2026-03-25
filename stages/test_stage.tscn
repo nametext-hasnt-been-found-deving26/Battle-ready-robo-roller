@@ -1166,7 +1166,7 @@ max_stretch = 70.0
 position = Vector2(2820, -203)
 scale = Vector2(2.5, 2.5)
 spring_strength = 80.0
-damping = 2.0
+damping = 0.0
 max_stretch = 40.0
 origin = Vector2(0, 0)
 
@@ -1183,16 +1183,16 @@ rotation_speed = 1.5
 position = Vector2(2037, 2761)
 scale = Vector2(4, 4)
 spring_strength = 80.0
-damping = 2.0
+damping = 0.0
 max_stretch = 100.0
 origin = Vector2(0, 0)
 
 [node name="vine5" parent="stage_gimmicks/Grapple_vines" instance=ExtResource("13_xs3dc")]
 position = Vector2(980, -423)
 scale = Vector2(4, 4)
-spring_strength = 35.0
+spring_strength = 5.0
 damping = 0.0
-max_stretch = 30.0
+max_stretch = 150.0
 origin = Vector2(0, 0)
 
 [node name="vine6" parent="stage_gimmicks/Grapple_vines" instance=ExtResource("13_xs3dc")]

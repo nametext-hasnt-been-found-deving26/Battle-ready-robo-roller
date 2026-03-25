@@ -216,6 +216,7 @@ var vine_velocity := Vector2.ZERO
 var did_vine_swinging = false
 var store_velocity = 0
 var vine_swinging = false
+var handle_rotation
 
 var boost_mode = 0
 var can_boost_mode = false
@@ -409,7 +410,7 @@ func _physics_process(delta):
 	health_bar()
 	set_animation()
 	if velocity.y > 0 and not is_on_floor():
-		if velocity.y > store_y and not floor_slope_disable:
+		if not floor_slope_disable:
 			store_y = velocity.y
 			#print(store_y)
 		if not walldive_start_downroll_buffer_timer.is_stopped():
@@ -446,11 +447,6 @@ func apply_main_movement(delta, direction):
 	
 	if grabbing and grabbed_vine:
 	# Let the player influence the swing
-		var input_vector = Vector2(
-			 Input.get_action_strength("left") - Input.get_action_strength("right"),
-		0
-			)
-		grabbed_vine.apply_spin_input(input_vector, delta)
 		mode = MovementMode.VINE
 	
 
@@ -866,11 +862,11 @@ func apply_main_movement(delta, direction):
 				downrolling = false
 				if fallingmomentum_timer.is_stopped():
 					fallingmomentum_timer.start()
-					print("engage downroll ", velocity.x)
+					#print("engage downroll ", velocity.x)
 				elif (angler_dir * velocity.x) <= (0)  and abs(velocity.x) > abs(velocity.y):
 					if angler_dir != 0:
 						velocity.x /= fixed_angle/25
-					print("downrolling ",velocity.x)
+					#print("downrolling ",velocity.x)
 					fallingmomentum_timer.stop()
 					fallingmomentum_timer.timeout.emit()
 					
@@ -1339,7 +1335,7 @@ func apply_main_movement(delta, direction):
 			#if floor_slope_disable == false :
 			if angle < 0.1:
 				fallingmomentum_timer.start()
-				print("start downroll",store_y)
+			#	print("start downroll",store_y)
 				downrolling = false
 			if not skates_on:
 				fallingmomentum_timer.start()
@@ -1711,7 +1707,9 @@ func apply_main_movement(delta, direction):
 		scarf.update_dash_color(can_dash)
 
 func _handle_rotation():
-	if is_on_floor():
+	if mode == MovementMode.VINE and handle_rotation:
+		rotation_degrees = handle_rotation
+	elif is_on_floor():
 		if skates_on == true or grindin == true:
 			rotation_degrees = (angle * (180 / 3.141592)) * angler_dir   
 			if Input.is_action_just_pressed("jump"):
@@ -2060,19 +2058,48 @@ func create_dust_cloud(delta):
 		cloud.rotation_degrees = rotation_degrees
 		dust_clouds_buffer_timer = dust_clouds_buffer_time_duration #+ cloud_velocity_timer_multiplier
 		#print("working")
-		
+
+var limit_brought_back : Vector2
 func apply_vine_pull(delta):
+	var input_vector = Vector2(
+		 Input.get_action_strength("left") - Input.get_action_strength("right"),
+		0
+			)
+	grabbed_vine.apply_spin_input(input_vector, delta, global_position)
+	var input_axis = input_vector.x
 	var handle_pos = grabbed_vine.get_handle_global_position()
+	handle_rotation = grabbed_vine.get_handle_rotation()
 	var spring_vector = handle_pos - global_position
+	var dir_to_center = spring_vector.normalized()
+	var tangent = Vector2(-dir_to_center.y, dir_to_center.x)
+	var radial_vel = dir_to_center * velocity.dot(dir_to_center)
+	var tangential_vel = tangent * velocity.dot(tangent)
+	var orbit_damping = 0.1  # tweak this
+
+	tangential_vel *= orbit_damping
+	var original_speed = velocity.length()
+
+	velocity = radial_vel + tangential_vel
+
+	if velocity.length() > 0:
+		velocity = velocity.normalized() * original_speed
 	#var direction = Input.get_axis("left", "right")
-	var spring_strength = 50.0
+	var spring_strength = grabbed_vine.spring_strength
 	var damping = 5
+	var steer_strength = 2.5  # tweak this
+	
 	if vine_swinging == false:
 		velocity += (spring_vector * spring_strength * delta) + store_velocity/70
-		velocity -= velocity * damping * delta
+		#velocity -= velocity * damping * delta
 	else:
-		velocity += (spring_vector * spring_strength * delta) + store_velocity/140
-		velocity -= velocity * damping * delta
+		if spring_vector.length() >= grabbed_vine.max_stretch:
+			limit_brought_back = spring_vector.normalized() *  (spring_vector.length() - grabbed_vine.max_stretch )
+			print(abs(spring_vector.x) + abs(spring_vector.y))
+		else:
+			limit_brought_back = Vector2.ZERO
+		velocity += ((spring_vector + limit_brought_back) * spring_strength * delta) + store_velocity/140
+		velocity += tangent * input_axis * 200 * delta
+			
 		#velocity.y += velocity.y + (gravity * delta)/20
 		#print(vine.global_position)
 	did_vine_swinging = true
@@ -2080,10 +2107,10 @@ func apply_vine_pull(delta):
 	vine_velocity = velocity  # ← store the current spring velocity
 	move_and_slide()
 	if Input.is_action_just_released("jump"):
-		grabbing = false
 		grabbed_vine.release_handle()
+		grabbing = false
 		grabbed_vine = null
-		velocity = vine_velocity * 2  # ← apply the stored velocity on release
+		velocity = vine_velocity * 1.5  # ← apply the stored velocity on release
 		vine_swinging = false
 		if can_dash < 1:
 			can_dash = 1
@@ -2285,7 +2312,7 @@ func _on_wallcling_cooldown_timeout():
 func _on_fallingmomentum_timer_timeout():
 	can_downroll = false
 	store_y = 0
-	print("no more downrolling")
+#	print("no more downrolling")
 
 
 func _on_possiblewallrun_timer_timeout():
