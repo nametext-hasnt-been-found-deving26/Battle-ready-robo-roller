@@ -8,6 +8,7 @@ enum MovementMode {
 	RAIL_GRINDING,
 	WATER,
 	TELEPORTING,
+	DIRECTION_CHANGE,
 }
 
 var mode = MovementMode.NORMAL
@@ -127,6 +128,8 @@ var was_on_slope = false
 var rolling = 0
 @onready var fallingmomentum_timer = $Timers/fallingmomentumTimer
 @onready var walldive_start_downroll_buffer_timer: Timer = $Timers/walldive_start_downroll_buffer_Timer
+@onready var ledge_titer_handler: Node2D = $Ledge_titer_handler
+
 
 var can_downroll = true
 var downrolling = true
@@ -206,7 +209,6 @@ var jump_bounce_multiplier: float
 var slope_launched = false
 var no_slope_launch: bool
 var slope_launch_direction: float
-
 var can_hold_vine = false
 var grabbing := false
 var grabbed_vine: Node = null
@@ -389,6 +391,10 @@ func _physics_process(delta):
 		MovementMode.NORMAL:
 			apply_main_movement(delta, direction)
 
+		MovementMode.DIRECTION_CHANGE:
+			direction_changing()
+			
+
 		MovementMode.VINE:
 			apply_vine_pull(delta)
 
@@ -486,12 +492,14 @@ func apply_main_movement(delta, direction):
 	if store_y > 0 and velocity.y >= 0:
 		if angler_dir != 0 and floor_slope_disable or angle > 0.1:
 			if skates_on:
-				velocity.y += store_y * angle
+				if ledge_titer_handler.half_colide and wallrunning_wallchecker.is_colliding() or angler_dir != 0:
+					velocity.y += store_y * angle
 				if fallingmomentum_timer.is_stopped():
-					rotation_degrees = 0
+					rotation_degrees = (angle * (180 / 3.141592)) * angler_dir   
 					print("something")
 			else:
-				velocity.y += (store_y * angle) /2
+				if ledge_titer_handler.half_colide and wallrunning_wallchecker.is_colliding() or angler_dir != 0:
+					velocity.y += (store_y * angle) /2
 			floor_snap_length = 250
 			#print(velocity.y)
 
@@ -509,7 +517,7 @@ func apply_main_movement(delta, direction):
 				#print("works")
 			elif abs(velocity.x) > Walking_SPEED and skates_on == false and angler_dir * velocity.x > 0 and running == true:
 				velocity.y = abs(velocity.x) / 2
-			elif can_downroll == false and can_walldive_left == false and can_walldive_right == false:
+			elif can_downroll == false and can_walldive_left == false and can_walldive_right == false and direction_change == false:
 				#print(0)
 				velocity.y = 0
 		angle = get_floor_angle()
@@ -657,7 +665,7 @@ func apply_main_movement(delta, direction):
 			velocity.y += (gravity * delta) / wallrun_dive_gravity_multipier if  abs(velocity.y) < inwall_gravity_limit else (gravity * delta)
 			if skates_on == false and velocity.y > -40 and noskates_falling_speed == false and wall_shotLForward == false and wall_shotRForward == false:
 				velocity.y += (gravity * delta) * nonskates_gravity_multipiler
-		floor_snap_length = 1
+		#floor_snap_length = 1
 		#print(can_dash)
 		if Input.is_action_just_pressed("jump") and dodash == false and skates_on == true:
 			jump_ball = true
@@ -1392,8 +1400,17 @@ func apply_main_movement(delta, direction):
 			grabbed_vine = null
 			velocity = vine_velocity  # ← apply the stored velocity on release
 
-		
-		
+
+		#print(switch_speed)
+	if direction_change and walldive_start_downroll_buffer_timer.is_stopped():
+		walldive_start_downroll_buffer_timer.start()
+		can_walldive = false
+	if direction_change == true :
+		if not possiblewallrun_timer.is_stopped():
+			possiblewallrun_timer.stop()
+			possiblewallrun_timer.timeout.emit()
+			rotation_degrees = 0
+		mode = MovementMode.DIRECTION_CHANGE
 
 		
 	if can_walldive and walldive_start_downroll_buffer_timer.is_stopped():
@@ -1462,24 +1479,11 @@ func apply_main_movement(delta, direction):
 	if disable_slope_launch():
 		slope_launched = true
 			
-	if direction_change == true and switch_speed != 0 :
-		if direction_change_timer.is_stopped():
-			#global_position = switch_starting_location
-			direction_change_timer.start()
-		if not possiblewallrun_timer.is_stopped():
-			possiblewallrun_timer.stop()
-		if angler_dir == 1:
-			velocity.x = abs(switch_speed) * -1
-			#print(velocity.x)
-		elif angler_dir == -1:
-			velocity.x = abs(switch_speed)
-		global_position = switch_starting_location
-		velocity.y = 0
-		#direction_change = false
 		
 
 #wall runs
 	if can_wallrun_right == true:
+		can_walldive = false
 		jump_ball = false
 		rotation_degrees = -90
 		#switch_speed = abs(velocity.y)
@@ -1521,6 +1525,7 @@ func apply_main_movement(delta, direction):
 
 
 	if can_wallrun_left == true:
+		can_walldive = false
 		jump_ball = false
 		rotation_degrees = 90
 		#switch_speed = abs(velocity.y)
@@ -1706,11 +1711,19 @@ func apply_main_movement(delta, direction):
 	if scarf:
 		scarf.update_dash_color(can_dash)
 
+
+
+var stay_like_that = false
 func _handle_rotation():
+	if stay_like_that and angler_dir == 0:
+		stay_like_that = false
+	if direction_change or stay_like_that:
+		rotation_degrees = 0
+		stay_like_that = true
 	if mode == MovementMode.VINE and handle_rotation:
 		rotation_degrees = handle_rotation
 	elif is_on_floor():
-		if skates_on == true or grindin == true:
+		if skates_on == true or grindin == true and mode == MovementMode.NORMAL:
 			rotation_degrees = (angle * (180 / 3.141592)) * angler_dir   
 			if Input.is_action_just_pressed("jump"):
 				rotation_degrees = 0
@@ -1733,7 +1746,7 @@ func _handle_rotation():
 		if do_dodgeslide == false:
 			#if floor_slope_disable == false:
 			rotation_degrees = move_toward(rotation_degrees, 0 , 2)
-			if dodash == true or direction_change == true:
+			if dodash == true:
 				rotation_degrees = 0
 
 func _handle_accel():
@@ -1939,8 +1952,24 @@ func only_slope_launch() -> bool:
 	return bool(tile_data.get_custom_data("only_slope_launch"))
 
 
-
-
+func direction_changing():
+	#move_and_slide()
+	can_wallrun_left = false
+	can_wallrun_right = false
+	rotation_degrees = 0
+	global_position = switch_starting_location
+	velocity = velocity.rotated(deg_to_rad(90 * angler_dir * -1))
+		
+		
+		
+	print(velocity.x)
+		#if global_position == switch_starting_location:
+	
+	direction_change = false
+	
+	mode = MovementMode.NORMAL
+	move_and_slide()
+	rotation_degrees = 0
 func is_grinding():
 	var angler_onrails = 0
 	var trick = false
@@ -2060,33 +2089,46 @@ func create_dust_cloud(delta):
 		#print("working")
 
 var limit_brought_back : Vector2
+var floor_bounce_back: bool = false
 func apply_vine_pull(delta):
+	floor_snap_length = 0
 	var input_vector = Vector2(
 		 Input.get_action_strength("left") - Input.get_action_strength("right"),
 		0
 			)
 	grabbed_vine.apply_spin_input(input_vector, delta, global_position)
-	var input_axis = input_vector.x
+	var input_axis = -input_vector.x
 	var handle_pos = grabbed_vine.get_handle_global_position()
 	handle_rotation = grabbed_vine.get_handle_rotation()
+	var steer_strength = grabbed_vine.steer_strength
+	var orbit_damping = grabbed_vine.orbit_damping
 	var spring_vector = handle_pos - global_position
 	var dir_to_center = spring_vector.normalized()
 	var tangent = Vector2(-dir_to_center.y, dir_to_center.x)
 	var radial_vel = dir_to_center * velocity.dot(dir_to_center)
 	var tangential_vel = tangent * velocity.dot(tangent)
-	var orbit_damping = 0.1  # tweak this
+	var min_speed = grabbed_vine.min_speed
+	var speed = velocity.length()
+	var speed_dif = 1
+	
+	 # tweak this
 
-	tangential_vel *= orbit_damping
+	
 	var original_speed = velocity.length()
-
-	velocity = radial_vel + tangential_vel
+	if not input_vector:
+		tangential_vel *= orbit_damping
+		velocity = radial_vel + tangential_vel
+	else:
+		var stretch_ratio = spring_vector.length() / grabbed_vine.max_stretch
+		var control_strength = clamp(stretch_ratio, 0.2, 1.5)
+		velocity += tangent * input_axis * 500 * control_strength * delta
+		velocity = velocity.rotated(input_axis * steer_strength * delta)
 
 	if velocity.length() > 0:
 		velocity = velocity.normalized() * original_speed
 	#var direction = Input.get_axis("left", "right")
 	var spring_strength = grabbed_vine.spring_strength
-	var damping = 5
-	var steer_strength = 2.5  # tweak this
+  # tweak this
 	
 	if vine_swinging == false:
 		velocity += (spring_vector * spring_strength * delta) + store_velocity/70
@@ -2094,14 +2136,25 @@ func apply_vine_pull(delta):
 	else:
 		if spring_vector.length() >= grabbed_vine.max_stretch:
 			limit_brought_back = spring_vector.normalized() *  (spring_vector.length() - grabbed_vine.max_stretch )
-			print(abs(spring_vector.x) + abs(spring_vector.y))
+			#print(abs(spring_vector.x) + abs(spring_vector.y))
 		else:
 			limit_brought_back = Vector2.ZERO
-		velocity += ((spring_vector + limit_brought_back) * spring_strength * delta) + store_velocity/140
-		velocity += tangent * input_axis * 200 * delta
+			print(speed)
+			if speed < min_speed:
+				speed_dif = min_speed - speed
+				var recovery_strength = 1.0 - (speed / min_speed)  # 0 → 1
+				velocity.y += gravity * delta * (recovery_strength * speed_dif)
+				velocity.x = move_toward(velocity.x, 0, speed_dif)
+				print("speed dif ",speed_dif)
+				
+				
+			else:
+				speed_dif = 1
+		velocity += ((spring_vector + limit_brought_back ) * spring_strength * delta) + store_velocity/140
+		
+		
 			
-		#velocity.y += velocity.y + (gravity * delta)/20
-		#print(vine.global_position)
+
 	did_vine_swinging = true
 	vine_swinging = true
 	vine_velocity = velocity  # ← store the current spring velocity
@@ -2316,7 +2369,7 @@ func _on_fallingmomentum_timer_timeout():
 
 
 func _on_possiblewallrun_timer_timeout():
-	if not wallrunning_wallchecker.is_colliding():
+	if not wallrunning_wallchecker.is_colliding() or direction_change:
 		if velocity.y > -100:
 			velocity.y = -100
 		wallrun_dive_gravity_multipier = skates_normal_gravity_multiplier
@@ -2421,4 +2474,4 @@ func chosing_teleport_location(delta):
 
 
 func _on_walldive_start_downroll_buffer_timer_timeout() -> void:
-	print("yes")
+	print("yesir")

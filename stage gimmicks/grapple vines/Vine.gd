@@ -7,11 +7,12 @@ extends Node2D
 
 
 @export var spring_strength := 200.0
-@export var damping := 10.0
+@export var min_speed:= 200
 @export var max_stretch := 120.0
 @export var origin := position 
 @export var swing_axis := Vector2.RIGHT
-@export var rotation_speed := 2.0  # radians per second (adjust to taste)
+@export var orbit_damping:= 0.98
+@export var steer_strength := 2.0  # radians per second (adjust to taste)
 
 
 
@@ -26,27 +27,11 @@ func _physics_process(delta):
 	if not grabbed:
 		handle.position.y = move_toward(handle.position.y, origin.y, 1)
 		handle.position.x = move_toward(handle.position.x, origin.x, 1 )
-		if handle.position != origin:
-			print("moving towards origin")
-	if grabbed:
-		var axis = swing_axis.normalized()
 
+	if grabbed:
 		# Project handle onto axis
 		handle.global_position = current_pos
-		velocity = velocity.project(axis)
 
-		# Spring force along the axis
-		var spring_force = -spring_strength * handle.position
-		var damping_force = -damping * velocity
-		var total_force = spring_force + damping_force
-
-		velocity += total_force * delta
-		#handle.position += velocity * delta
-
-		# Clamp stretch
-		if handle.position.length() > max_stretch:
-			#handle.position = handle.position.normalized() * max_stretch
-			velocity = velocity.slide(handle.position.normalized())
 
 	# Draw the vine
 	line.clear_points()
@@ -78,9 +63,9 @@ func apply_spin_input(input_vector: Vector2, delta: float, player_position: Vect
 		return
 
 	# Rotate the swing axis based on input
-	var rotation_dir := input_vector.x  # right positive, left negative
-	if rotation_dir != 0:
-		swing_axis = swing_axis.rotated(rotation_dir * rotation_speed * delta)
+	#var rotation_dir := input_vector.x  # right positive, left negative
+	#if rotation_dir != 0:
+		#swing_axis = swing_axis.rotated(rotation_dir * rotation_speed * delta)
 	current_pos = player_position
 
 func handle_spin():

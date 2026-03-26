@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=3 uid="uid://7qsog2ljagsn"]
+[gd_scene load_steps=45 format=3 uid="uid://7qsog2ljagsn"]
 
 [ext_resource type="Script" uid="uid://bwne4bcnao3mo" path="res://Players/Swift Roll/player(statemachinetest).gd" id="1_w3hjy"]
 [ext_resource type="PackedScene" uid="uid://bccoccqeyvrg3" path="res://Players/Swift Roll/afterimages SR/afterimages.tscn" id="2_42shm"]
@@ -20,6 +20,7 @@
 [ext_resource type="AudioStream" uid="uid://bkngmxhcg3lbj" path="res://Players/sfx library/dashsfx.mp3" id="18_hkrpb"]
 [ext_resource type="Script" uid="uid://bvun0nhvs38g2" path="res://Players/Swift Roll/wallkick_lock_r.gd" id="18_pylmc"]
 [ext_resource type="Script" uid="uid://drqtsc3mbdm7q" path="res://Players/Swift Roll/wallkick_lock_l.gd" id="19_pbfsw"]
+[ext_resource type="Script" uid="uid://ciriv5xl0wy04" path="res://Players/Swift Roll/ledge_titer_handler.gd" id="21_60n1h"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7l80f"]
 radius = 7.06
@@ -278,7 +279,6 @@ max_help_speed = -300.0
 wall_dive_gravity_multiplier = 1.0
 dive_direction_gravity_multiplier = 0.5
 walldive_switch_window = 0.4
-vine_exceed_drag = 0.5
 run_buffer_duration = 0.1
 afterimages = ExtResource("2_42shm")
 dust_clouds_buffer_time_duration = 0.008
@@ -562,16 +562,17 @@ collision_mask = 2
 [node name="Ledge_titer_handler" type="Node2D" parent="."]
 position = Vector2(7.0588236, 0)
 scale = Vector2(1.0000001, 1.0000001)
+script = ExtResource("21_60n1h")
 
 [node name="ledge_titer_L" type="RayCast2D" parent="Ledge_titer_handler"]
 position = Vector2(-14.117647, 0)
 scale = Vector2(1.0000001, 1.0000001)
-target_position = Vector2(0, 24.117647)
+target_position = Vector2(0, 25)
 collision_mask = 2
 
 [node name="ledge_titer_R" type="RayCast2D" parent="Ledge_titer_handler"]
 scale = Vector2(0.9999999, 0.9999999)
-target_position = Vector2(0, 24.117647)
+target_position = Vector2(0, 25)
 collision_mask = 2
 
 [connection signal="timeout" from="Timers/dash_timers/DashDurationTimer" to="." method="_on_dash_duration_timer_timeout"]

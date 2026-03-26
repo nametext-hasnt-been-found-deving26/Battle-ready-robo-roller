@@ -28,12 +28,12 @@ func _on_body_entered(body):
 		player.can_uproll = true
 		if player.velocity.y < 0 and disable_switch_H == false and player.can_wallrun_left == true:###
 			#if player.direction_change == false:
-			player_upspeed = player.velocity.y
+			#player_upspeed = player.velocity.y
 			player.switch_starting_location = switch_starter.global_position
-			player.switch_speed = player_upspeed
+			#player.switch_speed = player_upspeed
 			player.direction_change = true
 			player.direction_change_timer.start()
-		if disable_switch_V == false:
+		elif disable_switch_V == false:
 			player.walldive_starting_location = dive_starter.global_position
 			player.can_walldive = true
 					

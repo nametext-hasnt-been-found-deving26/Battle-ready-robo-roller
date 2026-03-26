@@ -357,7 +357,7 @@ material = SubResource("ShaderMaterial_dnvph")
 material = SubResource("ShaderMaterial_eol6t")
 
 [node name="player_position_handler" type="Marker2D" parent="." groups=["player_position_handler"]]
-position = Vector2(177, 141)
+position = Vector2(163, 328)
 scale = Vector2(1.0000001, 1.0000001)
 script = ExtResource("7_nlxau")
 
@@ -472,13 +472,13 @@ polygon = PackedVector2Array(78, 28, 122, 12, 171, -10, 197, -58, 212, -104, 237
 position = Vector2(3240, -3078)
 
 [node name="CollisionPolygon2D" parent="slopeRanglers/backslopes/BackslopeRangler" index="0"]
-polygon = PackedVector2Array(-14, -19, 3, -31, 5, 42, 16, 23, 34, 20, 40, 55, -26, 55, -25, -3)
+polygon = PackedVector2Array(-20, -85, 1, -95, 32, -90, 39, -7, 37, 16, 40, 55, -26, 55, -28, -7)
 
 [node name="dive_starter" parent="slopeRanglers/backslopes/BackslopeRangler" index="1"]
 position = Vector2(-26, 61)
 
 [node name="switch_starter" parent="slopeRanglers/backslopes/BackslopeRangler" index="2"]
-position = Vector2(9, 19)
+position = Vector2(34, -6)
 
 [node name="BackslopeRangler3" parent="slopeRanglers/backslopes" instance=ExtResource("8_ff5p3")]
 position = Vector2(23086, -11300)
@@ -490,7 +490,7 @@ polygon = PackedVector2Array(-31, -133, -23, -329, 57, -339, 55, 28, -43, 28, -4
 position = Vector2(-15, 33)
 
 [node name="switch_starter" parent="slopeRanglers/backslopes/BackslopeRangler3" index="2"]
-position = Vector2(8, 3)
+position = Vector2(32, -34)
 
 [node name="BackslopeRangler2" parent="slopeRanglers/backslopes" instance=ExtResource("8_ff5p3")]
 position = Vector2(-1144, -10215)
@@ -642,10 +642,10 @@ position = Vector2(773, 1962)
 disable_switch_V = true
 
 [node name="CollisionPolygon2D" parent="slopeLanglers/backslopes/BackslopeLangler" index="0"]
-polygon = PackedVector2Array(-8, -66, 22, -60, 47, -52, 57, -26, 68, 28, 34, 28, -5, 27)
+polygon = PackedVector2Array(-15, -84, 30, -83, 54, -65, 65, -33, 65, 20, -13, 19)
 
 [node name="switch_starter" parent="slopeLanglers/backslopes/BackslopeLangler" index="2"]
-position = Vector2(48, -13)
+position = Vector2(13, -45)
 
 [node name="BackslopeLangler5" parent="slopeLanglers/backslopes" instance=ExtResource("10_xro35")]
 position = Vector2(2447, -670)
@@ -665,10 +665,10 @@ disable_switch_V = true
 
 [node name="CollisionPolygon2D" parent="slopeLanglers/backslopes/BackslopeLangler2" index="0"]
 position = Vector2(4, -7)
-polygon = PackedVector2Array(-5, -18, 28, -21, 47, -15, 53, 10, 57, 54, -4, 54, -2, 18)
+polygon = PackedVector2Array(-19, -49, 21, -56, 62, -57, 85, -47, 99, 11, 95, 52, -12, 54)
 
 [node name="switch_starter" parent="slopeLanglers/backslopes/BackslopeLangler2" index="2"]
-position = Vector2(34, 20)
+position = Vector2(4, -17)
 
 [node name="BackslopeLangler3" parent="slopeLanglers/backslopes" instance=ExtResource("10_xro35")]
 position = Vector2(3371, -3071)
@@ -694,7 +694,7 @@ polygon = PackedVector2Array(-16, -5, 41, -4, 60, 15, 60, 47, -16, 47, -16, 20)
 position = Vector2(36, 62)
 
 [node name="switch_starter" parent="slopeLanglers/backslopes/BackslopeLangler6" index="2"]
-position = Vector2(11, 15)
+position = Vector2(-21, -16)
 
 [node name="BackslopeLangler7" parent="slopeLanglers/backslopes" instance=ExtResource("10_xro35")]
 position = Vector2(1783, -698)
@@ -1159,56 +1159,60 @@ scale = Vector2(1.7931302, -0.70979)
 position = Vector2(3030, 2169)
 scale = Vector2(4, 4)
 spring_strength = 80.0
-damping = 0.0
 max_stretch = 70.0
+orbit_damping = 0.9
+steer_strength = 0.5
 
 [node name="vine2" parent="stage_gimmicks/Grapple_vines" instance=ExtResource("13_xs3dc")]
 position = Vector2(2820, -203)
 scale = Vector2(2.5, 2.5)
 spring_strength = 80.0
-damping = 0.0
+min_speed = 300
 max_stretch = 40.0
 origin = Vector2(0, 0)
+steer_strength = 0.5
 
 [node name="vine3" parent="stage_gimmicks/Grapple_vines" instance=ExtResource("13_xs3dc")]
 position = Vector2(581, 1705)
 scale = Vector2(4, 4)
 spring_strength = 30.0
-damping = 0.0
-max_stretch = 45.0
+min_speed = 900
+max_stretch = 30.0
 origin = Vector2(0, 0)
-rotation_speed = 1.5
+steer_strength = 1.5
 
 [node name="vine4" parent="stage_gimmicks/Grapple_vines" instance=ExtResource("13_xs3dc")]
-position = Vector2(2037, 2761)
+position = Vector2(2468, 2799)
 scale = Vector2(4, 4)
 spring_strength = 80.0
-damping = 0.0
+min_speed = 0
 max_stretch = 100.0
 origin = Vector2(0, 0)
+orbit_damping = 0.9
+steer_strength = 0.5
 
 [node name="vine5" parent="stage_gimmicks/Grapple_vines" instance=ExtResource("13_xs3dc")]
 position = Vector2(980, -423)
 scale = Vector2(4, 4)
-spring_strength = 5.0
-damping = 0.0
-max_stretch = 150.0
+spring_strength = 30.0
+min_speed = 300
+max_stretch = 30.0
 origin = Vector2(0, 0)
+steer_strength = 1.0
 
 [node name="vine6" parent="stage_gimmicks/Grapple_vines" instance=ExtResource("13_xs3dc")]
 position = Vector2(23691, -10520)
 scale = Vector2(4, 4)
 spring_strength = 120.0
-damping = 0.0
 max_stretch = 45.0
 origin = Vector2(0, 0)
 
 [node name="vine7" parent="stage_gimmicks/Grapple_vines" instance=ExtResource("13_xs3dc")]
 position = Vector2(-248, -1762)
 scale = Vector2(4.22, 4.38001)
-spring_strength = 300.0
-damping = 2.0
-max_stretch = 40.0
+spring_strength = 40.0
+min_speed = 1200
+max_stretch = 50.0
 origin = Vector2(0, 0)
 
 [node name="Rails" type="Node" parent="stage_gimmicks"]
