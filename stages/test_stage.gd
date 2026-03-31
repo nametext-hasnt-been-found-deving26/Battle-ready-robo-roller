@@ -20,6 +20,7 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	
 	if player_position_handler.spawned == false:
 		player_position_handler.set_player(player)
 	else:

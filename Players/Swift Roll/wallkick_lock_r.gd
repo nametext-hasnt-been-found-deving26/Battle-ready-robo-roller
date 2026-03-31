@@ -2,6 +2,10 @@ extends Node
 @onready var wallkicklock_r_1: RayCast2D = $wallkicklockR1
 @onready var wallkicklock_r_2: RayCast2D = $wallkicklockR2
 @onready var wallkicklock_r_3: RayCast2D = $wallkicklockR3
+@onready var wallrunning_wallchecker: RayCast2D = $"../wallrunning_wallchecker"
+
+
+
 var is_colliding = false
 var enabled = true
 
@@ -19,7 +23,10 @@ func _physics_process(delta: float) -> void:
 	if enabled == true:
 		wallkicklock_r_1.enabled = true
 		wallkicklock_r_2.enabled = true
-		wallkicklock_r_3.enabled = true
+		if not wallrunning_wallchecker.is_colliding():
+			wallkicklock_r_3.enabled = true
+		else:
+			wallkicklock_r_3.enabled = false
 	else:
 		wallkicklock_r_1.enabled = false
 		wallkicklock_r_2.enabled = false

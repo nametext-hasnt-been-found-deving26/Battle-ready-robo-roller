@@ -240,7 +240,7 @@ animations = [{
 "speed": 10.0
 }]
 
-[node name="CharacterBody2D" type="CharacterBody2D" groups=["can roll", "player"]]
+[node name="CharacterBody2D" type="CharacterBody2D" groups=["can roll", "player", "sink_affectors"]]
 process_mode = 1
 top_level = true
 z_index = 3
@@ -265,11 +265,10 @@ jump_degrade_limit = -50.0
 inward_velocity_influence_adjust = 2.0
 inward_angle_influence_adjust = 1.5
 running_accel = 50.0
-air_drag_accel = 4.5
-Up_past_mach_accel = 7.5
+air_drag_accel = 1.0
+Up_past_mach_accel = 6.7
 normal_ground_accel = 6.0
 Air_normal_accel = 4.0
-up_accel = 6.7
 wall_cling_drag = 500.0
 inwall_gravity_limit = 1.0
 wall_run_gravity_multiplier = 25.0
@@ -286,6 +285,7 @@ dust_clouds = ExtResource("3_pbfsw")
 base_position = Vector2(0, 18.235)
 return_to_form_accel = 1.5
 water_pull = 300.0
+Conveyor_input_offset_duration = 0.1
 
 [node name="state_machines" type="Node" parent="."]
 
@@ -426,7 +426,7 @@ texture_repeat = 1
 position = Vector2(0, 18.235292)
 scale = Vector2(0.6, 0.578)
 sprite_frames = ExtResource("3_op7ga")
-animation = &"idle"
+animation = &"wall_cling_idle"
 autoplay = "idle"
 offset = Vector2(0, -42)
 
@@ -515,39 +515,41 @@ extension_multiplier = 1.5
 velocity_influence = 0.001
 
 [node name="wallkick_lockR" type="Node2D" parent="."]
+position = Vector2(7.0588245, 0)
 script = ExtResource("18_pylmc")
 
 [node name="wallkicklockR1" type="RayCast2D" parent="wallkick_lockR"]
 scale = Vector2(1.7, 1.7)
-target_position = Vector2(10, 0)
+target_position = Vector2(5, 0)
 collision_mask = 2
 
 [node name="wallkicklockR2" type="RayCast2D" parent="wallkick_lockR"]
 scale = Vector2(1.7, 1.7)
-target_position = Vector2(10, -10)
+target_position = Vector2(4, -10.7)
 collision_mask = 2
 
 [node name="wallkicklockR3" type="RayCast2D" parent="wallkick_lockR"]
 scale = Vector2(1.7, 1.7)
-target_position = Vector2(7, 9)
+target_position = Vector2(4, 10.7)
 collision_mask = 2
 
 [node name="wallkick_lockL" type="Node2D" parent="."]
+position = Vector2(-7.0588245, 0)
 script = ExtResource("19_pbfsw")
 
 [node name="wallkicklockL1" type="RayCast2D" parent="wallkick_lockL"]
 scale = Vector2(1.7, 1.7)
-target_position = Vector2(-10, -10)
+target_position = Vector2(-4, -10.7)
 collision_mask = 2
 
 [node name="wallkicklockL2" type="RayCast2D" parent="wallkick_lockL"]
 scale = Vector2(1.7, 1.7)
-target_position = Vector2(-10, 0)
+target_position = Vector2(-5, 0)
 collision_mask = 2
 
 [node name="wallkicklockL3" type="RayCast2D" parent="wallkick_lockL"]
 scale = Vector2(1.7, 1.7)
-target_position = Vector2(-11, 9)
+target_position = Vector2(-4, 10.7)
 collision_mask = 2
 
 [node name="dust_cloud_setter" type="Node2D" parent="."]
@@ -557,7 +559,7 @@ position = Vector2(0, 18)
 scale = Vector2(1.0000001, 1.0000001)
 exclude_parent = false
 target_position = Vector2(0, 21.764708)
-collision_mask = 2
+collision_mask = 3
 
 [node name="Ledge_titer_handler" type="Node2D" parent="."]
 position = Vector2(7.0588236, 0)
