@@ -31,8 +31,14 @@ var push_dirD= Vector2.ZERO
 @onready var downer_collision: Area2D = $CollisionShape2D/downer_collision
 
 var belt_built = false
-
+var frame_count := 0
 var process_toggle := false
+
+@export var frames_to_skip: int = 4
+var on_screen : bool = false
+@onready var visible_on_screen_notifier_2d: VisibleOnScreenNotifier2D = $VisibleOnScreenNotifier2D
+var active_type_state: bool = false
+
 
 func _ready():
 	push_dir = transform.x.normalized()
@@ -65,20 +71,41 @@ func set_position_collisions():
 	path_2d.curve.set_point_position(7,Vector2((collision_shape_2d.shape.size.x/ (2 + belt_corrector) ) - 1 , collision_shape_2d.shape.size.y/ - 2))
 	
 	wheels_container.position.x = (collision_shape_2d.shape.size.x/ - 2) + 9
+	
+	#visible_on_screen_notifier_2d.rect =Rect2(-10, -10, 20, 20)
+
+	visible_on_screen_notifier_2d.rect = Rect2(collision_shape_2d.shape.size.x/ - 2, collision_shape_2d.shape.size.y/ - 2, collision_shape_2d.shape.size.x, collision_shape_2d.shape.size.y)
+
 
 
 
 func _process(delta):
-	
-	process_toggle = !process_toggle
-	
-	if process_toggle:
+	var active_wheels = wheels_container.get_children()
+	if not on_screen:
+		for wheel in active_wheels:
+			wheel.set_process(false)
 		return
 	
-	move_belt(delta * 10)
+	for wheel in active_wheels:
+
+		wheel.set_process(true)
+	
+
+	frame_count += 1
+	
+	if frame_count % frames_to_skip != 0:
+		return
+	
+	move_belt(delta * frames_to_skip)
+	for body in upper_collision.get_overlapping_bodies() + lefter_collision.get_overlapping_bodies() + righter_collision.get_overlapping_bodies() + downer_collision.get_overlapping_bodies():#####
+		if body.is_in_group("sink_affectors"):
+			if abs(Speed) < 900 and active_type_state != true:
+				_activate_segments(true)
 	
 
 func _physics_process(delta: float) -> void:
+	if not on_screen:
+		return
 	for body in upper_collision.get_overlapping_bodies() + lefter_collision.get_overlapping_bodies() + righter_collision.get_overlapping_bodies() + downer_collision.get_overlapping_bodies():#####
 		if body.is_in_group("sink_affectors"):
 
@@ -104,6 +131,8 @@ func _on_upper_collision_body_entered(body: Node2D) -> void:
 
 func _on_upper_collision_body_exited(body: Node2D) -> void:
 	if body.is_in_group("sink_affectors"):
+		if abs(Speed) < 900 and active_type_state != false:
+			_activate_segments(false)
 		body.set("conveyor_area_dir", Vector2.ZERO)
 		body.set("conveyor_power", 0.0)
 		if body.is_in_group("player"):
@@ -120,6 +149,8 @@ func _on_lefter_collision_body_entered(body: Node2D) -> void:
 
 func _on_lefter_collision_body_exited(body: Node2D) -> void:
 	if body.is_in_group("sink_affectors"):
+		if abs(Speed) < 900 and active_type_state != false:
+			_activate_segments(false)
 		body.set("conveyor_area_dir", Vector2.ZERO)
 		body.set("conveyor_power", 0.0)
 		if body.is_in_group("player"):
@@ -136,6 +167,8 @@ func _on_righter_collision_body_entered(body: Node2D) -> void:
 
 func _on_righter_collision_body_exited(body: Node2D) -> void:
 	if body.is_in_group("sink_affectors"):
+		if abs(Speed) < 900 and active_type_state != false:
+			_activate_segments(false)
 		body.set("conveyor_area_dir", Vector2.ZERO)
 		body.set("conveyor_power", 0.0)
 		if body.is_in_group("player"):
@@ -152,6 +185,8 @@ func _on_downer_collision_body_entered(body: Node2D) -> void:
 
 func _on_downer_collision_body_exited(body: Node2D) -> void:
 	if body.is_in_group("sink_affectors"):
+		if abs(Speed) < 900 and active_type_state != false:
+			_activate_segments(false)
 		body.set("conveyor_area_dir", Vector2.ZERO)
 		body.set("conveyor_power", 0.0)
 		if body.is_in_group("player"):
@@ -215,10 +250,10 @@ func move_belt(delta):
 
 		# Move forward
 		if abs(Speed) < segment.speed_to_max:
-			dist -= Speed / 12  * delta 
+			dist += Speed / 12  * delta 
 			
 		else:
-			dist -= (Speed  / 12) / 900 * delta
+			dist += (Speed  / 12) / 900 * delta
 		dist = fposmod(dist, length)
 			#print(dist)
 
@@ -236,3 +271,18 @@ func move_belt(delta):
 
 		# Save updated distance
 		segment.set_meta("distance", dist)
+
+
+func _on_visible_on_screen_notifier_2d_screen_entered() -> void:
+	on_screen = true
+
+
+func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
+	on_screen = false
+	pass # Replace with function body.
+
+func _activate_segments(active:bool):
+	for segment in belt_container.get_children():
+		segment.area_2d.monitoring = active
+		segment.area_2d.monitorable = active
+		active_type_state = active

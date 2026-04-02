@@ -26,7 +26,7 @@ _data = {
 point_count = 8
 
 [node name="conveyor belt" type="StaticBody2D"]
-position = Vector2(186, 121)
+position = Vector2(103, 88)
 collision_layer = 3
 collision_mask = 3
 script = ExtResource("1_1oftd")
@@ -35,6 +35,7 @@ wheel_spacing = 2.0
 wheel_scene = ExtResource("2_1oftd")
 segment_width = 5.0
 belt_scene = ExtResource("3_gt3we")
+frames_to_skip = 6
 
 [node name="Wheels" type="Node2D" parent="."]
 scale = Vector2(10, 10)
@@ -73,6 +74,9 @@ position = Vector2(5.425995, 1)
 scale = Vector2(1.1481565, 1)
 curve = SubResource("Curve2D_2a4v6")
 
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+rect = Rect2(-48.84, -10, 48.84, 20)
+
 [connection signal="body_entered" from="CollisionShape2D/upper_collision" to="." method="_on_upper_collision_body_entered"]
 [connection signal="body_exited" from="CollisionShape2D/upper_collision" to="." method="_on_upper_collision_body_exited"]
 [connection signal="body_entered" from="CollisionShape2D/lefter_collision" to="." method="_on_lefter_collision_body_entered"]
@@ -81,3 +85,5 @@ curve = SubResource("Curve2D_2a4v6")
 [connection signal="body_exited" from="CollisionShape2D/righter_collision" to="." method="_on_righter_collision_body_exited"]
 [connection signal="body_entered" from="CollisionShape2D/downer_collision" to="." method="_on_downer_collision_body_entered"]
 [connection signal="body_exited" from="CollisionShape2D/downer_collision" to="." method="_on_downer_collision_body_exited"]
+[connection signal="screen_entered" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]

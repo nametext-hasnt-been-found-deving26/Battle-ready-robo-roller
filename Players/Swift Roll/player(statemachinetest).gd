@@ -110,6 +110,7 @@ var dodash = false
 
 @export_category("wall cling/ wall shot")
 @export var wall_cling_drag: float = 10
+@export var shotdown_strength: int = 450
 var wall_climb_drag_cancel: bool
 var wall_cling = false
 var wall_climb= false
@@ -430,6 +431,8 @@ func _physics_process(delta):
 		die()
 	health_bar()
 	set_animation()
+	if scarf:
+		scarf.update_dash_color(can_dash)
 	if velocity.y > 0 and not is_on_floor():
 		if not floor_slope_disable:
 			store_y = velocity.y
@@ -532,6 +535,8 @@ func apply_main_movement(delta, direction):
 			#velocity.y += store_y * angle
 			
 		if in_water == false and can_wallrun_left == false and can_wallrun_right == false:
+			if do_dodgeslide == true :
+				velocity.y += 150 * (angle * (180 / 3.141592))/4 
 			if skates_on == true and abs(velocity.x) > Base_Skates_SPEED and velocity.x * angler_dir > 0 and angle > 0.01 and can_downroll == false:
 				velocity.y = slope_launch_direction
 				#print("works")
@@ -863,8 +868,8 @@ func apply_main_movement(delta, direction):
 				if can_downroll == true  or can_walldive_left or can_walldive_right:
 					if angler_dir != 0 and is_on_floor():
 						velocity.x +=  ((angle + (store_y/60)) * angler_dir * (180 / 3.141592)/6)
-						velocity.y += (gravity * delta) * (angle * (180 / 3.141592)) 
-						print("shit")
+						#velocity.y += (gravity * delta) * (angle * (180 / 3.141592)) 
+						#print("shit")
 				elif can_downroll == false and angler_dir != 0:
 					velocity.x = move_toward(velocity.x + (angle * angler_dir * 25) , (skating_SPEED - delta) * direction  , accel)
 					#velocity.y += (gravity * delta) * (angle * (180 / 3.141592))
@@ -925,8 +930,8 @@ func apply_main_movement(delta, direction):
 			braking = false
 				#print("stop midair")
 		if shotdown == true and is_on_floor():
-			velocity.x +=  450 * dashDirection
-			print("shotdown")
+			velocity.x +=  shotdown_strength * dashDirection
+			#print("shotdown")
 			shotdown = false
 		if knockedback == false:
 			store_x = velocity.x
@@ -996,7 +1001,7 @@ func apply_main_movement(delta, direction):
 		imnMelee = true
 		if velocity.x > 0 and angler_dir > 0 or velocity.x < 0 and angler_dir < 0:
 			velocity.x = dashDirection * ((Walking_SPEED)+ (angle * (180 / 3.141592))*3) * dashSpeedMultiplicator
-			velocity.y += 150 * (angle * (180 / 3.141592))/4 
+			#velocity.y += 150 * (angle * (180 / 3.141592))/4 
 			
 			#print(velocity.x)
 			
@@ -1727,21 +1732,28 @@ func apply_main_movement(delta, direction):
 		eat_my_dust = true
 		#print("dusting")
 		
-	if scarf:
-		scarf.update_dash_color(can_dash)
+
 		
 	
 
 
 var stay_like_that = false
 func _handle_rotation():
-	if stay_like_that and angler_dir == 0:
-		stay_like_that = false
-	if direction_change or stay_like_that:
-		rotation_degrees = 0
-		stay_like_that = true
 	if mode == MovementMode.VINE and handle_rotation:
 		rotation_degrees = handle_rotation
+	elif do_dodgeslide == true:
+			if angler_dir != 0:
+				if velocity.x * angler_dir < 0:
+					if angler_dir == -1:
+						rotation_degrees = (90 +(angle * (180 / 3.141592))) * -1
+						print("upwards")
+					else:
+						rotation_degrees = (90 +(angle * (180 / 3.141592))) 
+				else:
+					rotation_degrees = (90 -(angle * (180 / 3.141592)))* angler_dir*-1
+					print("downwards")
+			else:
+				rotation_degrees = -90 * dashDirection 
 	elif is_on_floor():
 		if skates_on == true or grindin == true and mode == MovementMode.NORMAL:
 			rotation_degrees = (angle * (180 / 3.141592)) * angler_dir   
@@ -1749,19 +1761,9 @@ func _handle_rotation():
 				rotation_degrees = 0
 				#print("ball jumpin")
 		else:
-			if do_dodgeslide == true:
-				if angler_dir != 0:
-					if abs(velocity.x)/velocity.x != angler_dir:
-						rotation_degrees = (90 +(angle * (180 / 3.141592)))* angler_dir
-						#print("upwards")
-					else:
-						rotation_degrees = (90 -(angle * (180 / 3.141592)))* angler_dir*-1
-						#print("downwards")
-				else:
-					rotation_degrees = -90 * dashDirection
+			
 					#print("no angle")
-			else:
-				rotation_degrees = 0
+			rotation_degrees = 0
 	else:
 		if do_dodgeslide == false:
 			#if floor_slope_disable == false:
@@ -1985,7 +1987,7 @@ func direction_changing():
 		
 		
 		
-	print(velocity.x)
+	#print(velocity.x)
 		#if global_position == switch_starting_location:
 	
 	direction_change = false
@@ -2205,7 +2207,7 @@ func on_water(delta, direction):
 			velocity.y = JUMP_VELOCITY /2
 		mode = MovementMode.NORMAL
 	if splash == false:
-		velocity.x = velocity.x * 0.75
+		velocity = velocity * 0.75
 		splash = true
 	else:
 		if in_water == true:
@@ -2215,11 +2217,11 @@ func on_water(delta, direction):
 			if boost_mode > 0:
 				boost_mode = move_toward(boost_mode, 0, boost_mode_water_drag)
 			#print(boost_mode)
-			if velocity.y > 0:
-				velocity.y -=  delta  * abs(velocity.y) / water_pull
+			#if velocity.y > 0:
+				#velocity.y -=  delta  * abs(velocity.y) / water_pull
 
 			velocity.y -= delta * water_pull
-			print(velocity.y)
+			#print(velocity.y)
 			velocity.y -= water_accel /2.0
 			water_accel = water_accel + 0.05
 		else:

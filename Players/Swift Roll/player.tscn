@@ -1,4 +1,4 @@
-[gd_scene load_steps=45 format=3 uid="uid://7qsog2ljagsn"]
+[gd_scene load_steps=47 format=3 uid="uid://7qsog2ljagsn"]
 
 [ext_resource type="Script" uid="uid://bwne4bcnao3mo" path="res://Players/Swift Roll/player(statemachinetest).gd" id="1_w3hjy"]
 [ext_resource type="PackedScene" uid="uid://bccoccqeyvrg3" path="res://Players/Swift Roll/afterimages SR/afterimages.tscn" id="2_42shm"]
@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://nc5o76ylqkt2" path="res://ui/healthbardamaged.png" id="8_huc6j"]
 [ext_resource type="AudioStream" uid="uid://ca4yimlrpjr12" path="res://Players/sfx library/braking.mp3" id="9_p6lsp"]
 [ext_resource type="AudioStream" uid="uid://cic0w6ghy62nx" path="res://Players/sfx library/railgrind.mp3" id="11_lo3bv"]
+[ext_resource type="Shader" uid="uid://d4h3xrmkurji0" path="res://Players/Swift Roll/SR_shader.gdshader" id="12_nco40"]
 [ext_resource type="AudioStream" uid="uid://c86eeu7keebe8" path="res://Players/sfx library/railcontact.mp3" id="12_tntrf"]
 [ext_resource type="Texture2D" uid="uid://dghprnf0nfgv4" path="res://Players/Shared stuff/star outline.png" id="15_4mfyh"]
 [ext_resource type="Texture2D" uid="uid://cgynydgs3dur4" path="res://Players/Shared stuff/stardash fire.png" id="16_f7s8f"]
@@ -21,6 +22,16 @@
 [ext_resource type="Script" uid="uid://bvun0nhvs38g2" path="res://Players/Swift Roll/wallkick_lock_r.gd" id="18_pylmc"]
 [ext_resource type="Script" uid="uid://drqtsc3mbdm7q" path="res://Players/Swift Roll/wallkick_lock_l.gd" id="19_pbfsw"]
 [ext_resource type="Script" uid="uid://ciriv5xl0wy04" path="res://Players/Swift Roll/ledge_titer_handler.gd" id="21_60n1h"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_02jgc"]
+shader = ExtResource("12_nco40")
+shader_parameter/target_color = Color(0.019607844, 0.08235294, 0.45882353, 1)
+shader_parameter/replacement_color = Color(0.019607844, 0.08235294, 0.45882353, 1)
+shader_parameter/target_color2 = Color(0.02745098, 0.14117648, 0.6627451, 1)
+shader_parameter/replacement_color2 = Color(0.02745098, 0.14117648, 0.6627451, 1)
+shader_parameter/target_color3 = Color(0.549, 0.133, 0.706, 1)
+shader_parameter/replacement_color3 = Color(0.675, 0.796, 0.949, 1)
+shader_parameter/tolerance = 0.1
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7l80f"]
 radius = 7.06
@@ -265,11 +276,12 @@ jump_degrade_limit = -50.0
 inward_velocity_influence_adjust = 2.0
 inward_angle_influence_adjust = 1.5
 running_accel = 50.0
-air_drag_accel = 1.0
+air_drag_accel = 0.05
 Up_past_mach_accel = 6.7
 normal_ground_accel = 6.0
 Air_normal_accel = 4.0
 wall_cling_drag = 500.0
+shotdown_strength = 700
 inwall_gravity_limit = 1.0
 wall_run_gravity_multiplier = 25.0
 run_direction_gravity_multiplier = 10.0
@@ -423,14 +435,16 @@ volume_db = 12.0
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 z_as_relative = false
 texture_repeat = 1
+material = SubResource("ShaderMaterial_02jgc")
 position = Vector2(0, 18.235292)
 scale = Vector2(0.6, 0.578)
 sprite_frames = ExtResource("3_op7ga")
-animation = &"wall_cling_idle"
+animation = &"wall_shot"
 autoplay = "idle"
 offset = Vector2(0, -42)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
 position = Vector2(0, -1.1920929e-07)
 shape = SubResource("CapsuleShape2D_7l80f")
 
@@ -513,6 +527,8 @@ head_offset = Vector2(1.7, -8)
 stretch_limit = 1.5
 extension_multiplier = 1.5
 velocity_influence = 0.001
+color_inner = Color(0.02745098, 0.14117648, 0.6627451, 1)
+color_edge = Color(0.019607844, 0.08235294, 0.45882353, 1)
 
 [node name="wallkick_lockR" type="Node2D" parent="."]
 position = Vector2(7.0588245, 0)
