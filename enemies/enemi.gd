@@ -6,6 +6,10 @@ var Player
 var health = Maxhealth
 const Minhealth = 0
 @export var can_die = true
+@onready var area_2d: Area2D = $Area2D
+@onready var collision_shape_2d: CollisionShape2D = $CollisionShape2D
+
+
 
 func _physics_process(delta):
 	if knockback == true and can_die == true:
@@ -37,3 +41,15 @@ func _on_area_2d_body_entered(body):
 			health = health - 2
 			body.enemybouncesfx.play()
 			body.camera_2d.trigger_shake()
+
+
+func _on_visible_on_screen_notifier_2d_screen_entered() -> void:
+	area_2d.monitorable = true
+	area_2d.monitoring = true
+	pass # Replace with function body.
+
+
+func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
+	area_2d.monitorable = false
+	area_2d.monitoring = false
+	pass # Replace with function body.

@@ -22,7 +22,7 @@ func _on_body_entered(body):
 		player.no_slope_launch = no_slope_launch
 		player.can_uproll = no_uproll
 		player.floor_slope_disable = true
-		print("in slope")
+		#print("in slope")
 
 
 func _on_body_exited(body):
@@ -32,3 +32,13 @@ func _on_body_exited(body):
 		player.can_uproll = false
 		player.no_slope_launch = false
 		player.floor_slope_disable = false
+
+
+func _on_visible_on_screen_notifier_2d_screen_entered() -> void:
+	monitorable = true
+	monitoring = true
+
+
+func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
+	monitorable = false
+	monitoring = false

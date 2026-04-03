@@ -416,7 +416,7 @@ func _physics_process(delta):
 			is_grinding()
 
 		MovementMode.WATER:
-			on_water(delta, direction)
+			inside_water(delta, direction)
 
 		MovementMode.TELEPORTING:
 			chosing_teleport_location(delta)
@@ -2199,21 +2199,42 @@ func apply_vine_pull(delta):
 
 
 var splash = false
-func on_water(delta, direction):
+var first_splash = false
+var bounce = false
+func inside_water(delta, direction):
 	can_walldive_left = false
 	can_walldive_right = false
+	can_water_run = false
+	wallkick_lock_r.enabled = true
+	wallkick_lock_l.enabled = true
 	if is_on_floor() :
 		if angler_dir == 0:
 			velocity.y = JUMP_VELOCITY /2
+		first_splash = false
 		mode = MovementMode.NORMAL
-	if splash == false:
-		velocity = velocity * 0.75
+	if splash == false and in_water:
+		print("starting velocity ", velocity.y)
+		velocity.x = velocity.x / 1.33
+		if velocity.y < 0:
+			if not first_splash:
+				velocity.y = velocity.y * 0.75
+		else:
+			if velocity.y <= 300:
+				velocity.y = 300
+				print("corrective splash")
+			else:
+				if not first_splash:
+					velocity.y = velocity.y * 0.75
+			
+		print(velocity.y)
 		splash = true
+		first_splash = true
 	else:
 		if in_water == true:
 			if abs(velocity.x) > in_water_SPEED:
 				velocity.x = move_toward(velocity.x, 0, water_drag)
-			velocity.x =  move_toward(velocity.x, in_water_SPEED * direction, walking_accel)
+			if bounce == false:
+				velocity.x =  move_toward(velocity.x, in_water_SPEED * direction, walking_accel / wind_power)
 			if boost_mode > 0:
 				boost_mode = move_toward(boost_mode, 0, boost_mode_water_drag)
 			#print(boost_mode)
@@ -2225,16 +2246,33 @@ func on_water(delta, direction):
 			velocity.y -= water_accel /2.0
 			water_accel = water_accel + 0.05
 		else:
+			splash = false
 			water_accel = 0
 			if skates_on == false:
 				velocity.x =  move_toward(velocity.x, Walking_SPEED * direction, walking_accel)
 			else:
 				velocity.x =  move_toward(velocity.x, Base_Skates_SPEED * direction, Air_normal_accel)
 			velocity.y += gravity * delta
-	wind_push(delta*2)
-	if conveyor_power != 0:
-		conveyor_push(delta, direction)
+	wind_push(delta)
+
+	if conveyor_power != 0 and not bounce:
+		conveyor_push(delta , direction)
+		bounce = true
+	
 	move_and_slide()
+	if is_on_wall():
+		if wallkick_lock_r.is_colliding == true:
+			velocity.x = JUMP_VELOCITY * 1
+			bounce = true
+			#print(velocity.x)
+		elif wallkick_lock_l.is_colliding == true:
+			velocity.x = JUMP_VELOCITY  * -1
+			bounce = true
+			#print(velocity.x)
+	if wallkick_lock_r.is_colliding == false and wallkick_lock_l.is_colliding == false:
+		if bounce == true:
+			print("bounce true")
+		bounce = false
 
 
 var wind_area_dir = Vector2.ZERO
@@ -2247,7 +2285,12 @@ func wind_push(delta):
 var main_velocity : Vector2
 func conveyor_push(delta, direction):
 	if conveyor_area_dir != Vector2.ZERO:
+		if mode == MovementMode.WATER:
+			velocity = conveyor_power * conveyor_area_dir
+			print(velocity)
+			return 
 		#print("yes")
+		
 		if conveyor_input_offset <= 0:
 			if skates_on and abs(conveyor_area_dir.x) > abs(conveyor_area_dir.y):
 				if not_moving_x: 
@@ -2571,4 +2614,5 @@ func chosing_teleport_location(delta):
 
 
 func _on_walldive_start_downroll_buffer_timer_timeout() -> void:
-	print("yesir")
+	pass
+	#print("yesir")
