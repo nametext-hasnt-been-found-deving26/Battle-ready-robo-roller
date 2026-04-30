@@ -1,0 +1,21 @@
+[gd_scene load_steps=5 format=3 uid="uid://c5ytubq8frwqm"]
+
+[ext_resource type="Shader" uid="uid://b3sy86rxjpdv2" path="res://others/shader_materials/leafs/leaf_shader.gdshader" id="1_x2msp"]
+[ext_resource type="Script" uid="uid://dmrfjudrlnty0" path="res://others/shader_materials/leafs/leaf_box.gd" id="2_vnvuo"]
+[ext_resource type="Texture2D" uid="uid://c1rfjxds6ou5x" path="res://others/shader_materials/leafs/leaf.png" id="2_xs8xb"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5m7ek"]
+shader = ExtResource("1_x2msp")
+shader_parameter/leaf_texture = ExtResource("2_xs8xb")
+shader_parameter/particle_count = 120
+shader_parameter/speed = 0.3
+shader_parameter/size = 10.0
+shader_parameter/lifetime = 10.0
+shader_parameter/overlap_boost_mult = 1.5
+shader_parameter/rect_size = Vector2(100, 100)
+
+[node name="TextureRect" type="ColorRect"]
+material = SubResource("ShaderMaterial_5m7ek")
+offset_right = 1278.0
+offset_bottom = 711.0
+script = ExtResource("2_vnvuo")

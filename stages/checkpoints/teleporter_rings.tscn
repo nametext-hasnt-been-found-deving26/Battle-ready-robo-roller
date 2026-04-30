@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3 uid="uid://dj0s7inesajpv"]
+
+[ext_resource type="Texture2D" uid="uid://col2on2cc2ay4" path="res://stages/checkpoints/teleporters.png" id="1_aous1"]
+[ext_resource type="Script" uid="uid://wr1ivgadlof0" path="res://teleporter_rings.gd" id="2_r6mct"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6wtow"]
+atlas = ExtResource("1_aous1")
+region = Rect2(51.98815, 98.00629, 72.02629, 6.0109787)
+
+[node name="teleporter_rings" type="Sprite2D"]
+texture = SubResource("AtlasTexture_6wtow")
+script = ExtResource("2_r6mct")
+base_color = Color(1, 1, 1, 1)
+fade_time = 1.0
+acending_multiplier = 1.5

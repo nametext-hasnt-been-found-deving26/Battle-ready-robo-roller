@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://cficrv43kx21w"]
+
+[ext_resource type="Script" uid="uid://julruydsuk40" path="res://others/shader_materials/they let my thoughts wonder undisturbed.gd" id="1_v1xh4"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_737pr"]
+size = Vector2(40, 40)
+
+[node name="dark places comfort me" type="ColorRect"]
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0, 0, 0, 0.61960787)
+script = ExtResource("1_v1xh4")
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(20, 20)
+shape = SubResource("RectangleShape2D_737pr")
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="Area2D" to="." method="_on_area_2d_body_exited"]

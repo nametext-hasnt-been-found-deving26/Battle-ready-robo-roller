@@ -1,0 +1,264 @@
+[gd_scene load_steps=9 format=3 uid="uid://bbxogwa1uudyk"]
+
+[ext_resource type="Script" uid="uid://62owbuwb7kff" path="res://ui/pausemenu.gd" id="1_i6344"]
+[ext_resource type="Shader" uid="uid://ce85geu6om81" path="res://ui/ui.gdshader" id="2_hpi63"]
+[ext_resource type="Script" uid="uid://dgj83ws03y4au" path="res://ui/scroll_container.gd" id="3_qg8xq"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0td2y"]
+shader = ExtResource("2_hpi63")
+shader_parameter/lod = 0.0
+shader_parameter/tint_strength = 2.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_q775a"]
+
+[sub_resource type="Animation" id="Animation_6nimu"]
+length = 0.001
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PanelContainer:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(2),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("PanelContainer:modulate:b")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(2),
+"points": PackedFloat32Array(1, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/2/type = "bezier"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("PanelContainer:modulate:g")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"handle_modes": PackedInt32Array(2),
+"points": PackedFloat32Array(1, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/3/type = "bezier"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("PanelContainer:modulate:r")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"handle_modes": PackedInt32Array(2),
+"points": PackedFloat32Array(1, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("ColorRect:material:shader_parameter/lod")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("ColorRect:modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_5emoi"]
+resource_name = "blur"
+length = 0.6
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PanelContainer:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.6)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("PanelContainer:modulate:b")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.6)
+}
+tracks/2/type = "bezier"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("PanelContainer:modulate:g")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.6)
+}
+tracks/3/type = "bezier"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("PanelContainer:modulate:r")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.6)
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("ColorRect:material:shader_parameter/lod")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 3.575]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("ColorRect:modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_v1qp0"]
+_data = {
+&"RESET": SubResource("Animation_6nimu"),
+&"blur": SubResource("Animation_5emoi")
+}
+
+[node name="PauseMenu" type="Control"]
+process_mode = 3
+visibility_layer = 16
+z_index = 6
+z_as_relative = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_top = -2.0
+offset_right = 1.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_i6344")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+modulate = Color(1, 1, 1, 0)
+self_modulate = Color(0.996078, 0.992157, 1, 1)
+material = SubResource("ShaderMaterial_0td2y")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+auto_translate_mode = 2
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -139.0
+offset_top = -148.0
+offset_right = 139.0
+offset_bottom = 148.0
+grow_horizontal = 2
+grow_vertical = 2
+localize_numeral_system = false
+theme_override_styles/panel = SubResource("StyleBoxEmpty_q775a")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer"]
+process_mode = 2
+clip_contents = false
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+script = ExtResource("3_qg8xq")
+
+[node name="Content" type="Control" parent="PanelContainer/ScrollContainer"]
+layout_mode = 2
+
+[node name="resume" type="Button" parent="PanelContainer/ScrollContainer/Content"]
+layout_mode = 0
+offset_top = 97.0
+offset_right = 278.0
+offset_bottom = 128.0
+focus_neighbor_top = NodePath("../quit")
+focus_neighbor_bottom = NodePath("../restart")
+text = "resume"
+
+[node name="restart" type="Button" parent="PanelContainer/ScrollContainer/Content"]
+layout_mode = 0
+offset_top = 115.0
+offset_right = 278.0
+offset_bottom = 146.0
+focus_neighbor_top = NodePath("../resume")
+focus_neighbor_bottom = NodePath("../downwards_dash_mode")
+text = "restart"
+
+[node name="downwards_dash_mode" type="Button" parent="PanelContainer/ScrollContainer/Content"]
+layout_mode = 0
+offset_right = 194.0
+offset_bottom = 31.0
+focus_neighbor_top = NodePath("../restart")
+focus_neighbor_bottom = NodePath("../quit")
+text = "downwards_dash_mode"
+
+[node name="quit" type="Button" parent="PanelContainer/ScrollContainer/Content"]
+layout_mode = 0
+offset_top = 132.0
+offset_right = 278.0
+offset_bottom = 163.0
+focus_neighbor_top = NodePath("../downwards_dash_mode")
+focus_neighbor_bottom = NodePath("../resume")
+text = "quit"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_v1qp0")
+}
+
+[connection signal="pressed" from="PanelContainer/ScrollContainer/Content/resume" to="." method="_on_resume_pressed"]
+[connection signal="pressed" from="PanelContainer/ScrollContainer/Content/restart" to="." method="_on_restart_pressed"]
+[connection signal="pressed" from="PanelContainer/ScrollContainer/Content/downwards_dash_mode" to="." method="_on_downwards_dash_mode_pressed"]
+[connection signal="pressed" from="PanelContainer/ScrollContainer/Content/quit" to="." method="_on_quit_pressed"]

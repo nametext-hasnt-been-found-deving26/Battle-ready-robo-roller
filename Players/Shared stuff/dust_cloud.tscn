@@ -1,0 +1,41 @@
+[gd_scene load_steps=6 format=3 uid="uid://dd5bflc6ja565"]
+
+[ext_resource type="Texture2D" uid="uid://bafs7uhhsr5wj" path="res://Players/Shared stuff/dust_cloud.png" id="1_s2bei"]
+[ext_resource type="Script" uid="uid://bc5ohjur80v77" path="res://Players/Shared stuff/dust_cloud.gd" id="2_4iqao"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s2bei"]
+atlas = ExtResource("1_s2bei")
+region = Rect2(52, 16, 35, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4iqao"]
+atlas = ExtResource("1_s2bei")
+region = Rect2(15, 16, 35, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6lp50"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s2bei")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4iqao")
+}],
+"loop": true,
+"name": &"spike",
+"speed": 5.0
+}]
+
+[node name="dust_cloud" type="AnimatedSprite2D"]
+z_index = 3
+sprite_frames = SubResource("SpriteFrames_6lp50")
+animation = &"spike"
+offset = Vector2(0, -8)
+script = ExtResource("2_4iqao")
+base_color = Color(1, 1, 1, 1)
+fade_time = 1.05
+growth_multiplier = 1.3
