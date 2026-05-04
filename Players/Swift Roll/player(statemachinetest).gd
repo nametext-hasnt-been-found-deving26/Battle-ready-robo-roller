@@ -731,10 +731,10 @@ func apply_main_movement(delta, direction):
 				velocity.y = abs(velocity.x) * -1
 				can_wallrun_right = true
 				
-				print("uprolling")
+				#print("uprolling")
 				possiblewallrun_timer.start()
 			elif angler_dir == 1 and velocity.x <= 0 and (angle * (180 / 3.141592)) >= 75 and slope_launched == false and not disable_slope_launch() and can_uproll == false and can_downroll == false:
-				print("uprolling")
+				#print("uprolling")
 				dodash = false
 				velocity.y = abs(velocity.x) * -1
 				can_wallrun_left = true
@@ -846,7 +846,7 @@ func apply_main_movement(delta, direction):
 			#print(jump_bounce_multiplier)
 			imnContact = true
 			velocity = slope_launch_direction
-			if wallrunning_wallchecker.is_colliding():
+			if is_on_floor():
 				
 				velocity += wallrunning_wallchecker.get_collision_normal() * -JUMP_VELOCITY * jump_bounce_multiplier
 			else:
@@ -955,7 +955,7 @@ func apply_main_movement(delta, direction):
 			if slope_launched == false:
 						#print("shit")
 				if angler_dir != 0 and is_on_floor():
-					velocity.x = move_toward(velocity.x + (angle * angler_dir * 25) , (skating_SPEED - delta) * direction  , accel)
+					velocity.x = move_toward(velocity.x + (angle * angler_dir * 25) , 0  , accel)
 					#velocity.y += (gravity * delta) * (angle * (180 / 3.141592))
 
 					#print (rolling)
@@ -964,7 +964,7 @@ func apply_main_movement(delta, direction):
 			#print (velocity.x)
 			#print(angle)
 		#main control line for skates mode -------------------------------------------------------------
-		velocity.x = move_toward(velocity.x + (angle * angler_dir * 20), skating_SPEED  * direction, accel) if is_on_floor() else move_toward(velocity.x , Base_Skates_SPEED  * direction, accel)
+			velocity.x = move_toward(velocity.x + (angle * angler_dir * 20), skating_SPEED  * direction, accel) if is_on_floor() else move_toward(velocity.x , Base_Skates_SPEED  * direction, accel)
 		#manage exeed mach
 		if velocity.x * direction >= Base_Skates_SPEED + abs(conveyor_power) and is_on_floor() and abs(velocity.x) > skating_SPEED:
 			skating_SPEED = abs(velocity.x) if velocity.x * direction >= Base_Skates_SPEED + abs(conveyor_power) and is_on_floor() and abs(velocity.x) > skating_SPEED else move_toward(skating_SPEED, Base_Skates_SPEED, accel)
@@ -1017,9 +1017,9 @@ func apply_main_movement(delta, direction):
 				velocity.y += store_y 
 				#floor_snap_length = 1000
 				
-				print("vel downroll ",velocity, "store y ", store_y)
+				#print("vel downroll ",velocity, "store y ", store_y)
 				
-				print(tangent.angle()* (180.0 / 3.141592))
+				#print(tangent.angle()* (180.0 / 3.141592))
 				#velocity.y += (gravity * delta) * (angle * (180 / 3.141592)) 
 				downrolling = false
 				#can_downroll = false
@@ -1162,7 +1162,7 @@ func apply_main_movement(delta, direction):
 			boost_mode = abs(velocity.x) * 1.026
 			#print("boost mode", boost_mode)
 
-	if is_on_wall_only() and dodash == true and not downdash : if wallkick_lock_l.is_colliding or wallkick_lock_r.is_colliding :  mode = MovementMode.WALL_CLING ; print("wallclinged"); dodash = false
+	if is_on_wall_only() and dodash == true and not downdash : if wallkick_lock_l.is_colliding or wallkick_lock_r.is_colliding :  mode = MovementMode.WALL_CLING; dodash = false
 
 	if dodash == true and Input.is_action_pressed("dash"):
 		can_wallrun_left = false
@@ -2026,15 +2026,15 @@ func running_upside_down(direction, delta):
 	or abs(player_vel) < maintain_ceiling_run_speed 
 	or is_on_wall()
 	):
-		if  not wallrunning_wallchecker.is_colliding(): print("no cheker ", rotation_degrees )
-		if abs(player_vel) < maintain_ceiling_run_speed: print("too low velocity", player_vel)
-		if is_on_wall(): print("angle", ceiling_angle)
+		#if  not wallrunning_wallchecker.is_colliding(): print("no cheker ", rotation_degrees )
+		#if abs(player_vel) < maintain_ceiling_run_speed: print("too low velocity", player_vel)
+		#if is_on_wall(): print("angle", ceiling_angle)
 		init_angle_dir = 0
 		up_angle = 0
 		pre_angle = 0
 		starter = false
 		if is_on_wall() and abs(ceiling_angle) > 25:
-			print("walled")
+			#print("walled")
 			if player_vel < 0:
 				can_walldive_left = true
 			elif player_vel > 0:
@@ -2061,7 +2061,7 @@ func running_upside_down(direction, delta):
 		pre_angle = 0
 		could_wall_kick = false
 
-		print ("wont")
+		#print ("wont")
 		#print(velocity)
 		jump_ball = true
 		return
@@ -2099,10 +2099,10 @@ func _handle_pre_angle():
 
 func _handle_player_upsidedown_velocity(direction,delta):
 	if starter == false  and not ceiling_angle == 0:
-		print ("speed length ",store_vel_for_backwards.length(), "angle", abs(ceiling_angle)/ ceiling_angle )
+		#print ("speed length ",store_vel_for_backwards.length(), "angle", abs(ceiling_angle)/ ceiling_angle )
 		if store_vel_for_backwards.y < abs(store_vel_for_backwards.x)* -1 or can_wallrun_left or can_wallrun_right:
 			player_vel =  store_vel_for_backwards.length() * (abs(ceiling_angle)/ ceiling_angle)
-			print(player_vel, " player vel")
+			#print(player_vel, " player vel")
 			starter = true
 			print("upies")
 		elif store_vel_for_backwards.y > abs(store_vel_for_backwards.x)* -1 and ceiling_angle != 0 and store_vel_for_backwards.x != 0 and store_vel_for_backwards.y != 0:
@@ -2128,7 +2128,7 @@ func _handle_player_upsidedown_velocity(direction,delta):
 			player_vel  = move_toward(player_vel + deg_to_rad(ceiling_angle * -1)  , skating_SPEED  * direction * init_angle_dir, (normal_ground_accel/2)* (2 * direction))
 		elif direction * player_vel > 0:
 			player_vel  = move_toward(player_vel + deg_to_rad(ceiling_angle * -1)  , skating_SPEED  * direction, ground_forward_past_top_speed_accel)
-		print(deg_to_rad(ceiling_angle * -1))
+		#print(deg_to_rad(ceiling_angle * -1))
 	
 	if abs(player_vel ) > 2000:
 		create_dash_effect(delta)
@@ -2259,7 +2259,7 @@ func _set_wall_shot(setup_speed: Vector2, added_vel: float):
 		velocity += Vector2(added_vel, added_vel)
 	velocity.x *= dashDirection
 
-	print(wallshotTimer.time_left)
+	#print(wallshotTimer.time_left)
 	#wallcling_cooldown.start()
 	jump_buffer = false
 

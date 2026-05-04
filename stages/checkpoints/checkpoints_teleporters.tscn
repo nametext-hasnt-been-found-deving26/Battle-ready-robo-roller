@@ -53,6 +53,7 @@ region = Rect2(150.85403, 134.93329, 76.36502, 5.1022186)
 
 [node name="checkpoints_teleporters" type="Marker2D"]
 script = ExtResource("1_oqnpe")
+respawn_id = null
 ring_buffer_time_duration = 0.5
 rings = ExtResource("2_yxhow")
 post_base_color1 = Color(0.22352941, 0.09411765, 0.27450982, 1)
@@ -61,7 +62,14 @@ post_base_color3 = Color(0.7254902, 0, 1, 1)
 bulb_base_color1 = Color(0.09019608, 0.039215688, 0.10980392, 1)
 bulb_base_color2 = Color(0.38039216, 0.05490196, 0.5019608, 1)
 bulb_base_color3 = Color(0.54901963, 0.13333334, 0.7058824, 1)
+post_replacement_color1 = null
+post_replacement_color2 = null
+post_replacement_color3 = null
+bulb_replacement_color1 = null
+bulb_replacement_color2 = null
+bulb_replacement_color3 = null
 non_active_accel = 1.2
+non_active_drag = null
 active_drag = 0.1
 
 [node name="Area2D" type="Area2D" parent="."]

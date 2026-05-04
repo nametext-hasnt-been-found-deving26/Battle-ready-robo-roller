@@ -1,9 +1,9 @@
 [gd_scene load_steps=9 format=3 uid="uid://ciopw3rbfwj4c"]
 
 [ext_resource type="Texture2D" uid="uid://c1rfjxds6ou5x" path="res://others/shader_materials/leafs/leaf.png" id="1_7yuj2"]
-[ext_resource type="Shader" uid="uid://dl3opfq7k1215" path="res://leaf_particles2.gdshader" id="1_44su0"]
-[ext_resource type="Shader" uid="uid://cevhl28go68dx" path="res://leaf_particles.gdshader" id="1_ath2g"]
-[ext_resource type="Script" uid="uid://cy3g27ge5h7ry" path="res://leaf_particles.gd" id="1_igmao"]
+[ext_resource type="Shader" uid="uid://dl3opfq7k1215" path="res://others/shader_materials/leafs/leaf_particles2.gdshader" id="1_44su0"]
+[ext_resource type="Shader" uid="uid://cevhl28go68dx" path="res://others/shader_materials/leafs/leaf_particles.gdshader" id="1_ath2g"]
+[ext_resource type="Script" uid="uid://cy3g27ge5h7ry" path="res://others/shader_materials/leafs/leaf_particles.gd" id="1_igmao"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_44su0"]
 shader = ExtResource("1_44su0")
@@ -59,6 +59,7 @@ amount = 900
 texture = ExtResource("1_7yuj2")
 lifetime = 45.0
 randomness = 1.0
+fixed_fps = 15
 interpolate = false
 fract_delta = false
 process_material = SubResource("ParticleProcessMaterial_7yuj2")

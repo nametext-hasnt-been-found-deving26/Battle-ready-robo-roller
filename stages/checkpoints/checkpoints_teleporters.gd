@@ -1,9 +1,12 @@
+class_name CheckpointTeleporter
 extends Marker2D
 @onready var post: Sprite2D = $post
 @onready var post_bulb: Sprite2D = $post/post_bulb
 @onready var glow: Sprite2D = $glow
 
 @export var respawn_id: String
+
+var point_image: Texture2D
 
 @export_group("rings")
 @export var ring_buffer_time_duration: float = 0.1
@@ -52,8 +55,11 @@ func _ready() -> void:
 		restart_post_color()
 		glow.modulate.a = 0
 
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	#if not point_image:
+		#print(point_image)
 	if abs(post_bulb.rotation_degrees) >= 360:
 		post_bulb.rotation_degrees = 0
 	if activated == false:
@@ -94,16 +100,16 @@ func active(delta):
 			if not post_bulb.rotation_degrees == 0:
 				HandlePlayerInStage.respawn = true
 				HandlePlayerInStage.respawn_point = global_position
-				HandlePlayerInStage.activate_respawn(respawn_id, global_position)
-				var stage = get_tree().current_scene
-				var texture = await stage.capture_checkpoint_preview(global_position)
-				#checkpoint_data["preview"] = texture
+				HandlePlayerInStage.activate_respawn(respawn_id, global_position, point_image)
+
+
 			current_accel = 0
 			post_bulb.rotation_degrees = 0
 			update_bulb_color(delta)
 			if player and player.can_teleport == true:
 				player.teleport_location_x = global_position.x
 				HandlePlayerInStage.current_checkpoint_id = respawn_id
+
 			#if player.teleporting == true:
 
 

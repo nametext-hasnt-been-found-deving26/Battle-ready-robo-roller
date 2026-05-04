@@ -6,6 +6,7 @@ var respawn_point: Vector2
 var activated_respawns: Array = []
 var activated_checkpoints: Array = []
 var current_checkpoint_id
+#var texture: Texture2D
 
 func _ready():
 	print("autoload check")
@@ -26,7 +27,7 @@ func _on_scene_changed():
 			print("respawn")
 			scene.respawn_point = respawn_point
 
-func activate_respawn(id: String, position: Vector2) -> void:
+func activate_respawn(id: String, position: Vector2, texture: Texture2D) -> void:
 	if has_checkpoint(id):
 		return
 
@@ -39,7 +40,7 @@ func activate_respawn(id: String, position: Vector2) -> void:
 	
 	
 	if stage and stage.is_in_group("stage"):
-		var texture = await stage.capture_checkpoint_preview(position)
+		
 		print("Captured texture:", texture)
 
 		activated_checkpoints.append({

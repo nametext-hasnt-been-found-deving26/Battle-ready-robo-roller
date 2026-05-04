@@ -1,4 +1,4 @@
-[gd_scene load_steps=78 format=3 uid="uid://c1m7wvncjej4a"]
+[gd_scene load_steps=79 format=3 uid="uid://c1m7wvncjej4a"]
 
 [ext_resource type="Script" uid="uid://bxb6ubtvgace4" path="res://stages/test_stage.gd" id="1_wf2lb"]
 [ext_resource type="AudioStream" uid="uid://cymhj7fxf5trd" path="res://stages/stage_music/teststageplaceholder.mp3" id="2_hjq3q"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://cyn8r84m3tvvw" path="res://stages/stage backsground_parallax/desert_a.png" id="4_x4sk3"]
 [ext_resource type="PackedScene" uid="uid://bft5tela22vqs" path="res://ui/ui.tscn" id="6_if1m5"]
 [ext_resource type="PackedScene" uid="uid://cxjxo5y63x2yg" path="res://stages/checkpoints/checkpoints_teleporters.tscn" id="7_hjq3q"]
+[ext_resource type="Script" uid="uid://kwu80nc5nu70" path="res://stages/preview_creator.gd" id="7_lnaim"]
 [ext_resource type="Script" uid="uid://df7yj4pyf7qig" path="res://stages/player_position_handler.gd" id="7_nlxau"]
 [ext_resource type="PackedScene" uid="uid://blhaepagb6loq" path="res://slope_anglers/R/slope_rangler.tscn" id="7_yf65u"]
 [ext_resource type="PackedScene" uid="uid://sexj72eisr2u" path="res://slope_anglers/Back R/backslope_rangler.tscn" id="8_ff5p3"]
@@ -31,7 +32,7 @@
 [ext_resource type="Texture2D" uid="uid://b41mn0ytjcofg" path="res://ui/ui robo_roller.png" id="25_nfr3m"]
 [ext_resource type="PackedScene" uid="uid://becmuif6ldbcy" path="res://stages/checkpoints/teleportation_menu.tscn" id="29_53dow"]
 [ext_resource type="PackedScene" uid="uid://cficrv43kx21w" path="res://others/shader_materials/dark_places_comfort_me.tscn" id="31_yf65u"]
-[ext_resource type="PackedScene" uid="uid://ciopw3rbfwj4c" path="res://leaf_particles.tscn" id="32_ff5p3"]
+[ext_resource type="PackedScene" uid="uid://ciopw3rbfwj4c" path="res://others/shader_materials/leafs/leaf_particles.tscn" id="32_ff5p3"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uccoq"]
 texture = ExtResource("3_nlxau")
@@ -397,6 +398,8 @@ position = Vector2(1536.9999, 383)
 scale = Vector2(1.5000002, 1.5000002)
 respawn_id = "Respawner t-1"
 
+[node name="Camera2D" type="Camera2D" parent="teleporters/checkpoints_teleporters"]
+
 [node name="checkpoints_teleporters2" parent="teleporters" instance=ExtResource("7_hjq3q")]
 position = Vector2(3109.9998, -12023)
 scale = Vector2(1.5000002, 1.5000002)
@@ -407,6 +410,8 @@ material = SubResource("ShaderMaterial_x4sk3")
 
 [node name="post_bulb" parent="teleporters/checkpoints_teleporters2/post" index="0"]
 material = SubResource("ShaderMaterial_ex3l7")
+
+[node name="Camera2D" type="Camera2D" parent="teleporters/checkpoints_teleporters2"]
 
 [node name="checkpoints_teleporters3" parent="teleporters" instance=ExtResource("7_hjq3q")]
 position = Vector2(17228, -9815)
@@ -419,6 +424,8 @@ material = SubResource("ShaderMaterial_if1m5")
 [node name="post_bulb" parent="teleporters/checkpoints_teleporters3/post" index="0"]
 material = SubResource("ShaderMaterial_lnaim")
 
+[node name="Camera2D" type="Camera2D" parent="teleporters/checkpoints_teleporters3"]
+
 [node name="checkpoints_teleporters4" parent="teleporters" instance=ExtResource("7_hjq3q")]
 position = Vector2(18806, -9166)
 scale = Vector2(1.5000002, 1.5000002)
@@ -429,6 +436,8 @@ material = SubResource("ShaderMaterial_ff5p3")
 
 [node name="post_bulb" parent="teleporters/checkpoints_teleporters4/post" index="0"]
 material = SubResource("ShaderMaterial_xs3dc")
+
+[node name="Camera2D" type="Camera2D" parent="teleporters/checkpoints_teleporters4"]
 
 [node name="checkpoints_teleporters5" parent="teleporters" instance=ExtResource("7_hjq3q")]
 position = Vector2(14639.998, -8223.999)
@@ -441,6 +450,8 @@ material = SubResource("ShaderMaterial_xro35")
 [node name="post_bulb" parent="teleporters/checkpoints_teleporters5/post" index="0"]
 material = SubResource("ShaderMaterial_eol6t")
 
+[node name="Camera2D" type="Camera2D" parent="teleporters/checkpoints_teleporters5"]
+
 [node name="checkpoints_teleporters6" parent="teleporters" instance=ExtResource("7_hjq3q")]
 position = Vector2(-1125, -5463)
 scale = Vector2(1.5000002, 1.5000002)
@@ -452,6 +463,8 @@ material = SubResource("ShaderMaterial_qv0s7")
 [node name="post_bulb" parent="teleporters/checkpoints_teleporters6/post" index="0"]
 material = SubResource("ShaderMaterial_wjltx")
 
+[node name="Camera2D" type="Camera2D" parent="teleporters/checkpoints_teleporters6"]
+
 [node name="checkpoints_teleporters7" parent="teleporters" instance=ExtResource("7_hjq3q")]
 position = Vector2(479.99997, 1293)
 scale = Vector2(1.5000002, 1.5000002)
@@ -462,6 +475,11 @@ material = SubResource("ShaderMaterial_dnvph")
 
 [node name="post_bulb" parent="teleporters/checkpoints_teleporters7/post" index="0"]
 material = SubResource("ShaderMaterial_8iebk")
+
+[node name="Camera2D" type="Camera2D" parent="teleporters/checkpoints_teleporters7"]
+
+[node name="preview_creator" type="Node" parent="teleporters"]
+script = ExtResource("7_lnaim")
 
 [node name="player_position_handler" type="Marker2D" parent="." groups=["player_position_handler"]]
 position = Vector2(356, 215)
@@ -2905,7 +2923,9 @@ position = Vector2(323, 1199)
 skate_icon_off = SubResource("AtlasTexture_moclp")
 
 [node name="PreviewViewport" type="SubViewport" parent="."]
-size = Vector2i(150, 100)
+handle_input_locally = false
+oversampling = false
+size = Vector2i(1800, 1800)
 render_target_update_mode = 4
 
 [node name="PreviewCamera" type="Camera2D" parent="PreviewViewport"]
@@ -2921,10 +2941,10 @@ zoom = Vector2(0.07, 0.07)
 
 [node name="dark places comfort me" parent="shader_boxes" instance=ExtResource("31_yf65u")]
 z_index = -1
-offset_left = -3546.0
-offset_top = 677.0
-offset_right = -3506.0
-offset_bottom = 717.0
+offset_left = -3629.0
+offset_top = 632.0
+offset_right = -3589.0
+offset_bottom = 672.0
 scale = Vector2(289.4556, 101.78716)
 
 [node name="RayCast2D" type="RayCast2D" parent="."]
@@ -2933,13 +2953,15 @@ scale = Vector2(10, 10)
 target_position = Vector2(-1354.5, -613.6)
 
 [node name="TextureRect" parent="." instance=ExtResource("32_ff5p3")]
-z_index = -1
+z_index = -2
 offset_left = -3719.0
-offset_top = -3648.0
-offset_right = 7859.0
+offset_top = -14927.0
+offset_right = 24347.0
 offset_bottom = 634.0
 texture = SubResource("ViewportTexture_ex3l7")
+amount = 300
 lifetime = 400.0
+viewport_fill_in = Vector2(4, 1)
 
 [editable path="parallax/Control"]
 [editable path="teleporters/checkpoints_teleporters2"]

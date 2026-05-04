@@ -25,8 +25,8 @@ var current_pos: Vector2
 
 
 func _ready() -> void:
-
-	print(handle_origin)
+	pass
+	#print(handle_origin)
 
 
 func _physics_process(delta):
