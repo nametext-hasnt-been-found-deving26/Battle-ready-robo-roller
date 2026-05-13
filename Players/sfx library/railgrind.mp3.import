@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cic0w6ghy62nx"
+path="res://.godot/imported/railgrind.mp3-98cff9d25152190db1b93bd23955bd5d.mp3str"
+
+[deps]
+
+source_file="res://Players/sfx library/railgrind.mp3"
+dest_files=["res://.godot/imported/railgrind.mp3-98cff9d25152190db1b93bd23955bd5d.mp3str"]
+
+[params]
+
+loop=true
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

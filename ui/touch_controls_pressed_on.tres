@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://dn3magg47my16"]
+
+[ext_resource type="Texture2D" uid="uid://b41mn0ytjcofg" path="res://ui/ui robo_roller.png" id="1_ivgcx"]
+
+[resource]
+atlas = ExtResource("1_ivgcx")
+region = Rect2(58.09692, 49.05951, 41.902622, 20.05156)

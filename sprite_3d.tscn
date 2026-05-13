@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3 uid="uid://m82c4xe2xpyf"]
+
+[ext_resource type="Shader" uid="uid://fkcdqldw1tny" path="res://shader3d.gdshader" id="1_x3a0m"]
+[ext_resource type="Texture2D" uid="uid://bwvtvdan6iflj" path="res://others/sonic.png" id="2_325i5"]
+[ext_resource type="Script" uid="uid://bnhih15hdc8ci" path="res://sprite_3d.gd" id="3_325i5"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_325i5"]
+render_priority = 0
+shader = ExtResource("1_x3a0m")
+shader_parameter/sprite_texture = ExtResource("2_325i5")
+shader_parameter/target_color = Color(1, 1, 1, 1)
+shader_parameter/replacement_color = Color(1, 1, 1, 1)
+shader_parameter/target_color2 = Color(1, 1, 1, 1)
+shader_parameter/replacement_color2 = Color(0.525, 0.714, 0.957, 1)
+shader_parameter/target_color3 = Color(0.549, 0.133, 0.706, 1)
+shader_parameter/replacement_color3 = Color(0.675, 0.796, 0.949, 1)
+shader_parameter/target_color4 = Color(0.549, 0.133, 0.706, 1)
+shader_parameter/replacement_color4 = Color(0.675, 0.796, 0.949, 1)
+shader_parameter/target_color5 = Color(0.549, 0.133, 0.706, 1)
+shader_parameter/replacement_color5 = Color(0.675, 0.796, 0.949, 1)
+shader_parameter/target_color6 = Color(0.549, 0.133, 0.706, 1)
+shader_parameter/replacement_color6 = Color(0.675, 0.796, 0.949, 1)
+shader_parameter/target_color7 = Color(0.549, 0.133, 0.706, 1)
+shader_parameter/replacement_color7 = Color(0.675, 0.796, 0.949, 1)
+shader_parameter/target_color8 = Color(0.549, 0.133, 0.706, 1)
+shader_parameter/replacement_color8 = Color(0.675, 0.796, 0.949, 1)
+shader_parameter/target_color9 = Color(0.549, 0.133, 0.706, 1)
+shader_parameter/replacement_color9 = Color(0.675, 0.796, 0.949, 1)
+shader_parameter/tolerance = 0.1
+shader_parameter/brighten = 1.0
+shader_parameter/darken = 0.5
+shader_parameter/in_dark_place = true
+
+[node name="Sprite3D" type="Sprite3D"]
+material_override = SubResource("ShaderMaterial_325i5")
+texture = ExtResource("2_325i5")
+script = ExtResource("3_325i5")

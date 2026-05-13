@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3 uid="uid://b6mn0u3jv4xc2"]
+
+[ext_resource type="Script" uid="uid://bowaq60ija28k" path="res://others/cameos/andrick_easter_egg.gd" id="1_d424c"]
+[ext_resource type="AudioStream" uid="uid://b40vprktaqmyd" path="res://others/cameos/andrickeastereggsfx.mp3" id="2_owh34"]
+[ext_resource type="Texture2D" uid="uid://dis2mqrb81lb1" path="res://others/cameos/andrick_easter_egg.jpg" id="3_l6bsb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gpy0g"]
+size = Vector2(633, 632)
+
+[node name="andrick_easter_egg" type="Area2D"]
+script = ExtResource("1_d424c")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_owh34")
+volume_db = 9.75
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(1.5, 0)
+shape = SubResource("RectangleShape2D_gpy0g")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("3_l6bsb")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

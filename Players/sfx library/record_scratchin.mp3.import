@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://yvy8eohsu2kj"
+path="res://.godot/imported/record_scratchin.mp3-4df53c7055722244ad147a451f7a2997.mp3str"
+
+[deps]
+
+source_file="res://Players/sfx library/record_scratchin.mp3"
+dest_files=["res://.godot/imported/record_scratchin.mp3-4df53c7055722244ad147a451f7a2997.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://c7lqgd0or2aog"
+path="res://.godot/imported/wallkick.mp3-9f357a2137d941a72ccbdc1f71813bed.mp3str"
+
+[deps]
+
+source_file="res://Players/sfx library/wallkick.mp3"
+dest_files=["res://.godot/imported/wallkick.mp3-9f357a2137d941a72ccbdc1f71813bed.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0.0
+bpm=0
+beat_count=0
+bar_beats=4

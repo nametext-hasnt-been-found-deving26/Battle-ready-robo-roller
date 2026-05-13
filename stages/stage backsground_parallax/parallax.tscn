@@ -1,0 +1,43 @@
+[gd_scene load_steps=5 format=3 uid="uid://ck2ko6su5s81d"]
+
+[ext_resource type="Texture2D" uid="uid://cyn8r84m3tvvw" path="res://stages/stage backsground_parallax/desert_a.png" id="1_1g1u5"]
+[ext_resource type="PackedScene" uid="uid://7qsog2ljagsn" path="res://Players/Swift Roll/player.tscn" id="2_ur60c"]
+[ext_resource type="Script" uid="uid://dinhl5qhtvp2h" path="res://stages/stage backsground_parallax/background.gd" id="2_ykc37"]
+[ext_resource type="PackedScene" uid="uid://bft5tela22vqs" path="res://ui/ui.tscn" id="3_2l8q6"]
+
+[node name="parallax" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CharacterBody2D" parent="." instance=ExtResource("2_ur60c")]
+
+[node name="Control" parent="CharacterBody2D" instance=ExtResource("3_2l8q6")]
+
+[node name="ParallaxBackground2" type="ParallaxBackground" parent="."]
+visible = false
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground2"]
+show_behind_parent = true
+motion_scale = Vector2(0, 0)
+
+[node name="TextureRect" type="Sprite2D" parent="ParallaxBackground2/ParallaxLayer"]
+visible = false
+position = Vector2(128, 64)
+texture = ExtResource("1_1g1u5")
+script = ExtResource("2_ykc37")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+z_index = -100
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_1g1u5")
+
+[editable path="CharacterBody2D/Control"]

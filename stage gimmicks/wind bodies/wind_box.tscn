@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://dfewbuvdu6hhm"]
+
+[ext_resource type="Script" uid="uid://8faqmvj0b051" path="res://stage gimmicks/wind bodies/wind_box.gd" id="1_rrc3h"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_82kd7"]
+
+[node name="wind_box" type="Area2D"]
+visibility_layer = 2
+script = ExtResource("1_rrc3h")
+base_power = 2500.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_82kd7")
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+target_position = Vector2(16, 0)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]

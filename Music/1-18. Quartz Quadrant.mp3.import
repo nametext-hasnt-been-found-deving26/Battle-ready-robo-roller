@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://b27px3sve2hvu"
+path="res://.godot/imported/1-18. Quartz Quadrant.mp3-b383ab8078b78d4d108bc676f171b8f5.mp3str"
+
+[deps]
+
+source_file="res://Music/1-18. Quartz Quadrant.mp3"
+dest_files=["res://.godot/imported/1-18. Quartz Quadrant.mp3-b383ab8078b78d4d108bc676f171b8f5.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

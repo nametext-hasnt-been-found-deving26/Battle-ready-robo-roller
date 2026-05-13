@@ -1,0 +1,37 @@
+extends Area2D
+
+var player
+
+func _ready():
+	player = get_tree().get_first_node_in_group("player")
+
+func _physics_process(delta):
+	if not player:
+		player = get_tree().get_first_node_in_group("player")
+		return
+	
+	if not player.can_water_run and not player.in_water :
+		$StaticBody2D/CollisionShape2D.disabled = true
+	else:
+		$StaticBody2D/CollisionShape2D.disabled = false
+
+
+
+func _on_body_entered(body):
+	if not body.is_in_group("player"):
+		return
+	if body.is_in_group("player"):
+		body.in_water = true
+		print("in water")
+		body.velocity.y = body.velocity.y/3
+		
+
+
+func _on_body_exited(body):
+	if not body.is_in_group("player"):
+		return
+	if body.is_in_group("player"):
+		body.in_water = false
+		if body.can_dash <= 0:
+			body.can_dash = 1
+		body.velocity = body.velocity * 2.25

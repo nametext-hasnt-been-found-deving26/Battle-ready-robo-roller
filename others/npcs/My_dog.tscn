@@ -1,0 +1,87 @@
+[gd_scene load_steps=5 format=3 uid="uid://b8s1pmndq7yya"]
+
+[ext_resource type="Texture2D" uid="uid://iwekhhv41nbk" path="res://icon.svg" id="1_8qfdq"]
+
+[sub_resource type="GDScript" id="GDScript_cv1f5"]
+script/source = "extends CharacterBody2D
+
+
+@export var SPEED = 300.0
+@export var Move_offset_duration = 1.0
+var Move_offset_timer: float
+var rng := RandomNumberGenerator.new()
+var value: int
+func _ready() -> void:
+	rng.randomize()
+
+func _physics_process(delta: float) -> void:
+	
+	if Move_offset_timer <= 0: 
+		value = rng.randi_range(-1, 1)
+		Move_offset_timer = Move_offset_duration  # 1 to 10
+		#print(value)
+		
+	# Add the gravity.
+	if not is_on_floor():
+		velocity += get_gravity() * delta
+
+	# Handle jump.
+	#if Input.is_action_just_pressed(\"ui_accept\") and is_on_floor():
+		#velocity.y = JUMP_VELOCITY
+
+	# Get the input direction and handle the movement/deceleration.
+	# As good practice, you should replace UI actions with custom gameplay actions.
+	var direction = value
+	if direction != 0 :
+		velocity.x = direction * SPEED
+	else:
+		velocity.x = move_toward(velocity.x, 0, SPEED)
+	handle_move_offset(delta)
+	handle_not_falling()
+	move_and_slide()
+
+
+
+func handle_move_offset(delta: float):
+	Move_offset_timer -= delta
+	
+func handle_not_falling():
+	if not $RayCast2D.is_colliding() and value == -1 :
+		Move_offset_timer = 0
+	elif not $RayCast2D2.is_colliding() and value == 1:
+		Move_offset_timer = 0
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_y8sqc"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8qfdq"]
+
+[node name="Doggo" type="CharacterBody2D"]
+light_mask = 2
+visibility_layer = 2
+collision_layer = 2
+collision_mask = 2
+script = SubResource("GDScript_cv1f5")
+SPEED = 200.0
+Move_offset_duration = 2.5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+light_mask = 2
+visibility_layer = 2
+scale = Vector2(3, 3)
+shape = SubResource("RectangleShape2D_y8sqc")
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+position = Vector2(-31, 17)
+
+[node name="RayCast2D2" type="RayCast2D" parent="."]
+position = Vector2(31, 17)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_8qfdq")
+
+[node name="dialogue_activation" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="dialogue_activation"]
+shape = SubResource("RectangleShape2D_8qfdq")
