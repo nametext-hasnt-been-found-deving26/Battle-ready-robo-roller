@@ -7,6 +7,8 @@ var music_folder_on_exe_version = OS.get_executable_path().get_base_dir().path_j
 var allowed_extensions = ["mp3", "ogg", "wav"]
 var music_folder
 
+
+
 @onready var scroll = $ScrollContainer
 
 var scroll_speed := 200.0
@@ -123,3 +125,4 @@ func move_selection(direction):
 
 	# Optional: keep focused button visible
 	scroll.ensure_control_visible(button)
+	#print(button.grab_focus())

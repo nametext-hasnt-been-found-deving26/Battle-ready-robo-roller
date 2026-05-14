@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dd4xpfcvlouo"
+path="res://.godot/imported/03. Take Over.mp3-03c280db362197ee4a1233fb2213c5b8.mp3str"
+
+[deps]
+
+source_file="res://Music/03. Take Over.mp3"
+dest_files=["res://.godot/imported/03. Take Over.mp3-03c280db362197ee4a1233fb2213c5b8.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,0 +1,54 @@
+[gd_resource type="Theme" load_steps=12 format=3 uid="uid://bl07wdv1tudkm"]
+
+[ext_resource type="Texture2D" uid="uid://c7i06xl6g175m" path="res://ui/downscroll_mixtape_normal.tres" id="1_670dc"]
+[ext_resource type="StyleBox" uid="uid://cn7ynoumegbmb" path="res://ui/button_pressed.tres" id="1_i8e28"]
+[ext_resource type="Texture2D" uid="uid://bu62bv54wllaj" path="res://ui/arrow.png" id="2_670dc"]
+[ext_resource type="Texture2D" uid="uid://buiw3neaoybis" path="res://ui/disc.png" id="4_ksn8k"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ve3nr"]
+atlas = ExtResource("2_670dc")
+region = Rect2(64, 55, 26, 22)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_f62yd"]
+texture = SubResource("AtlasTexture_ve3nr")
+texture_margin_left = 6.0
+texture_margin_top = 7.0
+texture_margin_right = 8.0
+texture_margin_bottom = 9.0
+region_rect = Rect2(0, 0, 26, 22)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3rhko"]
+atlas = ExtResource("2_670dc")
+region = Rect2(32, 84, 24, 20)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_327qg"]
+texture = SubResource("AtlasTexture_3rhko")
+texture_margin_left = 6.0
+texture_margin_top = 7.0
+texture_margin_right = 6.0
+texture_margin_bottom = 7.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rvvib"]
+atlas = ExtResource("4_ksn8k")
+region = Rect2(6, 5, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ek36e"]
+atlas = ExtResource("4_ksn8k")
+region = Rect2(18, 26, 24, 17)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_2c3el"]
+texture = SubResource("AtlasTexture_ek36e")
+texture_margin_left = 7.0
+texture_margin_top = 7.0
+texture_margin_right = 7.0
+texture_margin_bottom = 7.0
+
+[resource]
+Button/icons/icon = ExtResource("1_670dc")
+Button/styles/focus = ExtResource("1_i8e28")
+Button/styles/hover = ExtResource("1_i8e28")
+Button/styles/normal = SubResource("StyleBoxTexture_f62yd")
+Button/styles/pressed = SubResource("StyleBoxTexture_327qg")
+Label/colors/font_color = Color(0, 0.2509804, 0.1254902, 1)
+Label/icons/icon = SubResource("AtlasTexture_rvvib")
+PanelContainer/styles/panel = SubResource("StyleBoxTexture_2c3el")

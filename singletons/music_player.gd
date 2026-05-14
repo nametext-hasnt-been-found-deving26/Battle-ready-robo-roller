@@ -5,10 +5,12 @@ var record_scrachin = preload("uid://yvy8eohsu2kj")
 
 
 func _ready():
+	
 
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	music_player = AudioStreamPlayer.new()
 	add_child(music_player)
+	music_player.bus = "Music"
 	get_tree().scene_changed.connect(update_music)
 	update_music()
 

@@ -1,10 +1,17 @@
-[gd_scene load_steps=11 format=3 uid="uid://bbxogwa1uudyk"]
+[gd_scene load_steps=21 format=3 uid="uid://bbxogwa1uudyk"]
 
 [ext_resource type="Script" uid="uid://62owbuwb7kff" path="res://ui/pausemenu.gd" id="1_i6344"]
 [ext_resource type="Shader" uid="uid://ce85geu6om81" path="res://ui/ui.gdshader" id="2_hpi63"]
 [ext_resource type="AudioStream" uid="uid://cymhj7fxf5trd" path="res://Music/Hype_street.mp3" id="2_ptdjk"]
 [ext_resource type="Script" uid="uid://dgj83ws03y4au" path="res://ui/scroll_container.gd" id="3_qg8xq"]
 [ext_resource type="PackedScene" uid="uid://d4a47515h2g2p" path="res://ui/playlist.tscn" id="4_4dg4t"]
+[ext_resource type="Texture2D" uid="uid://dwcq3vh8783u1" path="res://ui/upscroll_mixtape.tres" id="6_fdrbn"]
+[ext_resource type="Theme" uid="uid://bl07wdv1tudkm" path="res://ui/downscroll_mixtape_theme.tres" id="7_afaem"]
+[ext_resource type="Texture2D" uid="uid://c7i06xl6g175m" path="res://ui/downscroll_mixtape_normal.tres" id="8_bsjxr"]
+[ext_resource type="Script" uid="uid://cmpyn76bthpir" path="res://ui/song_name.gd" id="9_b11fi"]
+[ext_resource type="Texture2D" uid="uid://buiw3neaoybis" path="res://ui/disc.png" id="9_bsjxr"]
+[ext_resource type="Script" uid="uid://cg2upmqfhkfsv" path="res://ui/text_scroller.gd" id="9_eie8p"]
+[ext_resource type="Script" uid="uid://3p3l0ql085h3" path="res://ui/music_disc.gd" id="10_n75p4"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_0td2y"]
 shader = ExtResource("2_hpi63")
@@ -95,6 +102,30 @@ tracks/6/keys = {
 "update": 1,
 "values": [false]
 }
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("mixtape_buttons:visible")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("music_display:visible")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
 
 [sub_resource type="Animation" id="Animation_5emoi"]
 resource_name = "blur"
@@ -179,12 +210,44 @@ tracks/6/keys = {
 "update": 1,
 "values": [false, true]
 }
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("mixtape_buttons:visible")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("music_display:visible")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_v1qp0"]
 _data = {
 &"RESET": SubResource("Animation_6nimu"),
 &"blur": SubResource("Animation_5emoi")
 }
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rvv25"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bsjxr"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bsjxr"]
+atlas = ExtResource("9_bsjxr")
+region = Rect2(6, 5, 16, 16)
 
 [node name="PauseMenu" type="Control"]
 process_mode = 3
@@ -291,7 +354,64 @@ layout_mode = 1
 offset_left = -113.0
 offset_top = -70.0
 
+[node name="mixtape_buttons" type="VBoxContainer" parent="."]
+process_mode = 2
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="mixtape_upscroll" type="Button" parent="mixtape_buttons"]
+layout_mode = 2
+size_flags_vertical = 3
+theme = ExtResource("7_afaem")
+action_mode = 0
+icon = ExtResource("6_fdrbn")
+icon_alignment = 1
+
+[node name="mixtape_downscroll" type="Button" parent="mixtape_buttons"]
+material = SubResource("ShaderMaterial_rvv25")
+layout_mode = 2
+size_flags_vertical = 3
+theme = ExtResource("7_afaem")
+theme_override_styles/focus = SubResource("StyleBoxTexture_bsjxr")
+action_mode = 0
+icon = ExtResource("8_bsjxr")
+icon_alignment = 1
+
+[node name="music_display" type="PanelContainer" parent="."]
+process_mode = 3
+visible = false
+layout_mode = 0
+offset_right = 238.0
+offset_bottom = 37.0
+theme = ExtResource("7_afaem")
+
+[node name="text_scroller" type="ScrollContainer" parent="music_display"]
+custom_minimum_size = Vector2(1, 0)
+layout_direction = 3
+layout_mode = 2
+vertical_scroll_mode = 0
+script = ExtResource("9_eie8p")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="music_display/text_scroller"]
+layout_mode = 2
+
+[node name="song_name" type="Label" parent="music_display/text_scroller/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "nlkdsn zaflgasSGAZ<GADGA<"
+horizontal_alignment = 1
+script = ExtResource("9_b11fi")
+
+[node name="music_disc" type="Sprite2D" parent="music_display"]
+texture = SubResource("AtlasTexture_bsjxr")
+script = ExtResource("10_n75p4")
+strength = 1.0
+
 [connection signal="pressed" from="PanelContainer/ScrollContainer/Content/resume" to="." method="_on_resume_pressed"]
 [connection signal="pressed" from="PanelContainer/ScrollContainer/Content/restart" to="." method="_on_restart_pressed"]
 [connection signal="pressed" from="PanelContainer/ScrollContainer/Content/downwards_dash_mode" to="." method="_on_downwards_dash_mode_pressed"]
 [connection signal="pressed" from="PanelContainer/ScrollContainer/Content/quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="mixtape_buttons/mixtape_upscroll" to="." method="_on_mixtape_upscroll_pressed"]
+[connection signal="pressed" from="mixtape_buttons/mixtape_downscroll" to="." method="_on_mixtape_downscroll_pressed"]

@@ -29,9 +29,6 @@ vertical_scroll_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="."]
-layout_mode = 2
-
 [node name="input_buffer_Timer" type="Timer" parent="."]
 wait_time = 0.3
 one_shot = true
