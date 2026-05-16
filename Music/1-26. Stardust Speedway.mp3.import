@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://85bo81y8wgj0"
+path="res://.godot/imported/1-26. Stardust Speedway.mp3-19ea02a5975b253f61e4eeea0b45d0b1.mp3str"
+
+[deps]
+
+source_file="res://Music/1-26. Stardust Speedway.mp3"
+dest_files=["res://.godot/imported/1-26. Stardust Speedway.mp3-19ea02a5975b253f61e4eeea0b45d0b1.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

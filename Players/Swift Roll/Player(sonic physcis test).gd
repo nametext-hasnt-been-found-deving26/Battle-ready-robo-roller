@@ -52,7 +52,13 @@ var Player_velocity = Vector2.ZERO
 var braking: bool = false
 
 
-@export_category("slope launch settings")
+@export_category("slope settings")
+@export_group("slope downroll")
+@export var normal_downroll_multiplier: float = 1.0
+@export var tackle_downroll_multiplier: float = 1.0
+
+
+@export_group("slope launch")
 @export var smoothed_angle = 0.0 ## makes slope launch angle more precise
 
 
@@ -62,14 +68,6 @@ var skating_SPEED = 900.0
 @export var normal_jump_mutiplier: float
 @export var no_skates_bounce_jump_mutiplier: float
 @export var skates_bounce_jump_mutiplier: float
-@export_group("slope jump")
-@export_subgroup("counter jump")
-@export var counter_velocity_influence_adjust: float = 6.0
-@export var counter_angle_influence_adjust: float = 32.0
-@export_subgroup("inward jump")
-@export var jump_degrade_limit: float = 50
-@export var inward_velocity_influence_adjust: float = 30.0
-@export var inward_angle_influence_adjust: float = 30.0
 
 @onready var jumpbuffer_timer: Timer = $Timers/jump_timers/jumpbufferTimer
 @onready var jump_soundfx: AudioStreamPlayer = $sfx/jump_soundfx
@@ -558,7 +556,7 @@ func _physics_process(delta):
 		invincibility_frames()
 
 	if braking == true and not Input.is_action_pressed("jump"):
-		if mode == MovementMode.UPSIDE_DOWN: print("ceiling braking 2")
+		#if mode == MovementMode.UPSIDE_DOWN: print("ceiling braking 2")
 		create_dust_cloud(delta)
 		if skates_on == true:
 			braking_sfx.play()
@@ -1011,17 +1009,17 @@ func apply_main_movement(delta, direction):
 	
 				#velocity.y = store_y * abs(tangent.angle() /1.57) 
 				if tackle:
-					velocity.x += ((store_y  / 0.6)   * (tangent.angle() /1.57) ) 
+					velocity.x += ((store_y  / tackle_downroll_multiplier)   * (tangent.angle() /1.57) ) 
 				else:
-					velocity.x += ((store_y / 1.0)  * (tangent.angle() /1.57) ) 
+					velocity.x += ((store_y / normal_downroll_multiplier)  * (tangent.angle() /1.57) ) 
 					
 				#if not abs(tangent.angle()* (180.0 / 3.141592)) > 88:
 				
 				#floor_snap_length = 1000
 				
-				print("vel downroll ",velocity, "store y ", store_y)
+				#print("vel downroll ",velocity, "store y ", store_y)
 				
-				print(tangent.angle()* (180.0 / 3.141592))
+				#print(tangent.angle()* (180.0 / 3.141592))
 				#velocity.y += (gravity * delta) * (angle * (180 / 3.141592)) 
 				downrolling = false
 				
@@ -1066,7 +1064,7 @@ func apply_main_movement(delta, direction):
 	# Let knockback velocity persist, but still allow gravity
 	
 		if is_on_floor():
-			rot = tangent.angle()
+			rot = get_floor_normal().angle() + (PI/2)
 			#print(rot)
 		else: 
 			rot = 0
@@ -1708,7 +1706,7 @@ func _handle_rotation():
 				rotation_degrees = -90 * dashDirection 
 	elif is_on_floor():
 		if skates_on == true or grindin == true and mode == MovementMode.NORMAL:
-			rotation = Vector2(-get_floor_normal().y, get_floor_normal().x).angle()
+			rotation = rot
 			#print(get_floor_normal())
 			if Input.is_action_just_pressed("jump"):
 				rotation_degrees = 0
@@ -2131,7 +2129,7 @@ func _handle_player_upsidedown_velocity(direction,delta):
 			player_vel = move_toward(player_vel, skating_SPEED  * direction, (ground_brake_accel * ground_brake_multiplier )* delta * ground_brake_over_time_multiplier)
 			if velocity.length() > 500:
 				braking = true
-				print("ceiling braking")
+				#print("ceiling braking")
 		if abs(player_vel) < Base_Skates_SPEED:
 			player_vel  = move_toward(player_vel + deg_to_rad(ceiling_angle * -1)  , skating_SPEED  * direction * init_angle_dir, (normal_ground_accel/2)* (2 * direction))
 		elif direction * player_vel > 0:
@@ -2419,7 +2417,7 @@ func create_dust_cloud(delta):
 		dust_clouds_buffer_timer -= delta
 	var cloud = dust_clouds.instantiate()
 	if dust_clouds_buffer_timer < 0:
-		if mode == MovementMode.UPSIDE_DOWN:print("yesir")
+		#if mode == MovementMode.UPSIDE_DOWN:print("yesir")
 		cloud.set_property(dust_cloud_setter.global_position,  Vector2(abs(cloud_velocity_size_multiplier) - delta  * 2 , abs(cloud_velocity_size_multiplier) - delta * 2 ))
 		get_tree().current_scene.add_child(cloud)
 		if animated_sprite_2d.flip_h == true:

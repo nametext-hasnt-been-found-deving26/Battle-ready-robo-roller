@@ -4,6 +4,7 @@ var music_player: AudioStreamPlayer
 var record_scrachin = preload("uid://yvy8eohsu2kj")
 
 
+
 func _ready():
 	
 
@@ -34,6 +35,8 @@ func update_music():
 		music_player.stream = theme
 		music_player.play()
 
+
+
 func change_music(stream: String):
 
 	var current_tune = ProjectSettings.globalize_path(music_player.stream.resource_path)
@@ -55,6 +58,6 @@ func _process(delta: float) -> void:
 		return
 	if not music_player.playing and music_player.stream != record_scrachin:
 		music_player.play()
-		print("restart tune")
+		#print("restart tune")
 	else:
 		return

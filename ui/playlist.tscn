@@ -17,6 +17,7 @@ grow_horizontal = 0
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_of1jy")
 script = ExtResource("1_0p6tt")
+button_scroll_accel = 0.25
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
 layout_mode = 2

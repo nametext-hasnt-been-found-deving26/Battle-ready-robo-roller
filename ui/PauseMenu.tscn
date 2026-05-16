@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://bbxogwa1uudyk"]
+[gd_scene load_steps=23 format=3 uid="uid://bbxogwa1uudyk"]
 
 [ext_resource type="Script" uid="uid://62owbuwb7kff" path="res://ui/pausemenu.gd" id="1_i6344"]
 [ext_resource type="Shader" uid="uid://ce85geu6om81" path="res://ui/ui.gdshader" id="2_hpi63"]
@@ -105,7 +105,7 @@ tracks/6/keys = {
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("mixtape_buttons:visible")
+tracks/7/path = NodePath("music_display2:visible")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
@@ -213,7 +213,7 @@ tracks/6/keys = {
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("mixtape_buttons:visible")
+tracks/7/path = NodePath("music_display:visible")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
@@ -225,7 +225,7 @@ tracks/7/keys = {
 tracks/8/type = "value"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("music_display:visible")
+tracks/8/path = NodePath("music_display2:visible")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
@@ -241,13 +241,24 @@ _data = {
 &"blur": SubResource("Animation_5emoi")
 }
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_rvv25"]
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bsjxr"]
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_bsjxr"]
 atlas = ExtResource("9_bsjxr")
 region = Rect2(6, 5, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eie8p"]
+atlas = ExtResource("9_bsjxr")
+region = Rect2(47, 24, 17, 19)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_rvv25"]
+texture = SubResource("AtlasTexture_eie8p")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rvv25"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bsjxr"]
 
 [node name="PauseMenu" type="Control"]
 process_mode = 3
@@ -354,33 +365,8 @@ layout_mode = 1
 offset_left = -113.0
 offset_top = -70.0
 
-[node name="mixtape_buttons" type="VBoxContainer" parent="."]
-process_mode = 2
-visible = false
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="mixtape_upscroll" type="Button" parent="mixtape_buttons"]
-layout_mode = 2
-size_flags_vertical = 3
-theme = ExtResource("7_afaem")
-action_mode = 0
-icon = ExtResource("6_fdrbn")
-icon_alignment = 1
-
-[node name="mixtape_downscroll" type="Button" parent="mixtape_buttons"]
-material = SubResource("ShaderMaterial_rvv25")
-layout_mode = 2
-size_flags_vertical = 3
-theme = ExtResource("7_afaem")
-theme_override_styles/focus = SubResource("StyleBoxTexture_bsjxr")
-action_mode = 0
-icon = ExtResource("8_bsjxr")
-icon_alignment = 1
-
 [node name="music_display" type="PanelContainer" parent="."]
-process_mode = 3
+process_mode = 2
 visible = false
 layout_mode = 0
 offset_right = 238.0
@@ -391,6 +377,7 @@ theme = ExtResource("7_afaem")
 custom_minimum_size = Vector2(1, 0)
 layout_direction = 3
 layout_mode = 2
+horizontal_scroll_mode = 3
 vertical_scroll_mode = 0
 script = ExtResource("9_eie8p")
 
@@ -407,11 +394,40 @@ script = ExtResource("9_b11fi")
 [node name="music_disc" type="Sprite2D" parent="music_display"]
 texture = SubResource("AtlasTexture_bsjxr")
 script = ExtResource("10_n75p4")
-strength = 1.0
+strength = 1.25
+
+[node name="music_display2" type="PanelContainer" parent="."]
+process_mode = 2
+visible = false
+layout_mode = 0
+offset_left = -39.0
+offset_top = 1.0
+offset_bottom = 93.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_rvv25")
+
+[node name="mixtape_buttons" type="VBoxContainer" parent="music_display2"]
+process_mode = 2
+layout_mode = 2
+
+[node name="mixtape_upscroll" type="Button" parent="music_display2/mixtape_buttons"]
+layout_mode = 2
+size_flags_vertical = 3
+theme = ExtResource("7_afaem")
+icon = ExtResource("6_fdrbn")
+icon_alignment = 1
+
+[node name="mixtape_downscroll" type="Button" parent="music_display2/mixtape_buttons"]
+material = SubResource("ShaderMaterial_rvv25")
+layout_mode = 2
+size_flags_vertical = 3
+theme = ExtResource("7_afaem")
+theme_override_styles/focus = SubResource("StyleBoxTexture_bsjxr")
+icon = ExtResource("8_bsjxr")
+icon_alignment = 1
 
 [connection signal="pressed" from="PanelContainer/ScrollContainer/Content/resume" to="." method="_on_resume_pressed"]
 [connection signal="pressed" from="PanelContainer/ScrollContainer/Content/restart" to="." method="_on_restart_pressed"]
 [connection signal="pressed" from="PanelContainer/ScrollContainer/Content/downwards_dash_mode" to="." method="_on_downwards_dash_mode_pressed"]
 [connection signal="pressed" from="PanelContainer/ScrollContainer/Content/quit" to="." method="_on_quit_pressed"]
-[connection signal="pressed" from="mixtape_buttons/mixtape_upscroll" to="." method="_on_mixtape_upscroll_pressed"]
-[connection signal="pressed" from="mixtape_buttons/mixtape_downscroll" to="." method="_on_mixtape_downscroll_pressed"]
+[connection signal="pressed" from="music_display2/mixtape_buttons/mixtape_upscroll" to="." method="_on_mixtape_upscroll_pressed"]
+[connection signal="pressed" from="music_display2/mixtape_buttons/mixtape_downscroll" to="." method="_on_mixtape_downscroll_pressed"]

@@ -1701,14 +1701,14 @@ max_stretch = 50.0
 origin = Vector2(0, 0)
 
 [node name="vine8" parent="stage_gimmicks/Grapple_vines" instance=ExtResource("13_xs3dc")]
-position = Vector2(1244, -274)
+position = Vector2(1315, -852)
 scale = Vector2(4.22, 4.38001)
 spring_strength = 100.0
 min_speed = 0
 max_stretch = 2000.0
 origin = Vector2(0, 0)
 Spin_factor = 5.0
-rotation_damp = 0.095
+rotation_damp = 0.0
 
 [node name="Rails" type="Node" parent="stage_gimmicks"]
 

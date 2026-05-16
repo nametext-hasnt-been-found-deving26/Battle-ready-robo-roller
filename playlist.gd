@@ -18,6 +18,7 @@ var selected_index = 0
 
 @onready var input_buffer_timer: Timer = $input_buffer_Timer
 
+@export var button_scroll_accel:= 1.0
 
 func _ready():
 	var scene = get_tree().current_scene
@@ -122,7 +123,27 @@ func move_selection(direction):
 	var button = song_buttons[selected_index]
 
 	button.grab_focus()
+	var view_top = scroll.scroll_vertical
+	var view_bottom = view_top + scroll.size.y
 
-	# Optional: keep focused button visible
-	scroll.ensure_control_visible(button)
+	var button_top = button.position.y
+	var button_bottom = button_top + button.size.y
+
+	var target = view_top
+
+	# Button above visible area
+	if button_top < view_top:
+		target = button_top
+
+	# Button below visible area
+	elif button_bottom > view_bottom:
+		target = button_bottom - scroll.size.y
+
+	create_tween().tween_property(
+		scroll,
+		"scroll_vertical",
+		target,
+		button_scroll_accel
+	)
+
 	#print(button.grab_focus())

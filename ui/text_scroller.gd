@@ -1,16 +1,17 @@
 extends ScrollContainer
 
 @export var scroll_speed := 60.0
-var max_scroll: int
+
+var scroll_pos := 0.0
 
 func _process(delta):
-	scroll_horizontal += scroll_speed * delta
+	scroll_pos += scroll_speed * delta
+	scroll_horizontal = int(scroll_pos)
 
-	max_scroll = get_h_scroll_bar().max_value
-	print("scroll ", scroll_horizontal, " max_scroll ", max_scroll)
-	
+	var content_width = $HBoxContainer.size.x
+	var visible_width = size.x
 
-	if scroll_horizontal >= max_scroll/1.66:
-		scroll_horizontal = 0
-		print("reset")
-		
+	var true_max_scroll = content_width - visible_width
+
+	if scroll_pos >= true_max_scroll:
+		scroll_pos = 0

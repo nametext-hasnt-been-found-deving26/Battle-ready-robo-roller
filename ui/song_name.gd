@@ -14,9 +14,9 @@ func _process(delta: float) -> void:
 	if song_name == "record_scratchin":
 		text = "     "
 	else:
-		text = ("      "   
+		text = ("                                                                     "   
 			+ current_song.get_file().get_basename()
-			 + (" ".repeat(int(text_scroller.max_scroll)))      
+			 + "                                                                     "   
 			)
 
 
