@@ -723,20 +723,7 @@ func apply_main_movement(delta, direction):
 		if can_star_dash == false:
 			star_dash_effect = false
 
-		if skates_on == true:
-			if angler_dir == -1 and velocity.x >= 0 and (angle * (180 / 3.141592)) >= 75 and slope_launched == false and not disable_slope_launch() and  can_uproll == false and can_downroll == false:
-				dodash = false
-				velocity.y = abs(velocity.x) * -1
-				can_wallrun_right = true
-				
-				#print("uprolling")
-				possiblewallrun_timer.start()
-			elif angler_dir == 1 and velocity.x <= 0 and (angle * (180 / 3.141592)) >= 75 and slope_launched == false and not disable_slope_launch() and can_uproll == false and can_downroll == false:
-				#print("uprolling")
-				dodash = false
-				velocity.y = abs(velocity.x) * -1
-				can_wallrun_left = true
-				possiblewallrun_timer.start()
+		
 				
 				#print("no wall run")
 		
@@ -969,7 +956,7 @@ func apply_main_movement(delta, direction):
 			#print (velocity.x)
 			#print(angle)
 		#main control line for skates mode -------------------------------------------------------------
-			velocity.x = move_toward(velocity.x + (tangent.angle() * 20), skating_SPEED  * direction, accel) if is_on_floor() else move_toward(velocity.x , Base_Skates_SPEED  * direction, accel)
+			velocity.x = move_toward(velocity.x + (rot * 20), skating_SPEED  * direction, accel) if is_on_floor() else move_toward(velocity.x , Base_Skates_SPEED  * direction, accel)
 		#manage exeed mach
 		if velocity.x * direction >= Base_Skates_SPEED + abs(conveyor_power) and is_on_floor() and abs(velocity.x) > skating_SPEED:
 			skating_SPEED = abs(velocity.x) if velocity.x * direction >= Base_Skates_SPEED + abs(conveyor_power) and is_on_floor() and abs(velocity.x) > skating_SPEED else move_toward(skating_SPEED, Base_Skates_SPEED, accel)
@@ -1065,6 +1052,8 @@ func apply_main_movement(delta, direction):
 	
 		if is_on_floor():
 			rot = get_floor_normal().angle() + (PI/2)
+			if abs(rot) > 90:
+				rot = sign(rot) * 89
 			#print(rot)
 		else: 
 			rot = 0
@@ -1072,11 +1061,25 @@ func apply_main_movement(delta, direction):
 
 		
 		 # exit early so no player input overrides knockback
-	if abs(velocity.x) > Base_Skates_SPEED and velocity.y < 300 and skates_on == true:
+	if abs(velocity.x) > Base_Skates_SPEED and velocity.y < 300 :
 		can_water_run = true
 	else:
 		can_water_run = false
 				
+	if is_on_floor():
+		if angler_dir == -1 and velocity.x >= 0 and (angle * (180 / 3.141592)) >= 75 and slope_launched == false and not disable_slope_launch() and  can_uproll == false and not can_downroll:
+			dodash = false
+			velocity.y = abs(velocity.x) * -1
+			can_wallrun_right = true
+				
+				#print("uprolling")
+			possiblewallrun_timer.start()
+		elif angler_dir == 1 and velocity.x <= 0 and (angle * (180 / 3.141592)) >= 75 and slope_launched == false and not disable_slope_launch() and can_uproll == false and not can_downroll:
+				#print("uprolling")
+			dodash = false
+			velocity.y = abs(velocity.x) * -1
+			can_wallrun_left = true
+			possiblewallrun_timer.start()
 		#(direction)
 		#print(accel)
 
@@ -1706,11 +1709,13 @@ func _handle_rotation():
 				rotation_degrees = -90 * dashDirection 
 	elif is_on_floor():
 		if skates_on == true or grindin == true and mode == MovementMode.NORMAL:
-			rotation = rot
 			#print(get_floor_normal())
 			if Input.is_action_just_pressed("jump"):
 				rotation_degrees = 0
 				#print("ball jumpin")
+			else:
+				rotation = rot
+				return
 		else:
 			
 					#print("no angle")

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://ctdf6c7eccy1p"
+path="res://.godot/imported/2-11 SKY HIGH.mp3-d5d638fd5106acea8f103cfc4351b435.mp3str"
+
+[deps]
+
+source_file="res://Music/2-11 SKY HIGH.mp3"
+dest_files=["res://.godot/imported/2-11 SKY HIGH.mp3-d5d638fd5106acea8f103cfc4351b435.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

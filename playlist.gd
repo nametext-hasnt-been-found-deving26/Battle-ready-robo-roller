@@ -8,6 +8,7 @@ var allowed_extensions = ["mp3", "ogg", "wav"]
 var music_folder
 
 
+@onready var scroll_sfx: AudioStreamPlayer = $scroll_sfx
 
 @onready var scroll = $ScrollContainer
 
@@ -145,5 +146,5 @@ func move_selection(direction):
 		target,
 		button_scroll_accel
 	)
-
+	scroll_sfx.play()
 	#print(button.grab_focus())

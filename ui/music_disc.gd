@@ -26,6 +26,7 @@ func _process(delta):
 
 	# Scale effect
 	var target_scale = base_scale * (1.0 + volume * strength)
+	#print(volume)
 
 	scale = scale.lerp(target_scale, delta * smoothness)
 	rotation_degrees += rotation_speed

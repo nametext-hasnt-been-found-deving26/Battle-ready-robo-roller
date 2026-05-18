@@ -7,6 +7,7 @@ func save_dash_mode():
 	var cfg := ConfigFile.new()
 	cfg.set_value("Abilities", "down_dash_mode", current_dash_mode)
 	cfg.save("user://settings.ini")
+	print(ProjectSettings.globalize_path("user://settings.ini"))
 
 func load_dash_mode():
 	var cfg := ConfigFile.new()

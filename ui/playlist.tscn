@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://d4a47515h2g2p"]
+[gd_scene load_steps=4 format=3 uid="uid://d4a47515h2g2p"]
 
 [ext_resource type="Script" uid="uid://cwmd30r76y3jx" path="res://playlist.gd" id="1_0p6tt"]
+[ext_resource type="AudioStream" uid="uid://dyqmxhvih1gdl" path="res://Players/sfx library/scroll_sfx.wav" id="2_of1jy"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_of1jy"]
 
@@ -21,8 +22,6 @@ button_scroll_accel = 0.25
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
 layout_mode = 2
-follow_focus = true
-draw_focus_border = true
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 2
 
@@ -33,3 +32,6 @@ size_flags_horizontal = 3
 [node name="input_buffer_Timer" type="Timer" parent="."]
 wait_time = 0.3
 one_shot = true
+
+[node name="scroll_sfx" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_of1jy")

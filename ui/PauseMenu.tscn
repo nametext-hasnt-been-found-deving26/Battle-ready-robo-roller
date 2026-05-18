@@ -395,6 +395,7 @@ script = ExtResource("9_b11fi")
 texture = SubResource("AtlasTexture_bsjxr")
 script = ExtResource("10_n75p4")
 strength = 1.25
+smoothness = 12.0
 
 [node name="music_display2" type="PanelContainer" parent="."]
 process_mode = 2
@@ -408,6 +409,7 @@ theme_override_styles/panel = SubResource("StyleBoxTexture_rvv25")
 [node name="mixtape_buttons" type="VBoxContainer" parent="music_display2"]
 process_mode = 2
 layout_mode = 2
+focus_behavior_recursive = 1
 
 [node name="mixtape_upscroll" type="Button" parent="music_display2/mixtape_buttons"]
 layout_mode = 2
