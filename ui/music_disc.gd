@@ -29,4 +29,5 @@ func _process(delta):
 	#print(volume)
 
 	scale = scale.lerp(target_scale, delta * smoothness)
+	
 	rotation_degrees += rotation_speed

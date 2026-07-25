@@ -23,7 +23,7 @@ func _on_body_entered(body):
 	if body.is_in_group("player"):
 		body.in_water = true
 		print("in water")
-		body.velocity.y = body.velocity.y/3
+		body.velocity.y = body.velocity.y/2
 		
 
 

@@ -2,6 +2,7 @@ extends Control
 #@onready var grid: GridContainer = $ScrollContainer
 #var index := 0
 #@onready var focus_box: Control = $focus_box
+@onready var wheels: Sprite2D = $ui/wheels
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -18,3 +19,6 @@ func _on_button_pressed() -> void:
 
 func _on_button_3_pressed() -> void:
 	get_tree().quit()
+
+func _process(delta: float) -> void:
+	wheels.rotate(delta)

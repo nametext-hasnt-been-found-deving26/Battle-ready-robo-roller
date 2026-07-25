@@ -24,9 +24,9 @@ var mode = MovementMode.NORMAL
 
 
 @export_category("base settings")
-@export var Walking_SPEED = 300.0
-@export var Base_Skates_SPEED = 900.0
-@export var JUMP_VELOCITY = -500.0
+@export var Walking_SPEED := 300.0
+@export var Base_Skates_SPEED := 900.0
+@export var JUMP_VELOCITY := -500.0
 @export var full_snap_length: int = 150
 var Player_velocity = Vector2.ZERO
 
@@ -36,6 +36,11 @@ var Player_velocity = Vector2.ZERO
 @export var needed_speed_celing_run : int
 @export var maintain_ceiling_run_speed : int = 300
 
+@export_group("floor_snaping")
+@export var jump_snap_length := 1.0
+@export var normal_snap_length := 1.0
+@export var walldive_snap_length := 1.0
+@export var snap_accel := 1.0
 
 
 
@@ -77,19 +82,19 @@ var skating_SPEED = 900.0
 
 @export_category("accelerations")
 @export_group("no skates")
-@export var walking_accel = 40.0
-@export var running_accel = 10.0
+@export var walking_accel := 40.0
+@export var running_accel := 10.0
 @export_group("skates")
-@export var ground_forward_past_top_speed_accel = 0.0
-@export var air_drag_accel = 2.0
-@export var Up_past_mach_accel = 2.0
-@export var normal_ground_accel = 5.0
-@export var Air_normal_accel = 3.0
-@export var up_accel = 6.0
-@export var down_accel = 4.0
-@export var no_input_accel  = 3.0
-var no_input_accel_with_air_drag = no_input_accel + air_drag_accel
-@export var tackle_accel = 1.5
+@export var ground_forward_past_top_speed_accel := 0.0
+@export var air_drag_accel := 2.0
+@export var Up_past_mach_accel := 2.0
+@export var normal_ground_accel := 5.0
+@export var Air_normal_accel := 3.0
+@export var up_accel := 6.0
+@export var down_accel := 4.0
+@export var no_input_accel  := 3.0
+var no_input_accel_with_air_drag := no_input_accel + air_drag_accel
+@export var tackle_accel := 1.5
 var accel: float 
 var dedrag: float
 
@@ -118,6 +123,7 @@ var dodash = false
 @export_category("wall cling/ wall shot")
 @export var wall_cling_drag: float = 10
 @export var shotdown_strength: int = 450
+
 
 @export_group("shot speeds")
 @export var up_shot_speed: Vector2
@@ -248,7 +254,7 @@ var store_boost_mode_on_wall_cling = false
 #var no_boost_mode = false
 var running = false
 var store_running_speed: float
-var store_boost_mode = 0
+var store_boost_mode : float = 0.0
 var grounded : bool
 @export_category("running settings")
 @export_range(0.0, 1.0)
@@ -289,7 +295,7 @@ var eat_my_dust : bool = false
 @export var rot_sprite_offset: float = -42.0
 @export_group("squash and strech")
 @export_subgroup("Xs and Ys")
-@export var base_scale = Vector2(0.6, 0.578)
+@export var base_scale := Vector2(0.6, 0.578)
 @export var base_position = Vector2(0.0, -5.882)
 @export var return_to_form_accel: float
 @export_subgroup("on dash")
@@ -541,10 +547,10 @@ func _physics_process(delta):
 #endregion
 
 #region player size
-	if can_walldive_right or can_walldive_left:
-		Player_collision.shape.radius = 18.24
-	elif fallingmomentum_timer.is_stopped():
-		Player_collision.shape.radius = collision_normal_size.x
+	#if can_walldive_right or can_walldive_left:
+		#Player_collision.shape.radius = 18.24
+	#elif fallingmomentum_timer.is_stopped():
+		#Player_collision.shape.radius = collision_normal_size.x
 #endregion
 
 	_get_ceiling_rotation()
@@ -585,8 +591,7 @@ func apply_main_movement(delta, direction):
 	if floor_slope_disable == true and not possibewalldive_timer.is_stopped() or angle > 0.1 and not possibewalldive_timer.is_stopped() :
 		possibewalldive_timer.stop()
 		possibewalldive_timer.timeout.emit()
-	
-	
+
 
 	
 	if abs(ceiling_angle) > 1 and abs(ceiling_angle)  < 90  and is_on_ceiling():
@@ -620,15 +625,13 @@ func apply_main_movement(delta, direction):
 			jump_bounce_multiplier = no_skates_bounce_jump_mutiplier
 		else:
 			jump_bounce_multiplier = skates_bounce_jump_mutiplier
+			#print("skates bounce")
+		#downdash = false
 	else:
 		if not is_on_floor() or grounded == true:
 			jump_bounce_multiplier = normal_jump_mutiplier
 
-	if angler_dir * velocity.x >= 0 and floor_slope_disable and store_y <= 0  and velocity.y >= 0:
-		floor_snap_length = 100
-		#print("something")
-	if angler_dir * velocity.x < 0 and floor_slope_disable :
-		floor_snap_length = 1
+
 		#if not fallingmomentum_timer.is_stopped():
 			#print("something else")
 	if store_y > 0 and velocity.y >= 0:
@@ -637,12 +640,12 @@ func apply_main_movement(delta, direction):
 				if ledge_titer_handler.half_colide and wallrunning_wallchecker.is_colliding() or angler_dir != 0:
 					velocity.y += store_y * angle
 				#if fallingmomentum_timer.is_stopped():
-					rotation_degrees = (angle * (180 / 3.141592)) * angler_dir   
-					#print(rotation)
+ 
+					print(floor_snap_length, "gay sex")
 			else:
 				if ledge_titer_handler.half_colide and wallrunning_wallchecker.is_colliding() or angler_dir != 0:
 					velocity.y += (store_y * angle) /2
-			floor_snap_length = 350
+			#floor_snap_length = abs(store_y)
 			#print(velocity.y)
 
 	if is_on_floor():
@@ -662,9 +665,11 @@ func apply_main_movement(delta, direction):
 				#print(0)
 				velocity.y = 0
 		angle = get_floor_angle()
-		if angler_dir != 0:
+		if abs(rot) > 0.01:
 			was_on_slope = true
+			#print("was_on_slope", rot)
 		else:
+			
 			was_on_slope = false
 		if angle != 0:
 			fixed_angle = angle * (180 / 3.141592)
@@ -729,28 +734,27 @@ func apply_main_movement(delta, direction):
 		
 		if can_dash == 0:
 			can_dash = 1
-		if angler_dir != 0 and not Input.is_action_pressed("jump")  and dodash == false :
-			if skates_on == false:
-				if do_dodgeslide == true or Input.is_action_pressed("down") :
+		#if angler_dir != 0 and not Input.is_action_pressed("jump")  and dodash == false :
+			#if skates_on == false:
+				#if do_dodgeslide == true or Input.is_action_pressed("down") :
 					
-					floor_snap_length = 100
+					#floor_snap_length = 100
 					#print("dodgeslide")
-				else:
-					floor_snap_length = 3
-			if skates_on == true and angler_dir * velocity.x >= 0:
-				#if Input.is_action_pressed("down") == false:
-				floor_snap_length = 100
-			else:
-				floor_snap_length = 5
+				#else:
+					#floor_snap_length = 3
+			#if skates_on == true and angler_dir * velocity.x >= 0:
+				#if not fallingmomentum_timer.is_stopped():
+					#floor_snap_length = 100
+			#else:
+				#floor_snap_length = 5
 				#if Input.is_action_pressed("down") == true and is_on_floor():
 					#floor_snap_length = 500 * 10
 					#print (floor_snap_length)
 					#print("yes")
 			#print(angle)
-		else:
-			floor_snap_length = 1
-	if no_skates_slope_jump == true :
-			floor_snap_length = 0
+		#else:
+			#floor_snap_length = 1
+	#if no_skates_slope_jump == true :
 
 			#print(no_skates_slope_jump)
 	# for the main 4 directions
@@ -798,6 +802,10 @@ func apply_main_movement(delta, direction):
 			can_jump = true
 			#print(velocity.y)
 	
+		
+	_handle_floor_snap_length()
+			
+	
 	if jump_buffer == true and skates_on == false and can_jump == true:
 		if is_on_floor() and do_dodgeslide == false or can_cayote_jump == true and do_dodgeslide == false:
 			dodash = false
@@ -833,13 +841,18 @@ func apply_main_movement(delta, direction):
 			#print(jump_bounce_multiplier)
 			imnContact = true
 			
-			if is_on_floor():
+			if abs(wallrunning_wallchecker.get_collision_normal().angle() + (PI/2)) > 0.01:
 				velocity = slope_launch_direction
-			velocity += wallrunning_wallchecker.get_collision_normal() * -JUMP_VELOCITY * jump_bounce_multiplier
+				print(wallrunning_wallchecker.get_collision_normal().angle() + (PI/2)  )
+				velocity += wallrunning_wallchecker.get_collision_normal() * -JUMP_VELOCITY * jump_bounce_multiplier
+			else:
+				velocity.y = JUMP_VELOCITY * jump_bounce_multiplier
+				print(velocity, " jump vel " ,JUMP_VELOCITY ," bounce multiplier ", jump_bounce_multiplier )
 			can_cayote_jump = false
 			can_jump = false
 			jump_buffer = false
 			direction_change = false
+			
 			if can_dash == 0:
 				can_dash = 1
 			jumping = true
@@ -915,12 +928,16 @@ func apply_main_movement(delta, direction):
 				create_dash_effect(delta)
 			else:
 				store_running_speed = 0
-				store_boost_mode = move_toward(store_boost_mode, 0, Walking_SPEED)
+				store_boost_mode = move_toward(store_boost_mode, 0.0, Walking_SPEED)
 				velocity.x = move_toward(velocity.x, 0, Walking_SPEED)
 			
 			running = false
 		if knockedback == false:
 			store_x = velocity.x
+			
+
+
+
 	if skates_on == true and grindin == false and wallkicking == false:
 		var downroll_angle: Vector2 
 		if is_on_floor() :
@@ -946,8 +963,8 @@ func apply_main_movement(delta, direction):
 			imnContact = true
 			if slope_launched == false:
 						#print("shit")
-				if angler_dir != 0 and is_on_floor():
-					velocity.x = move_toward(velocity.x + (tangent.angle() * 25) , 0  , accel)
+				if rot != 0 and is_on_floor():
+					velocity.x = move_toward(velocity.x + (rot * 25) , 0  , accel)
 					#velocity.y += (gravity * delta) * (angle * (180 / 3.141592))
 
 					#print (rolling)
@@ -978,9 +995,9 @@ func apply_main_movement(delta, direction):
 		#if is_on_floor():
 			
 		
-		if not fallingmomentum_timer.is_stopped():
-			if tangent.angle() != 0 and is_on_floor()  and  abs(tangent.angle()) < 180 and ledge_titer_handler.full_colide: 
-				velocity.y = store_y * abs(tangent.angle() /1.57) 
+		#if not fallingmomentum_timer.is_stopped():
+			#if tangent.angle() != 0 and is_on_floor()  and  abs(tangent.angle()) < 180 and ledge_titer_handler.full_colide: 
+			#velocity.y = store_y #* abs(tangent.angle() /1.57) 
 				
 		if can_downroll == true :
 
@@ -999,7 +1016,7 @@ func apply_main_movement(delta, direction):
 					velocity.x += ((store_y  / tackle_downroll_multiplier)   * (tangent.angle() /1.57) ) 
 				else:
 					velocity.x += ((store_y / normal_downroll_multiplier)  * (tangent.angle() /1.57) ) 
-					
+				#velocity.y = get_real_velocity().y
 				#if not abs(tangent.angle()* (180.0 / 3.141592)) > 88:
 				
 				#floor_snap_length = 1000
@@ -1009,10 +1026,10 @@ func apply_main_movement(delta, direction):
 				#print(tangent.angle()* (180.0 / 3.141592))
 				#velocity.y += (gravity * delta) * (angle * (180 / 3.141592)) 
 				downrolling = false
-				
+				can_downroll = false
 				if fallingmomentum_timer.is_stopped():
 					fallingmomentum_timer.start()
-				can_downroll = false
+				
 					#print("engage downroll ", velocity.x)
 
 					
@@ -1052,29 +1069,30 @@ func apply_main_movement(delta, direction):
 	
 		if is_on_floor():
 			rot = get_floor_normal().angle() + (PI/2)
-			if abs(rot) > 90:
-				rot = sign(rot) * 89
+		#print(rot)
+			#if abs(rot) > 90:
+				#rot = sign(rot) * 89
 			#print(rot)
 		else: 
 			rot = 0
 		#print(from_dir)
 
 		
-		 # exit early so no player input overrides knockback
-	if abs(velocity.x) > Base_Skates_SPEED and velocity.y < 300 :
+	
+	if abs(velocity.x) > Base_Skates_SPEED and abs(velocity.x)  > velocity.y :
 		can_water_run = true
 	else:
 		can_water_run = false
 				
 	if is_on_floor():
-		if angler_dir == -1 and velocity.x >= 0 and (angle * (180 / 3.141592)) >= 75 and slope_launched == false and not disable_slope_launch() and  can_uproll == false and not can_downroll:
+		if angler_dir == -1 and velocity.x >= 0 and (abs(rot) * (180 / 3.141592)) >= 75 and slope_launched == false and not disable_slope_launch() and  can_uproll == false and not can_downroll:
 			dodash = false
 			velocity.y = abs(velocity.x) * -1
 			can_wallrun_right = true
 				
 				#print("uprolling")
 			possiblewallrun_timer.start()
-		elif angler_dir == 1 and velocity.x <= 0 and (angle * (180 / 3.141592)) >= 75 and slope_launched == false and not disable_slope_launch() and can_uproll == false and not can_downroll:
+		elif angler_dir == 1 and velocity.x <= 0 and (abs(rot) * (180 / 3.141592)) >= 75 and slope_launched == false and not disable_slope_launch() and can_uproll == false and not can_downroll:
 				#print("uprolling")
 			dodash = false
 			velocity.y = abs(velocity.x) * -1
@@ -1662,10 +1680,18 @@ func apply_main_movement(delta, direction):
 
 
 	if was_on_floor and not is_on_floor() and velocity.y >= 0:
-		if skates_on == true  and was_on_slope == true and in_water == false and grind_off == false and slope_launched == false and no_slope_launch == false and not disable_slope_launch() and fallingmomentum_timer.is_stopped():
-			#if velocity.x > 2000  or velocity.x < -2000 :
-			
+		if (skates_on == true 
+		and was_on_slope == true 
+		and in_water == false 
+		and grind_off == false 
+		and slope_launched == false 
+		and no_slope_launch == false 
+		and not disable_slope_launch() 
+		#and fallingmomentum_timer.is_stopped()
+		and jumping == false
+		):
 			velocity = slope_launch_direction
+			print("slope launch", slope_launch_direction)
 			#if can_downroll:
 				#velocity.y /= 2
 			#print("slope launch", velocity.y)
@@ -1766,7 +1792,7 @@ func _handle_accel():
 		else:
 			accel = no_input_accel
 	elif is_on_floor():
-		if angler_dir == 0:
+		if abs(rot) < 0.01:
 			if abs(velocity.x) > Base_Skates_SPEED  + conveyor_power  and dashDirection * velocity.x > 0 :
 				accel = ground_forward_past_top_speed_accel
 				#print("top normal")
@@ -1774,9 +1800,9 @@ func _handle_accel():
 				accel = normal_ground_accel - abs(velocity.x / 250)
 				#print(velocity.x)
 		else:
-			if angler_dir == dir:
+			if sign(rot) == dir:
 				accel = down_accel
-			elif angler_dir != dir:
+			elif sign(rot) != dir:
 				if abs(velocity.x) > Base_Skates_SPEED + abs(conveyor_power):
 					accel = Up_past_mach_accel
 					#print("sonic shit")
@@ -1791,6 +1817,27 @@ func _handle_accel():
 		else:
 			accel = Air_normal_accel - abs(velocity.x / 320)
 			#print("normal air drag")
+
+
+func _handle_floor_snap_length():
+	if jump_buffer == true:
+		floor_snap_length = jump_snap_length
+		#print("no")
+		return
+	else:
+		if get_real_velocity().y > 350 and not is_on_floor():
+			if can_walldive_left or can_walldive_right:
+				floor_snap_length =  get_real_velocity().y
+			else:
+				floor_snap_length =  move_toward(floor_snap_length, get_real_velocity().y/10, snap_accel)
+			#print(floor_snap_length, " fuck 1")
+		else:
+			if abs(rot) > 0.01 or velocity.y > 0:
+				floor_snap_length = normal_snap_length
+				#print(floor_snap_length, " fuck 2 ", velocity.y)
+			else:
+				floor_snap_length = move_toward(floor_snap_length, normal_snap_length, snap_accel)
+			#
 
 func set_launch_direction():
 	var pulled_vel = Vector2(velocity.x, 0.0)
@@ -1811,13 +1858,13 @@ func set_animation():
 		animation_to_play = "ball_jump"
 	if tackle == true:
 		animation_to_play = "rolling"
-		(Player_collision.shape as CapsuleShape2D).height = 27.06
-		Player_collision.position.y = 4.706
+		#(Player_collision.shape as CapsuleShape2D).height = 27.06
+		#Player_collision.position.y = 4.706
 		
 		return
-	elif not mode == MovementMode.VINE:
-		(Player_collision.shape as CapsuleShape2D).height = 36.47
-		Player_collision.position.y = 0.0
+	#elif not mode == MovementMode.VINE:
+		#(Player_collision.shape as CapsuleShape2D).height = 36.47
+		#Player_collision.position.y = 0.0
 	if do_dodgeslide == true:
 		animation_to_play = "dodgeslide"
 		return
@@ -2326,7 +2373,7 @@ func is_grinding():
 			angler_onrails = -1
 		if Input.is_action_pressed("jump") == false :
 			velocity.y = 500
-			floor_snap_length = 50
+
 		if skates_on == false:
 			grind_speed = grind_speed + 6 + store_velocity.x + ((angle * angler_onrails * 30)/8) if grind_speed <= 840 else grind_speed - 4 + ((angle * angler_onrails * 30)/8)
 			velocity.x = grind_speed *  store_direction
@@ -2443,7 +2490,7 @@ var additive_damp : float = 1.0
 var limit_brought_back : float
 var floor_bounce_back: bool = false
 func apply_vine_pull(delta):
-	floor_snap_length = 0
+	#floor_snap_length = 0
 	var input_vector = Vector2(
 		 Input.get_action_strength("left") - Input.get_action_strength("right"),
 		0

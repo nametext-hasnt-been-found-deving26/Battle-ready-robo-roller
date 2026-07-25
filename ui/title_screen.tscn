@@ -1,6 +1,23 @@
-[gd_scene load_steps=2 format=3 uid="uid://c4ga5sgqatc5m"]
+[gd_scene load_steps=9 format=3 uid="uid://c4ga5sgqatc5m"]
 
 [ext_resource type="Script" uid="uid://bhjs22flmelsx" path="res://ui/title_screen.gd" id="1_7xhpk"]
+[ext_resource type="Texture2D" uid="uid://wga3dkf62o8h" path="res://ui/wheel ui.png" id="2_bor1v"]
+[ext_resource type="Texture2D" uid="uid://nl2i0dgnliev" path="res://ui/texture border.png" id="3_dk6f0"]
+[ext_resource type="Texture2D" uid="uid://c7krlt4bktyq5" path="res://ui/background texture.png" id="3_qer0c"]
+[ext_resource type="Texture2D" uid="uid://lbe883xlkx65" path="res://Players/Swift Roll/swift_roll.png" id="5_l1ku3"]
+
+[sub_resource type="Theme" id="Theme_l1ku3"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_6qcwj"]
+texture = ExtResource("3_dk6f0")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6qcwj"]
+atlas = ExtResource("5_l1ku3")
+region = Rect2(718, 17, 17, 24)
 
 [node name="title_screen" type="Control"]
 layout_mode = 3
@@ -10,42 +27,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_7xhpk")
-
-[node name="ScrollContainer" type="ScrollContainer" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -93.0
-offset_top = -72.0
-offset_right = 97.0
-offset_bottom = 77.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="HBoxContainer" type="VBoxContainer" parent="ScrollContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 20
-
-[node name="Button" type="Button" parent="ScrollContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-text = "Swift Roll
-"
-
-[node name="Button2" type="Button" parent="ScrollContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.0
-text = "MM-247 Scarlet Storm"
-
-[node name="Button3" type="Button" parent="ScrollContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-text = "quit"
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 1
@@ -61,6 +42,86 @@ text = "
 
 Battle-ready Robo-roller"
 vertical_alignment = 2
+
+[node name="ui" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_bottom = 40.0
+grow_horizontal = 0
+focus_behavior_recursive = 1
+
+[node name="wheels" type="Sprite2D" parent="ui"]
+position = Vector2(-37, 57)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_bor1v")
+
+[node name="Line2D" type="Line2D" parent="ui"]
+points = PackedVector2Array(-131, -5, -70.42224, 34.34073)
+default_color = Color(0.7254902, 0, 1, 1)
+
+[node name="Line2D2" type="Line2D" parent="ui"]
+points = PackedVector2Array(43, 108, -4, 77)
+default_color = Color(0.7254902, 0, 1, 1)
+
+[node name="Container" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_l1ku3")
+theme_override_styles/panel = SubResource("StyleBoxTexture_6qcwj")
+
+[node name="background" type="TextureRect" parent="Container"]
+z_index = -1
+layout_mode = 2
+focus_behavior_recursive = 1
+texture = ExtResource("3_qer0c")
+stretch_mode = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -99.0
+offset_top = -72.0
+offset_right = 109.0
+offset_bottom = 77.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="VBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="Button" type="Button" parent="ScrollContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+theme_override_icons/icon = SubResource("AtlasTexture_6qcwj")
+text = "Swift Roll
+"
+
+[node name="Button2" type="Button" parent="ScrollContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.0
+text = "MM-247 Scarlet Storm"
+
+[node name="Button3" type="Button" parent="ScrollContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+text = "quit"
 
 [connection signal="pressed" from="ScrollContainer/HBoxContainer/Button" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="ScrollContainer/HBoxContainer/Button3" to="." method="_on_button_3_pressed"]

@@ -2,7 +2,8 @@ extends Node
 
 var music_player: AudioStreamPlayer
 var record_scrachin = preload("uid://yvy8eohsu2kj")
-
+var music_bus = AudioServer.get_bus_index("Music")
+var filter = AudioServer.get_bus_effect(music_bus, 0)
 
 
 func _ready():
@@ -54,6 +55,15 @@ func change_music(stream: String):
 	music_player.play()
 
 func _process(delta: float) -> void:
+	if get_tree().paused == true:
+		#print(music_bus)
+		#print("Effect count:", AudioServer.get_bus_effect_count(music_bus))
+
+		#for i in AudioServer.get_bus_effect_count(music_bus):
+			#print(i, ": ", AudioServer.get_bus_effect(music_bus, i))
+		filter.cutoff_hz = 2000.0
+	else:
+		filter.cutoff_hz = 20000.0
 	if music_player.stream == null:
 		return
 	if not music_player.playing and music_player.stream != record_scrachin:
