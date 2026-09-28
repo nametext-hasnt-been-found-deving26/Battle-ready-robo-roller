@@ -23,11 +23,13 @@ Settings="*res://singletons/settings.gd"
 ThatOneScriptINeedForTheMobileVersion="*res://singletons/that_one_script_i_need_for_the_mobile_version.gd"
 HandlePlayerInStage="*res://singletons/handle_player_in stage.gd"
 MusicPlayer="*res://singletons/music_player.gd"
+UiInstancing="*res://singletons/ui_instancing.gd"
 
 [display]
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
+window/size/mode=3
 window/stretch/scale_mode="integer"
 
 [editor]

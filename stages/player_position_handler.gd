@@ -2,7 +2,6 @@ extends Marker2D
 @onready var tile_map: TileMap = $"../TileMap"
 var player: PackedScene
 var spawned: bool
-@onready var stage_gimmicks: Node = $"../stage_gimmicks"
 var stage = get_parent()
 func set_player(p: PackedScene):
 	#print("SET PLAYER CALLED")
@@ -11,7 +10,7 @@ func set_player(p: PackedScene):
 
 func spawn_player():
 	if not player:
-		#print("Player is null")
+		print("Player is null")
 		return
 	spawned = true
 	var current_player = player.instantiate()

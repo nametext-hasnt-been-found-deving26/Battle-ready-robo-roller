@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://bbxogwa1uudyk"]
+[gd_scene load_steps=24 format=3 uid="uid://bbxogwa1uudyk"]
 
 [ext_resource type="Script" uid="uid://62owbuwb7kff" path="res://ui/pausemenu.gd" id="1_i6344"]
 [ext_resource type="Shader" uid="uid://ce85geu6om81" path="res://ui/ui.gdshader" id="2_hpi63"]
@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://buiw3neaoybis" path="res://ui/disc.png" id="9_bsjxr"]
 [ext_resource type="Script" uid="uid://cg2upmqfhkfsv" path="res://ui/text_scroller.gd" id="9_eie8p"]
 [ext_resource type="Script" uid="uid://3p3l0ql085h3" path="res://ui/music_disc.gd" id="10_n75p4"]
+[ext_resource type="Script" uid="uid://bd121705d3dm3" path="res://ui/background_play.gd" id="11_rvv25"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_0td2y"]
 shader = ExtResource("2_hpi63")
@@ -126,6 +127,18 @@ tracks/8/keys = {
 "update": 1,
 "values": [false]
 }
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("background_play:visible")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
 
 [sub_resource type="Animation" id="Animation_5emoi"]
 resource_name = "blur"
@@ -234,6 +247,18 @@ tracks/8/keys = {
 "update": 1,
 "values": [false, true]
 }
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("background_play:visible")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_v1qp0"]
 _data = {
@@ -260,7 +285,9 @@ texture_margin_bottom = 2.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bsjxr"]
 
-[node name="PauseMenu" type="Control"]
+[node name="CanvasLayer" type="CanvasLayer"]
+
+[node name="PauseMenu" type="Control" parent="."]
 process_mode = 3
 visibility_layer = 16
 z_index = 6
@@ -278,7 +305,7 @@ grow_vertical = 2
 script = ExtResource("1_i6344")
 current_theme = ExtResource("2_ptdjk")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect" type="ColorRect" parent="PauseMenu"]
 modulate = Color(1, 1, 1, 0)
 self_modulate = Color(0.996078, 0.992157, 1, 1)
 material = SubResource("ShaderMaterial_0td2y")
@@ -289,7 +316,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="PauseMenu"]
 auto_translate_mode = 2
 modulate = Color(1, 1, 1, 0)
 layout_mode = 1
@@ -307,7 +334,7 @@ grow_vertical = 2
 localize_numeral_system = false
 theme_override_styles/panel = SubResource("StyleBoxEmpty_q775a")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="PauseMenu/PanelContainer"]
 process_mode = 2
 clip_contents = false
 layout_mode = 2
@@ -316,10 +343,10 @@ horizontal_scroll_mode = 0
 vertical_scroll_mode = 3
 script = ExtResource("3_qg8xq")
 
-[node name="Content" type="Control" parent="PanelContainer/ScrollContainer"]
+[node name="Content" type="Control" parent="PauseMenu/PanelContainer/ScrollContainer"]
 layout_mode = 2
 
-[node name="resume" type="Button" parent="PanelContainer/ScrollContainer/Content"]
+[node name="resume" type="Button" parent="PauseMenu/PanelContainer/ScrollContainer/Content"]
 layout_mode = 0
 offset_top = 97.0
 offset_right = 278.0
@@ -328,7 +355,7 @@ focus_neighbor_top = NodePath("../quit")
 focus_neighbor_bottom = NodePath("../restart")
 text = "resume"
 
-[node name="restart" type="Button" parent="PanelContainer/ScrollContainer/Content"]
+[node name="restart" type="Button" parent="PauseMenu/PanelContainer/ScrollContainer/Content"]
 layout_mode = 0
 offset_top = 115.0
 offset_right = 278.0
@@ -337,7 +364,7 @@ focus_neighbor_top = NodePath("../resume")
 focus_neighbor_bottom = NodePath("../downwards_dash_mode")
 text = "restart"
 
-[node name="downwards_dash_mode" type="Button" parent="PanelContainer/ScrollContainer/Content"]
+[node name="downwards_dash_mode" type="Button" parent="PauseMenu/PanelContainer/ScrollContainer/Content"]
 layout_mode = 0
 offset_right = 194.0
 offset_bottom = 31.0
@@ -345,7 +372,7 @@ focus_neighbor_top = NodePath("../restart")
 focus_neighbor_bottom = NodePath("../quit")
 text = "downwards_dash_mode"
 
-[node name="quit" type="Button" parent="PanelContainer/ScrollContainer/Content"]
+[node name="quit" type="Button" parent="PauseMenu/PanelContainer/ScrollContainer/Content"]
 layout_mode = 0
 offset_top = 132.0
 offset_right = 278.0
@@ -354,18 +381,27 @@ focus_neighbor_top = NodePath("../downwards_dash_mode")
 focus_neighbor_bottom = NodePath("../resume")
 text = "quit"
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="PauseMenu"]
 libraries = {
 &"": SubResource("AnimationLibrary_v1qp0")
 }
 
-[node name="playlist" parent="." instance=ExtResource("4_4dg4t")]
+[node name="playlist" parent="PauseMenu" instance=ExtResource("4_4dg4t")]
 visible = false
 layout_mode = 1
 offset_left = -113.0
 offset_top = -70.0
 
-[node name="music_display" type="PanelContainer" parent="."]
+[node name="background_play" type="Button" parent="PauseMenu"]
+visible = false
+layout_mode = 0
+offset_left = 6.0
+offset_top = 7.0
+offset_right = 232.0
+offset_bottom = 47.0
+script = ExtResource("11_rvv25")
+
+[node name="music_display" type="PanelContainer" parent="PauseMenu"]
 process_mode = 2
 visible = false
 layout_mode = 0
@@ -373,7 +409,7 @@ offset_right = 238.0
 offset_bottom = 37.0
 theme = ExtResource("7_afaem")
 
-[node name="text_scroller" type="ScrollContainer" parent="music_display"]
+[node name="text_scroller" type="ScrollContainer" parent="PauseMenu/music_display"]
 custom_minimum_size = Vector2(1, 0)
 layout_direction = 3
 layout_mode = 2
@@ -381,23 +417,23 @@ horizontal_scroll_mode = 3
 vertical_scroll_mode = 0
 script = ExtResource("9_eie8p")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="music_display/text_scroller"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PauseMenu/music_display/text_scroller"]
 layout_mode = 2
 
-[node name="song_name" type="Label" parent="music_display/text_scroller/HBoxContainer"]
+[node name="song_name" type="Label" parent="PauseMenu/music_display/text_scroller/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "nlkdsn zaflgasSGAZ<GADGA<"
 horizontal_alignment = 1
 script = ExtResource("9_b11fi")
 
-[node name="music_disc" type="Sprite2D" parent="music_display"]
+[node name="music_disc" type="Sprite2D" parent="PauseMenu/music_display"]
 texture = SubResource("AtlasTexture_bsjxr")
 script = ExtResource("10_n75p4")
 strength = 1.25
 smoothness = 12.0
 
-[node name="music_display2" type="PanelContainer" parent="."]
+[node name="music_display2" type="PanelContainer" parent="PauseMenu"]
 process_mode = 2
 visible = false
 layout_mode = 0
@@ -406,19 +442,19 @@ offset_top = 1.0
 offset_bottom = 93.0
 theme_override_styles/panel = SubResource("StyleBoxTexture_rvv25")
 
-[node name="mixtape_buttons" type="VBoxContainer" parent="music_display2"]
+[node name="mixtape_buttons" type="VBoxContainer" parent="PauseMenu/music_display2"]
 process_mode = 2
 layout_mode = 2
 focus_behavior_recursive = 1
 
-[node name="mixtape_upscroll" type="Button" parent="music_display2/mixtape_buttons"]
+[node name="mixtape_upscroll" type="Button" parent="PauseMenu/music_display2/mixtape_buttons"]
 layout_mode = 2
 size_flags_vertical = 3
 theme = ExtResource("7_afaem")
 icon = ExtResource("6_fdrbn")
 icon_alignment = 1
 
-[node name="mixtape_downscroll" type="Button" parent="music_display2/mixtape_buttons"]
+[node name="mixtape_downscroll" type="Button" parent="PauseMenu/music_display2/mixtape_buttons"]
 material = SubResource("ShaderMaterial_rvv25")
 layout_mode = 2
 size_flags_vertical = 3
@@ -427,9 +463,10 @@ theme_override_styles/focus = SubResource("StyleBoxTexture_bsjxr")
 icon = ExtResource("8_bsjxr")
 icon_alignment = 1
 
-[connection signal="pressed" from="PanelContainer/ScrollContainer/Content/resume" to="." method="_on_resume_pressed"]
-[connection signal="pressed" from="PanelContainer/ScrollContainer/Content/restart" to="." method="_on_restart_pressed"]
-[connection signal="pressed" from="PanelContainer/ScrollContainer/Content/downwards_dash_mode" to="." method="_on_downwards_dash_mode_pressed"]
-[connection signal="pressed" from="PanelContainer/ScrollContainer/Content/quit" to="." method="_on_quit_pressed"]
-[connection signal="pressed" from="music_display2/mixtape_buttons/mixtape_upscroll" to="." method="_on_mixtape_upscroll_pressed"]
-[connection signal="pressed" from="music_display2/mixtape_buttons/mixtape_downscroll" to="." method="_on_mixtape_downscroll_pressed"]
+[connection signal="pressed" from="PauseMenu/PanelContainer/ScrollContainer/Content/resume" to="PauseMenu" method="_on_resume_pressed"]
+[connection signal="pressed" from="PauseMenu/PanelContainer/ScrollContainer/Content/restart" to="PauseMenu" method="_on_restart_pressed"]
+[connection signal="pressed" from="PauseMenu/PanelContainer/ScrollContainer/Content/downwards_dash_mode" to="PauseMenu" method="_on_downwards_dash_mode_pressed"]
+[connection signal="pressed" from="PauseMenu/PanelContainer/ScrollContainer/Content/quit" to="PauseMenu" method="_on_quit_pressed"]
+[connection signal="pressed" from="PauseMenu/background_play" to="PauseMenu/background_play" method="_on_pressed"]
+[connection signal="pressed" from="PauseMenu/music_display2/mixtape_buttons/mixtape_upscroll" to="PauseMenu" method="_on_mixtape_upscroll_pressed"]
+[connection signal="pressed" from="PauseMenu/music_display2/mixtape_buttons/mixtape_downscroll" to="PauseMenu" method="_on_mixtape_downscroll_pressed"]

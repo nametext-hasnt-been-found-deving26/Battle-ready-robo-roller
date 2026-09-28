@@ -112,8 +112,13 @@ func _unhandled_input(event):
 func move_selection(direction):
 	if song_buttons.is_empty():
 		return
-
-	selected_index += direction
+	if selected_index + direction >= song_buttons.size():
+		selected_index = 0
+	elif selected_index + direction < 0:
+		selected_index = song_buttons.size() - 1
+	else:
+		selected_index += direction
+	
 
 	selected_index = clamp(
 		selected_index,
@@ -147,4 +152,4 @@ func move_selection(direction):
 		button_scroll_accel
 	)
 	scroll_sfx.play()
-	#print(button.grab_focus())
+#	print(button.grab_focus())

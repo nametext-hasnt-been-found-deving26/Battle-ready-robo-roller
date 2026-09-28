@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://crpiax7vrcu8b"]
 
-[ext_resource type="Script" uid="uid://bx1uwq4gqgmsb" path="res://line_2d.gd" id="1_qaid5"]
+[ext_resource type="Script" uid="uid://bx1uwq4gqgmsb" path="res://stages/checkpoints/line_2d.gd" id="1_qaid5"]
 
 [node name="teleport_trail" type="Line2D"]
 script = ExtResource("1_qaid5")

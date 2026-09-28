@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://dwb8cfx31yv11"]
+
+[ext_resource type="Script" uid="uid://bcs1sebu1pn18" path="res://stage gimmicks/rails/rails.gd" id="1_naagv"]
+[ext_resource type="Texture2D" uid="uid://blsdu0q7h1kn4" path="res://stage gimmicks/rails/grind_rail.png" id="2_3dpc8"]
+
+[sub_resource type="Curve2D" id="Curve2D_xki3q"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0)
+}
+point_count = 2
+
+[node name="rail" type="Node2D"]
+script = ExtResource("1_naagv")
+
+[node name="rail path" type="Path2D" parent="."]
+curve = SubResource("Curve2D_xki3q")
+
+[node name="rail_texture" type="Line2D" parent="."]
+width = 50.0
+texture = ExtResource("2_3dpc8")
+texture_mode = 1

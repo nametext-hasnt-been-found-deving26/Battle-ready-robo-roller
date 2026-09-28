@@ -47,6 +47,7 @@ func build_slots():
 func _process(_delta):
 	if not player:
 		player = get_tree().get_first_node_in_group("player")
+		return
 	# Detect transition
 	if player.teleporting and not was_teleporting:
 		open(player, HandlePlayerInStage.current_checkpoint_id)

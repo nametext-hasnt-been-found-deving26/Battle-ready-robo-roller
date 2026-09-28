@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://dehwysy8xicqf"]
 
-[ext_resource type="Script" uid="uid://bi556laf8rd0b" path="res://reset_menu.gd" id="1_vkm6i"]
+[ext_resource type="Script" uid="uid://bi556laf8rd0b" path="res://ui/reset_menu.gd" id="1_vkm6i"]
 
 [sub_resource type="Animation" id="Animation_vkm6i"]
 resource_name = "on appear"

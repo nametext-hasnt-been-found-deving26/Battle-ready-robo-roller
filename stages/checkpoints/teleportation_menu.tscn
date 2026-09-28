@@ -4,7 +4,9 @@
 [ext_resource type="PackedScene" uid="uid://bmrhj8pgljip6" path="res://stages/checkpoints/checkpoint_slot.tscn" id="2_qo2yg"]
 [ext_resource type="PackedScene" uid="uid://crpiax7vrcu8b" path="res://stages/checkpoints/teleport_trail.tscn" id="3_xj5qw"]
 
-[node name="Teleportation menu" type="Control" groups=["teleportation menu"]]
+[node name="CanvasLayer" type="CanvasLayer"]
+
+[node name="Teleportation menu" type="Control" parent="." groups=["teleportation menu"]]
 modulate = Color(1, 1, 1, 0.5294118)
 top_level = true
 custom_minimum_size = Vector2(200, 120)
@@ -18,7 +20,7 @@ script = ExtResource("1_2jfqg")
 checkpoint_slot_scene = ExtResource("2_qo2yg")
 teleport_trail = ExtResource("3_xj5qw")
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="Teleportation menu"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -26,11 +28,11 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="Panel" parent="CenterContainer"]
+[node name="Panel" type="Panel" parent="Teleportation menu/CenterContainer"]
 custom_minimum_size = Vector2(600, 200)
 layout_mode = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/Panel"]
+[node name="ScrollContainer" type="ScrollContainer" parent="Teleportation menu/CenterContainer/Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -41,18 +43,18 @@ follow_focus = true
 horizontal_scroll_mode = 2
 vertical_scroll_mode = 0
 
-[node name="SlotsContainer" type="HBoxContainer" parent="CenterContainer/Panel/ScrollContainer"]
+[node name="SlotsContainer" type="HBoxContainer" parent="Teleportation menu/CenterContainer/Panel/ScrollContainer"]
 custom_minimum_size = Vector2(400, 200)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4
 theme_override_constants/separation = 8
 
-[node name="teletransport_trail_buffer_Timer" type="Timer" parent="."]
+[node name="teletransport_trail_buffer_Timer" type="Timer" parent="Teleportation menu"]
 wait_time = 0.1
 
-[node name="scroll_buffer_timer" type="Timer" parent="."]
+[node name="scroll_buffer_timer" type="Timer" parent="Teleportation menu"]
 wait_time = 0.25
 one_shot = true
 
-[connection signal="timeout" from="teletransport_trail_buffer_Timer" to="." method="_on_teletransport_trail_buffer_timer_timeout"]
+[connection signal="timeout" from="Teleportation menu/teletransport_trail_buffer_Timer" to="Teleportation menu" method="_on_teletransport_trail_buffer_timer_timeout"]

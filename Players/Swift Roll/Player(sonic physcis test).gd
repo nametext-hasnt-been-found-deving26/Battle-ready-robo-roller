@@ -13,6 +13,7 @@ enum MovementMode {
 	DIRECTION_CHANGE,
 	WALL_CLING,WALL_CLIMB,
 	WALL_SHOT,
+	NO_SKATES_WALL_KICK,
 }
 
 var mode = MovementMode.NORMAL
@@ -100,7 +101,7 @@ var dedrag: float
 
 var not_moving_x = true
 var not_moving_y = true
-var dir = 2
+var dir = 1
 var skates_on = false
 
 @onready var dashDurationTimer = $Timers/dash_timers/DashDurationTimer
@@ -323,17 +324,37 @@ var conveyor_area_dir = Vector2.ZERO
 var conveyor_power = 0.0
 var conveyor_velocity : Vector2
 
-var grindin = false
+
 var store_direction = 0
-var grind_speed = 0
-var grind_off = false
-var rail_land = false
+
+
 var has_landed = false
 var noskates_falling_speed = false
 
-@onready var rail_grind: AudioStreamPlayer = $sfx/rail_grind
-@onready var rail_contact: AudioStreamPlayer = $sfx/rail_contact
-@onready var pass_through_rails: Timer = $Timers/pass_through_rails
+@export_category("rail grind settings")
+@export var on_rail_position_offset: Vector2
+
+@export var rail_trick_speed := 300
+
+@export_group("accels")
+@export var rail_no_skates_accel := 10.0
+@export var rail_skates_accel := 10.0
+
+@export_group("slope influences")
+@export var rail_slope_into_influence := 10.0
+@export var rail_slope_counter_influence := 1.0
+
+var rail_path: Path2D
+
+var rail_slope_influence := 1.0
+var rail_offset := 0.0
+var rail_speed := 0.0
+
+@onready var rail_grind_sfx: AudioStreamPlayer = $sfx/rail_grind
+@onready var rail_contact_sfx: AudioStreamPlayer = $sfx/rail_contact
+@onready var spark_emiter: GPUParticles2D = $dust_cloud_setter/spark_emiter
+
+
 
 
 var dash_recharge = false
@@ -449,7 +470,8 @@ func _physics_process(delta):
 		MovementMode.UPSIDE_DOWN:
 			running_upside_down(direction, delta)
 
-		
+		MovementMode.NO_SKATES_WALL_KICK:
+			_handle_no_skates_wall_bounce()
 
 		MovementMode.DASH:
 			pass
@@ -478,7 +500,7 @@ func _physics_process(delta):
 
 
 		MovementMode.RAIL_GRINDING:
-			is_grinding()
+			is_grinding(delta, direction)
 
 		MovementMode.WATER:
 			inside_water(delta, direction)
@@ -568,6 +590,10 @@ func _physics_process(delta):
 			braking_sfx.play()
 	else:
 		eat_my_dust = true
+	if mode == MovementMode.RAIL_GRINDING:
+		spark_emiter.emitting = true
+	else:
+		spark_emiter.emitting = false
 
 
 
@@ -607,8 +633,7 @@ func apply_main_movement(delta, direction):
 			direction = -1
 	else:
 		direction = 0
-	if direction != 0  and grindin == false:
-		store_direction = direction 
+
 	if in_water == true:
 		mode = MovementMode.WATER
 	else:
@@ -641,7 +666,7 @@ func apply_main_movement(delta, direction):
 					velocity.y += store_y * angle
 				#if fallingmomentum_timer.is_stopped():
  
-					print(floor_snap_length, "gay sex")
+					#print(floor_snap_length, "gay sex")
 			else:
 				if ledge_titer_handler.half_colide and wallrunning_wallchecker.is_colliding() or angler_dir != 0:
 					velocity.y += (store_y * angle) /2
@@ -793,7 +818,7 @@ func apply_main_movement(delta, direction):
 		jump_ball_collision.set_monitoring(true)
 		jump_ball_collision.set_monitorable(true)
 		imnContact = true
-	if  grindin == false and dodash == false:
+	if  dodash == false:
 		store_velocity = velocity
 	# Handle jump.
 	if Input.is_action_just_released("jump") and velocity.y < 0 :
@@ -842,7 +867,7 @@ func apply_main_movement(delta, direction):
 			imnContact = true
 			
 			if abs(wallrunning_wallchecker.get_collision_normal().angle() + (PI/2)) > 0.01:
-				velocity = slope_launch_direction
+				velocity = get_real_velocity()
 				print(wallrunning_wallchecker.get_collision_normal().angle() + (PI/2)  )
 				velocity += wallrunning_wallchecker.get_collision_normal() * -JUMP_VELOCITY * jump_bounce_multiplier
 			else:
@@ -866,7 +891,7 @@ func apply_main_movement(delta, direction):
 
 
 
-	if skates_on == false and grindin == false and wallkicking == false and knockedback == false:
+	if skates_on == false  and wallkicking == false and knockedback == false:
 		jump_ball = false
 		if boost_mode < 300 and running == false or no_skates_slope_jump == true:
 			if no_skates_slope_jump == false:
@@ -938,7 +963,7 @@ func apply_main_movement(delta, direction):
 
 
 
-	if skates_on == true and grindin == false and wallkicking == false:
+	if skates_on == true  and wallkicking == false:
 		var downroll_angle: Vector2 
 		if is_on_floor() :
 			downroll_angle  =  ledge_titer_handler.ledge_angle
@@ -1085,14 +1110,14 @@ func apply_main_movement(delta, direction):
 		can_water_run = false
 				
 	if is_on_floor():
-		if angler_dir == -1 and velocity.x >= 0 and (abs(rot) * (180 / 3.141592)) >= 75 and slope_launched == false and not disable_slope_launch() and  can_uproll == false and not can_downroll:
+		if angler_dir == -1 and velocity.x >= 0 and (abs(rot) * (180 / 3.141592)) >= 70 and slope_launched == false and not disable_slope_launch() and  can_uproll == false and not can_downroll:
 			dodash = false
 			velocity.y = abs(velocity.x) * -1
 			can_wallrun_right = true
 				
 				#print("uprolling")
 			possiblewallrun_timer.start()
-		elif angler_dir == 1 and velocity.x <= 0 and (abs(rot) * (180 / 3.141592)) >= 75 and slope_launched == false and not disable_slope_launch() and can_uproll == false and not can_downroll:
+		elif angler_dir == 1 and velocity.x <= 0 and (abs(rot) * (180 / 3.141592)) >= 70 and slope_launched == false and not disable_slope_launch() and can_uproll == false and not can_downroll:
 				#print("uprolling")
 			dodash = false
 			velocity.y = abs(velocity.x) * -1
@@ -1178,8 +1203,8 @@ func apply_main_movement(delta, direction):
 	if slide_jump == true:
 		
 		velocity.y = JUMP_VELOCITY - 100
-		jump_soundfx.play()
-		jump_grunt_1_sfx.play()
+		#jump_soundfx.play()
+		#jump_grunt_1_sfx.play()
 		can_cayote_jump = false
 		can_jump = false
 		jump_buffer = false
@@ -1300,8 +1325,7 @@ func apply_main_movement(delta, direction):
 			if wall_shotLUP == false and wall_shotRUP == false and wall_shotLForward == false and wall_shotRForward == false and wall_shotLDown == false and wall_shotRDown == false and wall_cling == false:
 				wallkicking = true
 					#print("wallkick")
-				if skates_on == false:
-					wallkicklock_timer.start()
+				
 				if wallkick_lock_r.is_colliding == true:
 					can_wall_kickR = false
 					can_wall_kickL = true
@@ -1311,6 +1335,9 @@ func apply_main_movement(delta, direction):
 					can_wall_kickL = false
 					wallkick_dir = 1
 				wall_kick.play()
+				if skates_on == false:
+					wallkicklock_timer.start()
+					mode = MovementMode.NO_SKATES_WALL_KICK
 				#print(wallkick_velocity)
 				if can_dash == 0:
 					can_dash = 1
@@ -1331,11 +1358,7 @@ func apply_main_movement(delta, direction):
 				velocity.y = JUMP_VELOCITY/4 - abs(wallkick_velocity)/2
 			dir *= -1
 			wallkicking = false
-		else:
-			print("walkick_noskates")
-			velocity.x =( abs(wallkick_velocity) + 300)*wallkick_dir
-			velocity.y = JUMP_VELOCITY/3 - abs(wallkick_velocity)/2
-			boost_mode = abs(velocity.x/ 1.2) + 10 
+		
 		
 		
 
@@ -1641,25 +1664,13 @@ func apply_main_movement(delta, direction):
 		star_dash = star_dash + 1
 		dash_recharge = false
 			
-	if grindin == true:
-		is_grinding()
-	else:
-		grind_speed = 0
-		has_landed = false
-		rail_grind.stop()
+
+		
 	var was_on_floor = is_on_floor()
-	if grind_off == true:
-		grindin = false
-		#print("grind off")
-		velocity.x = velocity.x + grind_speed * dashDirection
-		grind_off = false
-		if Input.is_action_pressed("jump"):
-			velocity.y = velocity.y * 1.35
-		else:
-			if skates_on == true:
-				velocity.y += gravity * delta - ((fixed_angle * 1.5) + (velocity.x/3) ) /3
-			if skates_on == false :
-				velocity.y += gravity * delta - ((fixed_angle * 1.5) + (velocity.x/2.2) )
+
+
+
+
 	
 	
 	wind_push(delta)
@@ -1683,7 +1694,6 @@ func apply_main_movement(delta, direction):
 		if (skates_on == true 
 		and was_on_slope == true 
 		and in_water == false 
-		and grind_off == false 
 		and slope_launched == false 
 		and no_slope_launch == false 
 		and not disable_slope_launch() 
@@ -1734,7 +1744,7 @@ func _handle_rotation():
 			else:
 				rotation_degrees = -90 * dashDirection 
 	elif is_on_floor():
-		if skates_on == true or grindin == true and mode == MovementMode.NORMAL:
+		if skates_on == true and mode == MovementMode.NORMAL:
 			#print(get_floor_normal())
 			if Input.is_action_just_pressed("jump"):
 				rotation_degrees = 0
@@ -1853,83 +1863,158 @@ func _on_Area2D_body_entered(body):
 func set_animation():
 	if tackle == false:
 		animated_sprite_2d.flip_h = true if dir == -1  else false
-	star_dash_header.flip_h = true if animated_sprite_2d.flip_h == true else false
-	if jump_ball == true and wall_cling == false:
-		animation_to_play = "ball_jump"
-	if tackle == true:
-		animation_to_play = "rolling"
-		#(Player_collision.shape as CapsuleShape2D).height = 27.06
-		#Player_collision.position.y = 4.706
+	match mode:
+		MovementMode.PAUSED:
+			_player_paused()
+#region main movement states
+		MovementMode.NORMAL:
+			
+			star_dash_header.flip_h = true if animated_sprite_2d.flip_h == true else false
+			if jump_ball == true and wall_cling == false:
+				animation_to_play = "ball_jump"
+			if tackle == true:
+				animation_to_play = "rolling"
+				#(Player_collision.shape as CapsuleShape2D).height = 27.06
+				#Player_collision.position.y = 4.706
+				
+				return
+			#elif not mode == MovementMode.VINE:
+				#(Player_collision.shape as CapsuleShape2D).height = 36.47
+				#Player_collision.position.y = 0.0
+			if do_dodgeslide == true:
+				animation_to_play = "dodgeslide"
+				return
+			elif velocity.y < 0 and can_wallrun_left == false and can_wallrun_right == false and jump_ball == false and not is_on_floor():
+				if conti_up == true  :
+					animation_to_play = "going_up"
+					
+				else:
+					animation_to_play = "going_up_start"
+					if animated_sprite_2d.frame >= animated_sprite_2d.sprite_frames.get_frame_count(animated_sprite_2d.animation) - 1 and animation_to_play == "going_up_start":
+						conti_up = true
+			elif velocity.y > 0 and can_wallrun_left == false and can_wallrun_right == false  and jump_ball == false and not is_on_floor() and can_walldive_left == false and can_walldive_right == false:
+				if conti_down == true :
+					animation_to_play = "going_down"
+				else:
+					#conti_up = false
+					conti_dash = false
+					animation_to_play = "going_down_start"
+					if animated_sprite_2d.frame >= animated_sprite_2d.sprite_frames.get_frame_count(animated_sprite_2d.animation) - 1  and animation_to_play == "going_down_start":
+						conti_down = true
+			elif dodash == true and wall_cling == false and velocity.y == 0:
+				if conti_dash == true and conti_down == false:
+					animation_to_play = "dash"
+				else:
+					animation_to_play = "dash_start"
+					if animated_sprite_2d.frame >= animated_sprite_2d.sprite_frames.get_frame_count(animated_sprite_2d.animation) - 1:
+						conti_dash = true
+					#applying_velocity(delta)
+			if (is_on_floor() and dodash == false and not_moving_x == false and do_dodgeslide == false 
+				or can_wallrun_left == true 
+				or can_wallrun_right == true 
+				or can_walldive_left == true 
+				or can_walldive_right == true
+				
+				):
+				if store_running_speed != 0:
+					animation_to_play = "Running"
+				else:
+					animation_to_play = "walking_no_skates"
+					
+					
+			elif is_on_floor_only() and dodash == false and not_moving_x == true and tackle == false:
+				conti_dash = false
+				conti_up = false
+				conti_down = false
+				if skates_on == false:
+					animation_to_play = "idle"
+				else:
+					animation_to_play = "idle_skates"
 		
-		return
-	#elif not mode == MovementMode.VINE:
-		#(Player_collision.shape as CapsuleShape2D).height = 36.47
-		#Player_collision.position.y = 0.0
-	if do_dodgeslide == true:
-		animation_to_play = "dodgeslide"
-		return
-	elif velocity.y < 0 and can_wallrun_left == false and can_wallrun_right == false and jump_ball == false and not is_on_floor():
-		if conti_up == true  :
-			animation_to_play = "going_up"
+
+		MovementMode.NO_SKATES_WALL_KICK:
+			_handle_no_skates_wall_bounce()
+
+		MovementMode.DASH:
+			pass
+
+#region wall cling/shot system states
+
+		MovementMode.WALL_CLING:
+			if Input.is_action_pressed("up")  or Input.is_action_pressed("up") and Input.is_action_pressed("right") and animated_sprite_2d.flip_h == false or Input.is_action_pressed("up") and Input.is_action_pressed("left") and animated_sprite_2d.flip_h == true:
+				animation_to_play = "wall_cling_up"
+				
+			elif Input.is_action_pressed("down")  or Input.is_action_pressed("down") and Input.is_action_pressed("right") and animated_sprite_2d.flip_h == false or Input.is_action_pressed("down") and Input.is_action_pressed("left") and animated_sprite_2d.flip_h == true:
+				animation_to_play = "wall_cling_down"
+			elif Input.is_action_pressed("left") and dashDirection == -1 or dashDirection == 1  and Input.is_action_pressed("right") :
+				animation_to_play = "wall_cling_forward"
+			else: 
+				animation_to_play = "wall_cling_idle"
+
+		MovementMode.WALL_SHOT:
+			animation_to_play = "wall_shot"
+			return
+
+		MovementMode.WALL_CLIMB:
+			if velocity.y < 0 and can_wallrun_left == false and can_wallrun_right == false and jump_ball == false and not is_on_floor():
+				if conti_up == true  :
+					animation_to_play = "going_up"
+					
+				else:
+					animation_to_play = "going_up_start"
+					if animated_sprite_2d.frame >= animated_sprite_2d.sprite_frames.get_frame_count(animated_sprite_2d.animation) - 1 and animation_to_play == "going_up_start":
+						conti_up = true
+
+#endregion
+
+#endregion
+
+		MovementMode.HIT:
+			pass
 			
-		else:
-			animation_to_play = "going_up_start"
-			if animated_sprite_2d.frame >= animated_sprite_2d.sprite_frames.get_frame_count(animated_sprite_2d.animation) - 1 and animation_to_play == "going_up_start":
-				conti_up = true
-	elif velocity.y > 0 and can_wallrun_left == false and can_wallrun_right == false  and jump_ball == false and not is_on_floor() and can_walldive_left == false and can_walldive_right == false:
-		if conti_down == true :
-			animation_to_play = "going_down"
-		else:
-			#conti_up = false
-			conti_dash = false
-			animation_to_play = "going_down_start"
-			if animated_sprite_2d.frame >= animated_sprite_2d.sprite_frames.get_frame_count(animated_sprite_2d.animation) - 1  and animation_to_play == "going_down_start":
-				conti_down = true
-	elif dodash == true and wall_cling == false and velocity.y == 0:
-		if conti_dash == true and conti_down == false:
-			animation_to_play = "dash"
-		else:
-			animation_to_play = "dash_start"
-			if animated_sprite_2d.frame >= animated_sprite_2d.sprite_frames.get_frame_count(animated_sprite_2d.animation) - 1:
-				conti_dash = true
-	elif mode == MovementMode.WALL_CLING:
-		if Input.is_action_pressed("up")  or Input.is_action_pressed("up") and Input.is_action_pressed("right") and animated_sprite_2d.flip_h == false or Input.is_action_pressed("up") and Input.is_action_pressed("left") and animated_sprite_2d.flip_h == true:
-			animation_to_play = "wall_cling_up"
 			
-		elif Input.is_action_pressed("down")  or Input.is_action_pressed("down") and Input.is_action_pressed("right") and animated_sprite_2d.flip_h == false or Input.is_action_pressed("down") and Input.is_action_pressed("left") and animated_sprite_2d.flip_h == true:
-			animation_to_play = "wall_cling_down"
-		elif Input.is_action_pressed("left") and dashDirection == -1 or dashDirection == 1  and Input.is_action_pressed("right") :
-			animation_to_play = "wall_cling_forward"
-		else: 
-			animation_to_play = "wall_cling_idle"
-		return
+
+		MovementMode.VINE:
+			pass
+
+
+		MovementMode.RAIL_GRINDING:
+			if skates_on == false:
+				animation_to_play = "idle"
+			else:
+				animation_to_play = "idle_skates"
+		
+
+		MovementMode.WATER:
+			if velocity.y < 0 and can_wallrun_left == false and can_wallrun_right == false and jump_ball == false and not is_on_floor():
+				if conti_up == true  :
+					animation_to_play = "going_up"
+					
+				else:
+					animation_to_play = "going_up_start"
+					if animated_sprite_2d.frame >= animated_sprite_2d.sprite_frames.get_frame_count(animated_sprite_2d.animation) - 1 and animation_to_play == "going_up_start":
+						conti_up = true
+			elif velocity.y > 0 and can_wallrun_left == false and can_wallrun_right == false  and jump_ball == false and not is_on_floor() and can_walldive_left == false and can_walldive_right == false:
+				if conti_down == true :
+					animation_to_play = "going_down"
+				else:
+					#conti_up = false
+					conti_dash = false
+					animation_to_play = "going_down_start"
+					if animated_sprite_2d.frame >= animated_sprite_2d.sprite_frames.get_frame_count(animated_sprite_2d.animation) - 1  and animation_to_play == "going_down_start":
+						conti_down = true
+
+		MovementMode.TELEPORTING:
+			if skates_on == false:
+				animation_to_play = "idle"
+			else:
+				animation_to_play = "idle_skates"
+
+	
+
 		#animated_sprite_2d.flip_h = true  if dashDirection == 1 else false
-	if mode == MovementMode.WALL_SHOT:
-		animation_to_play = "wall_shot"
-		return
-	if (is_on_floor() and dodash == false and not_moving_x == false and do_dodgeslide == false 
-	or can_wallrun_left == true 
-	or can_wallrun_right == true 
-	or can_walldive_left == true 
-	or can_walldive_right == true
-	or mode == MovementMode.UPSIDE_DOWN
-	):
-		if store_running_speed != 0:
-			animation_to_play = "Running"
-		else:
-			animation_to_play = "walking_no_skates"
-		conti_dash = false
-		conti_up = false
-		conti_down = false
-		
-	elif is_on_floor_only() and dodash == false and not_moving_x == true and tackle == false:
-		conti_dash = false
-		conti_up = false
-		conti_down = false
-		if skates_on == false:
-			animation_to_play = "idle"
-		else:
-			animation_to_play = "idle_skates"
+
+
 
 func _handle_squash_and_strech(delta):
 	if not fallingmomentum_timer.is_stopped() and jumping == false:
@@ -1947,7 +2032,7 @@ func _handle_squash_and_strech(delta):
 			animated_sprite_2d.scale.x -= (dash_squash) 
 			#animated_sprite_2d.position.x += dash_squash + (base_scale.x - animated_sprite_2d.scale.x) * 2
 		#print("dash squash")
-	elif jumping == true:
+	elif jumping == true and animated_sprite_2d.scale.y <= base_scale.y*1.5:
 		animated_sprite_2d.scale.y += (jump_strech) 
 		#animated_sprite_2d.position.y -= jump_strech + (base_scale.y - animated_sprite_2d.scale.y) * 3
 		jumping = false
@@ -2201,9 +2286,6 @@ func _handle_player_upsidedown_velocity(direction,delta):
 func _wall_climb(delta):
 	velocity.y += gravity * delta
 	
-
-	
-		#print("normal")
 	if Input.is_action_just_pressed("jump"):
 		mode = MovementMode.WALL_CLING
 
@@ -2352,60 +2434,103 @@ func _wall_shot(delta):
 
 #endregion
 
-func is_grinding():
-	var angler_onrails = 0
-	var trick = false
+#region griding functions
+func is_grinding(delta, direction):
+	if sign(rotation ) + sign(rail_speed) == 0:
+		rail_slope_influence = rail_slope_counter_influence
+	else:
+		rail_slope_influence = rail_slope_into_influence
+	if not rail_grind_sfx.is_playing():
+		rail_grind_sfx.play()
 	
-	if is_on_floor_only():
-		if store_direction == 1:
-			dir = 2
-			animated_sprite_2d.flip_h = false
-		elif store_direction == -1:
-			dir = 1
-			animated_sprite_2d.flip_h = true
-		dodash = false
-		if has_landed == false:
-			rail_land = true
-		store_velocity.x = store_velocity.x if store_velocity.x >= 0 else store_velocity.x *-1
-		if angler_dir == store_direction:
-			angler_onrails = 1
-		else:
-			angler_onrails = -1
-		if Input.is_action_pressed("jump") == false :
-			velocity.y = 500
+		
+	var rail_length := rail_path.curve.get_baked_length()
 
-		if skates_on == false:
-			grind_speed = grind_speed + 6 + store_velocity.x + ((angle * angler_onrails * 30)/8) if grind_speed <= 840 else grind_speed - 4 + ((angle * angler_onrails * 30)/8)
-			velocity.x = grind_speed *  store_direction
-		if skates_on == true:
-			grind_speed = grind_speed - 2 + store_velocity.x + (angle * angler_onrails * 30) 
-			velocity.x = grind_speed *  store_direction
-			store_velocity.x = 0
-			if Input.is_action_just_pressed("dash"):
-				trick = true
-			if trick == true :
-				grind_speed = grind_speed + 220  + (angle  * 120)
-				rail_contact.play()
-				trick = false
-		if Input.is_action_pressed("down") :
-			if skates_on == false:
-				grind_speed = grind_speed + 6 + store_velocity.x + ((angle * angler_onrails * 30)/4) if grind_speed <= 800 else grind_speed - 4 + ((angle * angler_onrails * 30)/4)
-				velocity.x = grind_speed *  store_direction
-			if skates_on == true:
-				grind_speed = grind_speed - 2 + store_velocity.x + ((angle * angler_onrails * 30) *2 )
-				velocity.x = grind_speed *  store_direction
-				store_velocity.x = 0
-			if Input.is_action_just_pressed("jump"):
-				velocity.y = 100
-				#print("pass through")
-				Player_collision.disabled = true
-				pass_through_rails.start()
-	if rail_land == true:
-		rail_grind.play()
-		rail_contact.play()
-		has_landed = true
-		rail_land = false
+	if rail_offset >= rail_length and rail_speed > 0 or rail_offset <= 0.0 and rail_speed < 0:
+		rail_exit(0.0)
+	var curve := rail_path.curve
+	
+	rail_offset += rail_speed * delta
 
+	var local_pos := curve.sample_baked(rail_offset) + (on_rail_position_offset.rotated(rotation))
+
+	global_position = rail_path.to_global(local_pos)
+	var rail_transform := curve.sample_baked_with_rotation(rail_offset)
+	rotation = rail_transform.get_rotation()
+	
+	if skates_on == true:
+		rail_speed = move_toward(rail_speed + (rotation * rail_slope_influence) , Walking_SPEED * dir , rail_skates_accel )
+		if Input.is_action_just_pressed("dash"):
+			rail_speed += dir * rail_trick_speed
+			rail_contact_sfx.play()
+		
+	else:
+		rail_speed = move_toward(rail_speed + (rotation * rail_slope_influence) , skating_SPEED  * dir , rail_no_skates_accel )
+	if direction + sign(rail_speed ) == 0:
+		rail_speed = move_toward(rail_speed, 0 , (ground_brake_accel * ground_brake_multiplier )* delta * ground_brake_over_time_multiplier)
+
+	if not jumpbuffer_timer.is_stopped() or Input.is_action_just_pressed("jump"):
+		rail_exit(JUMP_VELOCITY)
+
+func grind_start(current_rail : Path2D):
+	rail_path = current_rail
+	print("new rail: ",rail_path)
+	var curve := rail_path.curve
+	var rail_transform := curve.sample_baked_with_rotation(rail_offset)
+	
+	if can_dash <= 0:
+		can_dash += 1
+
+	var local_pos := rail_path.to_local(global_position) + Vector2(0.0,-20.0)
+
+	var offset := curve.get_closest_offset(local_pos)
+	var before := curve.sample_baked(maxf(offset - 1.0, 0.0))
+	var after := curve.sample_baked(minf(offset + 1.0, curve.get_baked_length()))
+
+	var angle := (after - before).angle()
+
+	rail_speed = velocity.x
+	rail_speed += (velocity.y / 1.5708) * angle
+	print(angle)
+	
+	
+
+	
+
+	rail_offset = curve.get_closest_offset(local_pos)
+
+	if abs(angle) <  1.5708:
+		rail_contact_sfx.play()
+		velocity = Vector2.ZERO
+		mode = MovementMode.RAIL_GRINDING
+
+func rail_exit(aditional_upwards_velocity: float):
+	velocity = Vector2(rail_speed,aditional_upwards_velocity).rotated(rotation)
+	print("exit")
+	rail_grind_sfx.stop()
+	mode = MovementMode.NORMAL
+#endregion
+
+func _handle_no_skates_wall_bounce():
+	if skates_on == true or wallkicklock_timer.is_stopped():
+		mode = MovementMode.NORMAL
+		print("walkick_noskates")
+		return
+		
+	
+	if  Input.is_action_just_pressed("jump"):
+		if wallkick_lock_r.is_colliding == true :
+			wallkick_dir = -1 
+			wallkicklock_timer.start()
+		if wallkick_lock_l.is_colliding == true :
+			wallkick_dir = 1
+			wallkicklock_timer.start()
+	velocity.x =( abs(wallkick_velocity) + 300)*wallkick_dir
+	velocity.y = JUMP_VELOCITY/3 - abs(wallkick_velocity)/2
+	boost_mode = abs(velocity.x/ 1.2) + 10 
+	
+	
+	move_and_slide()
 
 var afterimage_velocity_buffer_multiplier: float
 func create_dash_effect(delta):
@@ -2958,8 +3083,7 @@ func _on_detector_area_exited(area):
 	if area.get_parent().is_in_group("Vine"):
 		vine_nearby = null
 
-func _on_pass_through_rails_timeout():
-	Player_collision.disabled = false
+
 
 func _on_wallkick_timer_timeout():
 	can_wall_kickL = false
@@ -2969,6 +3093,7 @@ func _on_wallkick_timer_timeout():
 
 func _on_wallkicklock_timer_timeout():
 	wallkicking = false
+	print("wallkick stop")
 
 func _on_dodgeslide_timer_timeout():
 	do_dodgeslide = false

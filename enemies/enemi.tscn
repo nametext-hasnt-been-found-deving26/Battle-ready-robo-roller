@@ -72,6 +72,7 @@ size = Vector2(43, 28)
 texture_filter = 1
 position = Vector2(0, -3)
 script = ExtResource("1_2hell")
+damage = 1
 metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

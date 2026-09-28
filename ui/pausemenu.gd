@@ -8,12 +8,16 @@ var downscroll_normal =  preload("uid://c7i06xl6g175m")
 var downscroll_focus = preload("uid://cp3j7tkixjpd0")
 @onready var music_display: PanelContainer = $music_display
 @onready var music_disc: Sprite2D = $music_display/music_disc
+@onready var background_play: Button = $background_play
+
+
 
 
 
 
 func _ready():
 	$AnimationPlayer.play("RESET")
+	
 
 func resume():
 	get_tree().paused = false
@@ -26,6 +30,7 @@ func pause():
 func menu_paused():
 	if Input.is_action_just_pressed("pause") and get_tree().paused == false:
 		pause()
+		
 	elif Input.is_action_just_pressed("pause") and get_tree().paused == true:
 		resume()
 # Called when the node enters the scene tree for the first time.
@@ -46,8 +51,8 @@ func _on_quit_pressed():
 
 func _process(delta):
 	menu_paused()
-
-	_set_mixtape_ui()
+	if get_tree().paused == true:
+		_set_mixtape_ui()
 
 
 func _on_downwards_dash_mode_pressed() -> void:
@@ -64,6 +69,8 @@ func _set_mixtape_ui():
 	music_display.position.y = mixtape.position.y - music_display.size.y
 	music_disc.position.y = music_display.size.y/2
 	music_disc.position.x = 15
+	background_play.position.y = music_display.position.y - music_display.size.y
+	background_play.position.x = music_display.position.x
 	
 	
 
@@ -74,3 +81,7 @@ func _on_mixtape_downscroll_pressed() -> void:
 
 func _on_mixtape_upscroll_pressed() -> void:
 	mixtape.move_selection(-1)
+
+
+func _on_background_play_pressed() -> void:
+	pass # Replace with function body.

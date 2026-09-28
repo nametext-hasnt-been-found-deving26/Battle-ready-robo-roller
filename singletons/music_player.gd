@@ -4,6 +4,7 @@ var music_player: AudioStreamPlayer
 var record_scrachin = preload("uid://yvy8eohsu2kj")
 var music_bus = AudioServer.get_bus_index("Music")
 var filter = AudioServer.get_bus_effect(music_bus, 0)
+var filter_switch := true
 
 
 func _ready():
@@ -28,7 +29,7 @@ func update_music():
 		var theme = scene.current_theme
 
 		# Don't restart same music
-		if  scene.current_theme== theme and music_player.playing:
+		if  music_player.stream == theme and music_player.playing:
 			print("no theme")
 			return
 
@@ -61,7 +62,10 @@ func _process(delta: float) -> void:
 
 		#for i in AudioServer.get_bus_effect_count(music_bus):
 			#print(i, ": ", AudioServer.get_bus_effect(music_bus, i))
-		filter.cutoff_hz = 2000.0
+		if filter_switch == true:
+			filter.cutoff_hz = 2000.0
+		else:
+			filter.cutoff_hz = 20000.0
 	else:
 		filter.cutoff_hz = 20000.0
 	if music_player.stream == null:
