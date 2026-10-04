@@ -333,11 +333,12 @@ afterimages = ExtResource("2_42shm")
 dust_clouds_buffer_time_duration = 0.008
 dust_clouds = ExtResource("3_pbfsw")
 rotation_accel = 8.0
-base_position = Vector2(0, 18.235)
+base_position = Vector2(0, 19.4)
 return_to_form_accel = 1.5
 water_pull = 300.0
 Conveyor_input_offset_duration = 0.1
-on_rail_position_offset = Vector2(0, -30)
+on_rail_position_offset = Vector2(0, -35)
+rail_trick_speed = 150
 rail_skates_accel = 0.5
 rail_slope_counter_influence = 3.0
 
@@ -477,10 +478,10 @@ z_index = 1
 z_as_relative = false
 texture_repeat = 1
 material = SubResource("ShaderMaterial_02jgc")
-position = Vector2(0, 18.235)
+position = Vector2(0, 19.4)
 scale = Vector2(0.6, 0.578)
 sprite_frames = ExtResource("3_op7ga")
-animation = &"Running"
+animation = &"idle"
 autoplay = "idle"
 offset = Vector2(0, -42)
 
@@ -623,12 +624,14 @@ collision_mask = 2
 position = Vector2(0, 18)
 
 [node name="spark_emiter" type="GPUParticles2D" parent="dust_cloud_setter"]
+position = Vector2(0, 4.1176453)
 emitting = false
+amount = 180
 texture = ExtResource("23_skliy")
 lifetime = 1.5
 speed_scale = 2.0
 explosiveness = 0.1
-randomness = 1.0
+randomness = 0.5
 fixed_fps = 15
 process_material = SubResource("ParticleProcessMaterial_fjbd1")
 

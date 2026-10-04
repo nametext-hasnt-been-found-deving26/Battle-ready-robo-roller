@@ -37,7 +37,9 @@ var process_toggle := false
 @export var frames_to_skip: int = 4
 var on_screen : bool = false
 @onready var visible_on_screen_notifier_2d: VisibleOnScreenNotifier2D = $VisibleOnScreenNotifier2D
-var active_type_state: bool = false
+
+
+var tracked_bodies: Dictionary = {}
 
 
 func _ready():
@@ -80,6 +82,8 @@ func set_position_collisions():
 
 
 func _process(delta):
+	var curve := path_2d.curve
+	
 	var active_wheels = wheels_container.get_children()
 	if not on_screen:
 		for wheel in active_wheels:
@@ -97,10 +101,45 @@ func _process(delta):
 		return
 	
 	move_belt(delta * frames_to_skip)
-	for body in upper_collision.get_overlapping_bodies() + lefter_collision.get_overlapping_bodies() + righter_collision.get_overlapping_bodies() + downer_collision.get_overlapping_bodies():#####
-		if body.is_in_group("sink_affectors"):
-			if abs(Speed) < 900 and active_type_state != true:
-				_activate_segments(true)
+	var nearby_segments: Dictionary = {}
+	#var curve := path_2d.curve
+
+	var bodies = (
+		upper_collision.get_overlapping_bodies()
+		+ lefter_collision.get_overlapping_bodies()
+		+ righter_collision.get_overlapping_bodies()
+		+ downer_collision.get_overlapping_bodies()
+	)
+
+	for body in bodies:
+		if not body.is_in_group("sink_affectors"):
+			continue
+
+		# Convert the body position to curve-local coordinates.
+		var body_pos := path_2d.to_local(body.global_position)
+		var closest_point := curve.get_closest_point(body_pos)
+
+		for segment in belt_container.get_children():
+			# Convert the segment position to curve-local coordinates.
+			var segment_pos := path_2d.to_local(segment.global_position)
+
+			# Measure the distance in the conveyor's local space.
+			var distance := segment_pos.distance_to(closest_point)
+
+			if distance <= segment_width :
+				nearby_segments[segment] = true
+
+# Activate or deactivate segments after checking all bodies.
+	for segment in belt_container.get_children():
+		segment.entity_offset = nearby_segments.has(segment)
+
+				
+
+
+					
+
+			
+			#var distance := pos_on_belt.distance_to(closest_point)
 	
 
 func _physics_process(delta: float) -> void:
@@ -122,77 +161,54 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_upper_collision_body_entered(body: Node2D) -> void:
-	if body.is_in_group("sink_affectors"):
-		# Save direction so the player can push forward
-		body.set("conveyor_area_dir", push_dir)
-		# (Power will be adjusted each frame)
-		body.set("conveyor_power", Speed)
+	_conveyor_entry(body, push_dir)
 
 
 func _on_upper_collision_body_exited(body: Node2D) -> void:
-	if body.is_in_group("sink_affectors"):
-		if abs(Speed) < 900 and active_type_state != false:
-			_activate_segments(false)
-		body.set("conveyor_area_dir", Vector2.ZERO)
-		body.set("conveyor_power", 0.0)
-		if body.is_in_group("player"):
-			body.wall_cling = false
+	_conveyor_exit(body)
 
 
 func _on_lefter_collision_body_entered(body: Node2D) -> void:
-	if body.is_in_group("sink_affectors"):
-		# Save direction so the player can push forward
-		body.set("conveyor_area_dir", push_dirL)
-		# (Power will be adjusted each frame)
-		body.set("conveyor_power", Speed)
+	_conveyor_entry(body, push_dirL)
 
 
 func _on_lefter_collision_body_exited(body: Node2D) -> void:
-	if body.is_in_group("sink_affectors"):
-		if abs(Speed) < 900 and active_type_state != false:
-			_activate_segments(false)
-		body.set("conveyor_area_dir", Vector2.ZERO)
-		body.set("conveyor_power", 0.0)
-		if body.is_in_group("player"):
-			body.wall_cling = false
+	_conveyor_exit(body)
 
 
 func _on_righter_collision_body_entered(body: Node2D) -> void:
-	if body.is_in_group("sink_affectors"):
-		# Save direction so the player can push forward
-		body.set("conveyor_area_dir", push_dirR)
-		# (Power will be adjusted each frame)
-		body.set("conveyor_power", Speed)
+	_conveyor_entry(body, push_dirR)
 
 
 func _on_righter_collision_body_exited(body: Node2D) -> void:
-	if body.is_in_group("sink_affectors"):
-		if abs(Speed) < 900 and active_type_state != false:
-			_activate_segments(false)
-		body.set("conveyor_area_dir", Vector2.ZERO)
-		body.set("conveyor_power", 0.0)
-		if body.is_in_group("player"):
-			body.wall_cling = false
+	_conveyor_exit(body)
 
 
 func _on_downer_collision_body_entered(body: Node2D) -> void:
-	if body.is_in_group("sink_affectors"):
-		# Save direction so the player can push forward
-		body.set("conveyor_area_dir", push_dirD)
-		# (Power will be adjusted each frame)
-		body.set("conveyor_power", Speed)
+	_conveyor_entry(body, push_dirD)
 
 
 func _on_downer_collision_body_exited(body: Node2D) -> void:
+	_conveyor_exit(body)
+
+func _conveyor_exit(body):
 	if body.is_in_group("sink_affectors"):
-		if abs(Speed) < 900 and active_type_state != false:
-			_activate_segments(false)
+		body._conveyor_exit()
+		
 		body.set("conveyor_area_dir", Vector2.ZERO)
 		body.set("conveyor_power", 0.0)
-		if body.is_in_group("player"):
-			body.wall_cling = false
+		#if body.is_in_group("player"):
+			
+		
 
-
+func _conveyor_entry(body, dir):
+	if body.is_in_group("sink_affectors"):
+		# Save direction so the player can push forward
+		body.set("conveyor_area_dir", dir)
+		# (Power will be adjusted each frame)
+		body.set("conveyor_power", Speed)
+		
+		
 
 func update_wheels():
 	for child in wheels_container.get_children():
@@ -246,10 +262,10 @@ func move_belt(delta):
 
 		# Move forward
 		if abs(Speed) < segment.speed_to_max:
-			dist += Speed / 12  * delta 
+			dist += Speed / 8.5  * delta 
 			
 		else:
-			dist += (Speed  / 12) / 900 * delta
+			dist += (Speed  / 8.5 ) / 900 * delta
 		dist = fposmod(dist, length)
 			#print(dist)
 
@@ -283,9 +299,3 @@ func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
 	on_screen = false
 	take_out_belt()
 	pass # Replace with function body.
-
-func _activate_segments(active:bool):
-	for segment in belt_container.get_children():
-		segment.area_2d.monitoring = active
-		segment.area_2d.monitorable = active
-		active_type_state = active

@@ -1,0 +1,72 @@
+[gd_scene format=3 uid="uid://qa24jeg0qo1p"]
+
+[sub_resource type="GDScript" id="GDScript_5hhxg"]
+script/source = "extends Node2D
+
+@export var detection_range := 20.0
+@export var minimum_natural_entrence_speed := -100
+
+var player
+
+@onready var rail_path: Path2D = $\"rail path\"
+@onready var rail_texture: Line2D = $rail_texture
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	_build_texture()
+	
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _physics_process(delta: float) -> void:
+	if not player:
+		_get_player()
+		return
+	var curve := rail_path.curve
+	var player_pos := rail_path.to_local(player.global_position)
+
+	var closest_point := curve.get_closest_point(player_pos)
+	var distance := player_pos.distance_to(closest_point)
+	
+
+	if distance <= detection_range:
+		#print(distance)
+		if player.mode != player.MovementMode.RAIL_GRINDING:
+			if player.velocity.y >= minimum_natural_entrence_speed or Input.is_action_pressed(\"jump\"):
+				player.grind_start(rail_path)
+
+			
+	pass
+
+func _get_player():
+	player = get_tree().get_first_node_in_group(\"player\")
+
+func _build_texture():
+	var curve := rail_path.curve
+	for point in (curve.point_count):
+		rail_texture.add_point(curve.get_point_position(point))
+		print(curve.get_point_position(point))
+"
+
+[sub_resource type="Curve2D" id="Curve2D_xki3q"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0)
+}
+point_count = 2
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_irq1l"]
+load_path = "res://.godot/imported/grind_rail.png-cbc2c25ddfbc35f19e9e1e2c62a4ba68.ctex"
+
+[node name="rail" type="Node2D" unique_id=1320922022]
+script = SubResource("GDScript_5hhxg")
+detection_range = 30.0
+
+[node name="rail path" type="Path2D" parent="." unique_id=1592668357]
+curve = SubResource("Curve2D_xki3q")
+
+[node name="rail_texture" type="Line2D" parent="." unique_id=618347469]
+width = 50.0
+texture = SubResource("CompressedTexture2D_irq1l")
+texture_mode = 1

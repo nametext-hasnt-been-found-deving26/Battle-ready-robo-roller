@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" load_steps=58 format=3 uid="uid://ca7sfdbm4cr5d"]
+[gd_resource type="SpriteFrames" format=3 uid="uid://ca7sfdbm4cr5d"]
 
 [ext_resource type="Texture2D" uid="uid://bpyauqo6m4tm" path="res://Players/Swift Roll/afterimages SR/afterimages.png" id="1_6u8cf"]
 
@@ -253,7 +253,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_6md2i")
 }],
-"loop": true,
+"loop": 1,
 "name": &"Running",
 "speed": 5.0
 }, {
@@ -282,7 +282,7 @@ animations = [{
 "duration": 0.2,
 "texture": SubResource("AtlasTexture_btvsf")
 }],
-"loop": true,
+"loop": 1,
 "name": &"ball_jump",
 "speed": 5.0
 }, {
@@ -293,7 +293,7 @@ animations = [{
 "duration": 0.3,
 "texture": SubResource("AtlasTexture_7vxqv")
 }],
-"loop": true,
+"loop": 1,
 "name": &"dash",
 "speed": 5.0
 }, {
@@ -310,7 +310,7 @@ animations = [{
 "duration": 0.3,
 "texture": SubResource("AtlasTexture_d8ep1")
 }],
-"loop": true,
+"loop": 1,
 "name": &"dash_start",
 "speed": 5.0
 }, {
@@ -321,7 +321,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_lu1f8")
 }],
-"loop": true,
+"loop": 1,
 "name": &"dodgeslide",
 "speed": 14.0
 }, {
@@ -332,7 +332,7 @@ animations = [{
 "duration": 0.7,
 "texture": SubResource("AtlasTexture_eafr3")
 }],
-"loop": true,
+"loop": 1,
 "name": &"going_down",
 "speed": 5.0
 }, {
@@ -349,7 +349,7 @@ animations = [{
 "duration": 0.7,
 "texture": SubResource("AtlasTexture_50apu")
 }],
-"loop": true,
+"loop": 1,
 "name": &"going_down_start",
 "speed": 5.0
 }, {
@@ -360,7 +360,7 @@ animations = [{
 "duration": 0.7,
 "texture": SubResource("AtlasTexture_tjbpo")
 }],
-"loop": true,
+"loop": 1,
 "name": &"going_up",
 "speed": 5.0
 }, {
@@ -377,7 +377,7 @@ animations = [{
 "duration": 0.7,
 "texture": SubResource("AtlasTexture_8lj1g")
 }],
-"loop": true,
+"loop": 1,
 "name": &"going_up_start",
 "speed": 5.0
 }, {
@@ -394,7 +394,7 @@ animations = [{
 "duration": 0.6,
 "texture": SubResource("AtlasTexture_13xnm")
 }],
-"loop": true,
+"loop": 1,
 "name": &"idle",
 "speed": 5.0
 }, {
@@ -423,7 +423,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_p5ewd")
 }],
-"loop": true,
+"loop": 1,
 "name": &"idle_skates",
 "speed": 5.0
 }, {
@@ -431,7 +431,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_gftix")
 }],
-"loop": true,
+"loop": 1,
 "name": &"rolling",
 "speed": 5.0
 }, {
@@ -460,7 +460,7 @@ animations = [{
 "duration": 0.5,
 "texture": SubResource("AtlasTexture_ene1d")
 }],
-"loop": true,
+"loop": 1,
 "name": &"walking_no_skates",
 "speed": 12.0
 }, {
@@ -468,7 +468,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_rhjko")
 }],
-"loop": true,
+"loop": 1,
 "name": &"wall_cling_down",
 "speed": 5.0
 }, {
@@ -476,7 +476,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_i7sg5")
 }],
-"loop": true,
+"loop": 1,
 "name": &"wall_cling_forward",
 "speed": 5.0
 }, {
@@ -484,7 +484,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_0bfin")
 }],
-"loop": true,
+"loop": 1,
 "name": &"wall_cling_idle",
 "speed": 5.0
 }, {
@@ -492,7 +492,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_tn5ld")
 }],
-"loop": true,
+"loop": 1,
 "name": &"wall_cling_up",
 "speed": 5.0
 }]

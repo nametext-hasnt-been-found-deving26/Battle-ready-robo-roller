@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://blsdu0q7h1kn4"
-path="res://.godot/imported/grind_rail.png-cbc2c25ddfbc35f19e9e1e2c62a4ba68.ctex"
+uid="uid://dc33usngbf3o7"
+path="res://.godot/imported/grind_rail.png-257a0288c323c528a5d567547c36fea3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://stage gimmicks/rails/grind_rail.png"
-dest_files=["res://.godot/imported/grind_rail.png-cbc2c25ddfbc35f19e9e1e2c62a4ba68.ctex"]
+source_file="res://stage gimmicks/Grind rails/grind_rail.png"
+dest_files=["res://.godot/imported/grind_rail.png-257a0288c323c528a5d567547c36fea3.ctex"]
 
 [params]
 

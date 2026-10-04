@@ -349,11 +349,13 @@ var rail_path: Path2D
 var rail_slope_influence := 1.0
 var rail_offset := 0.0
 var rail_speed := 0.0
+var ontop_rail := true
 
 @onready var rail_grind_sfx: AudioStreamPlayer = $sfx/rail_grind
 @onready var rail_contact_sfx: AudioStreamPlayer = $sfx/rail_contact
-@onready var spark_emiter: GPUParticles2D = $dust_cloud_setter/spark_emiter
 
+@onready var spark_emiter: GPUParticles2D = $dust_cloud_setter/spark_emiter
+var spark_emiter_base_position : Vector2
 
 
 
@@ -447,6 +449,7 @@ var no_skates_slope_jump = false
 
 func _ready():
 	Settings.load_dash_mode()
+	spark_emiter_base_position = spark_emiter.position 
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
@@ -531,7 +534,7 @@ func _physics_process(delta):
 	if currentHP <= 0:
 		die()
 	health_bar()
-	set_animation()
+	set_animation(direction)
 
 	if scarf:
 		scarf.update_dash_color(can_dash)
@@ -735,7 +738,7 @@ func apply_main_movement(delta, direction):
 		if abs(velocity.x) < 400:
 			braking = false
 		#running stuff -----------------------------------------------------
-		if abs(velocity.x ) > Walking_SPEED + conveyor_power and running == false and grounded == true:
+		if abs(velocity.x ) > Walking_SPEED  and running == false and grounded == true:
 			store_running_speed = abs(velocity.x ) 
 			#print(store_running_speed)
 			running = true
@@ -1728,45 +1731,96 @@ func apply_main_movement(delta, direction):
 
 var stay_like_that = false
 func _handle_rotation():
-	if mode == MovementMode.VINE and handle_rotation:
-		rotation_degrees = handle_rotation
-	elif do_dodgeslide == true:
-			if angler_dir != 0:
-				if velocity.x * angler_dir < 0:
-					if angler_dir == -1:
-						rotation_degrees = (90 +(angle * (180 / 3.141592))) * -1
-						#print("upwards")
+	match mode:
+		MovementMode.PAUSED:
+			pass
+#region main movement states
+		MovementMode.NORMAL:
+			if do_dodgeslide == true:
+				if angler_dir != 0:
+					if velocity.x * angler_dir < 0:
+						if angler_dir == -1:
+							rotation_degrees = (90 +(angle * (180 / 3.141592))) * -1
+							#print("upwards")
+						else:
+							rotation_degrees = (90 +(angle * (180 / 3.141592))) 
 					else:
-						rotation_degrees = (90 +(angle * (180 / 3.141592))) 
+						rotation_degrees = (90 -(angle * (180 / 3.141592)))* angler_dir*-1
+						#print("downwards")
 				else:
-					rotation_degrees = (90 -(angle * (180 / 3.141592)))* angler_dir*-1
-					#print("downwards")
+					rotation_degrees = -90 * dashDirection 
+			elif is_on_floor():
+				if skates_on == true and mode == MovementMode.NORMAL:
+					#print(get_floor_normal())
+					if Input.is_action_just_pressed("jump"):
+						rotation_degrees = 0
+						#print("ball jumpin")
+					else:
+						rotation = rot
+						return
+				else:
+					
+							#print("no angle")
+					rotation_degrees = 0
 			else:
-				rotation_degrees = -90 * dashDirection 
-	elif is_on_floor():
-		if skates_on == true and mode == MovementMode.NORMAL:
-			#print(get_floor_normal())
-			if Input.is_action_just_pressed("jump"):
-				rotation_degrees = 0
-				#print("ball jumpin")
-			else:
-				rotation = rot
-				return
-		else:
+				if do_dodgeslide == false:
+					#if floor_slope_disable == false:
+					
+						#print(rotation_degrees)
+					
+						
+					if dodash == true:
+						rotation_degrees = 0
+					else:rotation_degrees = move_toward(rotation_degrees, 0 , 2)
+						
+					#applying_velocity(delta)
+
+		MovementMode.DIRECTION_CHANGE:
+			direction_changing()
 			
-					#print("no angle")
-			rotation_degrees = 0
-	else:
-		if do_dodgeslide == false:
-			#if floor_slope_disable == false:
-			if mode == MovementMode.UPSIDE_DOWN:
-				
-				rotation_degrees = ceiling_angle + 180
-				#print(rotation_degrees)
-			else:
-				rotation_degrees = move_toward(rotation_degrees, 0 , 2)
-			if dodash == true:
-				rotation_degrees = 0
+
+		MovementMode.UPSIDE_DOWN:
+			rotation_degrees = ceiling_angle + 180
+
+		MovementMode.NO_SKATES_WALL_KICK:
+			pass
+
+		MovementMode.DASH:
+			pass
+
+#region wall cling/shot system states
+
+		MovementMode.WALL_CLING:
+			rotation = 0
+
+		MovementMode.WALL_SHOT:
+			rotation = 0
+
+		MovementMode.WALL_CLIMB:
+			rotation = 0
+
+#endregion
+
+#endregion
+
+		MovementMode.HIT:
+			rotation = 0
+			
+
+		MovementMode.VINE:
+			rotation_degrees = handle_rotation
+
+
+		MovementMode.RAIL_GRINDING:
+			rotation = rail_angle
+
+		MovementMode.WATER:
+			rotation_degrees = move_toward(rotation_degrees, 0 , 2)
+
+		MovementMode.TELEPORTING:
+			rotation = 0
+		
+	
 
 
 var avg_normal = Vector2.ZERO
@@ -1860,7 +1914,7 @@ func _on_Area2D_body_entered(body):
 	if body.name == "Vine":
 		vine_nearby = body
 
-func set_animation():
+func set_animation(direction):
 	if tackle == false:
 		animated_sprite_2d.flip_h = true if dir == -1  else false
 	match mode:
@@ -1918,8 +1972,10 @@ func set_animation():
 				):
 				if store_running_speed != 0:
 					animation_to_play = "Running"
+					#print(2)
 				else:
 					animation_to_play = "walking_no_skates"
+					#print(1)
 					
 					
 			elif is_on_floor_only() and dodash == false and not_moving_x == true and tackle == false:
@@ -1932,8 +1988,27 @@ func set_animation():
 					animation_to_play = "idle_skates"
 		
 
+		MovementMode.DIRECTION_CHANGE:
+			pass
+			
+
+		MovementMode.UPSIDE_DOWN:
+			conti_dash = false
+			conti_up = false
+			conti_down = false
+			if direction == 0:
+				if skates_on == false:
+						animation_to_play = "idle"
+				else:
+						animation_to_play = "idle_skates"
+			else:
+				if abs(player_vel) > Walking_SPEED:
+					animation_to_play = "Running"
+				else:
+					animation_to_play = "walking_no_skates"
+
 		MovementMode.NO_SKATES_WALL_KICK:
-			_handle_no_skates_wall_bounce()
+			pass
 
 		MovementMode.DASH:
 			pass
@@ -1979,10 +2054,13 @@ func set_animation():
 
 
 		MovementMode.RAIL_GRINDING:
-			if skates_on == false:
-				animation_to_play = "idle"
+			if ontop_rail:
+				if skates_on == false:
+					animation_to_play = "idle"
+				else:
+					animation_to_play = "idle_skates"
 			else:
-				animation_to_play = "idle_skates"
+				animation_to_play = "going_down"
 		
 
 		MovementMode.WATER:
@@ -2435,7 +2513,23 @@ func _wall_shot(delta):
 #endregion
 
 #region griding functions
+var pos_before_rail : Vector2
+var rail_angle : float
+var rail_side := 0
 func is_grinding(delta, direction):
+	
+	spark_emiter.amount_ratio = absf(rail_speed)/2000
+
+	
+
+	if abs(rail_speed) > 2000:
+		advance_boost_mode = true
+	else:
+		advance_boost_mode = false
+
+	if advance_boost_mode == true:
+		create_dash_effect(delta)
+
 	if sign(rotation ) + sign(rail_speed) == 0:
 		rail_slope_influence = rail_slope_counter_influence
 	else:
@@ -2448,15 +2542,25 @@ func is_grinding(delta, direction):
 
 	if rail_offset >= rail_length and rail_speed > 0 or rail_offset <= 0.0 and rail_speed < 0:
 		rail_exit(0.0)
+		return
 	var curve := rail_path.curve
 	
 	rail_offset += rail_speed * delta
 
-	var local_pos := curve.sample_baked(rail_offset) + (on_rail_position_offset.rotated(rotation))
+	var local_pos := curve.sample_baked(rail_offset) 
+
+	var offset := curve.get_closest_offset(local_pos)
+	var before := curve.sample_baked(maxf(offset - 1.0, 0.0))
+	var after := curve.sample_baked(minf(offset + 1.0, curve.get_baked_length()))
+
+	rail_angle = (after - before).angle()
+
+	local_pos +=  ((on_rail_position_offset*rail_side).rotated(rail_angle))
+
 
 	global_position = rail_path.to_global(local_pos)
-	var rail_transform := curve.sample_baked_with_rotation(rail_offset)
-	rotation = rail_transform.get_rotation()
+	
+	
 	
 	if skates_on == true:
 		rail_speed = move_toward(rail_speed + (rotation * rail_slope_influence) , Walking_SPEED * dir , rail_skates_accel )
@@ -2472,44 +2576,67 @@ func is_grinding(delta, direction):
 	if not jumpbuffer_timer.is_stopped() or Input.is_action_just_pressed("jump"):
 		rail_exit(JUMP_VELOCITY)
 
+	#print(ontop_rail)
+	if ontop_rail == true:
+		rail_side = 1
+		spark_emiter.position.y = spark_emiter_base_position.y
+	else:
+		rail_side = -1
+		spark_emiter.position.y = (spark_emiter_base_position.y + dust_cloud_setter.position.y ) *-1
+	
+	if Input.is_action_just_pressed("down"):
+		ontop_rail = false
+		#print("down boy")
+	elif Input.is_action_just_pressed("up"):
+		ontop_rail = true
+
 func grind_start(current_rail : Path2D):
+	
+	pos_before_rail = global_position
 	rail_path = current_rail
 	print("new rail: ",rail_path)
 	var curve := rail_path.curve
-	var rail_transform := curve.sample_baked_with_rotation(rail_offset)
 	
 	if can_dash <= 0:
 		can_dash += 1
 
-	var local_pos := rail_path.to_local(global_position) + Vector2(0.0,-20.0)
+	var local_pos := rail_path.to_local(global_position) 
+	#print(local_pos, global_position)
 
 	var offset := curve.get_closest_offset(local_pos)
 	var before := curve.sample_baked(maxf(offset - 1.0, 0.0))
 	var after := curve.sample_baked(minf(offset + 1.0, curve.get_baked_length()))
 
-	var angle := (after - before).angle()
+	rail_angle = (after - before).angle()
+
+	local_pos +=  (on_rail_position_offset.rotated(rail_angle))
 
 	rail_speed = velocity.x
-	rail_speed += (velocity.y / 1.5708) * angle
-	print(angle)
-	
-	
-
-	
+	rail_speed += (velocity.y / 1.5708) * rail_angle
+	#print(angle)
 
 	rail_offset = curve.get_closest_offset(local_pos)
 
 	if abs(angle) <  1.5708:
+		jump_ball = false
 		rail_contact_sfx.play()
+		ontop_rail = true
+		rail_side = 1
 		velocity = Vector2.ZERO
+		
 		mode = MovementMode.RAIL_GRINDING
 
 func rail_exit(aditional_upwards_velocity: float):
-	velocity = Vector2(rail_speed,aditional_upwards_velocity).rotated(rotation)
-	print("exit")
+	velocity = Vector2(rail_speed,aditional_upwards_velocity * rail_side).rotated(rail_angle)
+
 	rail_grind_sfx.stop()
+	rail_side = 0
 	mode = MovementMode.NORMAL
+	
+	#print("rail exit ", velocity)
+	move_and_slide()
 #endregion
+
 
 func _handle_no_skates_wall_bounce():
 	if skates_on == true or wallkicklock_timer.is_stopped():
@@ -2801,62 +2928,18 @@ func wind_push(delta):
 
 var main_velocity : Vector2
 func conveyor_push(delta, direction):
-	if conveyor_area_dir != Vector2.ZERO:
-		if mode == MovementMode.WATER:
-			velocity = conveyor_power * conveyor_area_dir
-			print(velocity)
-			return 
-		#print("yes")
-		
-		if conveyor_input_offset <= 0:
-			if skates_on and abs(conveyor_area_dir.x) > abs(conveyor_area_dir.y):
-				if not_moving_x: 
-					velocity.x = move_toward(velocity.x + (angle * angler_dir * 15),(conveyor_power * conveyor_area_dir.x ), accel * 100 )
-				elif abs(velocity.x) <= Base_Skates_SPEED + abs(conveyor_power):
-					velocity = (conveyor_power * conveyor_area_dir ) + velocity
-				#print(velocity, conveyor_area_dir)
-				
-			#if not_moving_x and abs(velocity.x) > conveyor_power:
-				#velocity = (conveyor_power * conveyor_area_dir )
-			#main_velocity -= (conveyor_power * conveyor_area_dir )
-			
-			conveyor_input_offset = Conveyor_input_offset_duration
-			
-		if not skates_on:
-			if jump_buffer:
-				boost_mode = abs(velocity.x)
-			if is_on_floor():
-				
-				if not grounded and not jump_buffer:
-					store_running_speed = 0
-					boost_mode = 0
-					if not jump_buffer:
-						velocity.x /= 1.5
-			
-			if abs(conveyor_area_dir.x) < abs(conveyor_area_dir.y):
-				if wall_cling == false:
-					velocity = (conveyor_power * conveyor_area_dir ) / 100 + velocity
-				else:
-					velocity = (conveyor_power * conveyor_area_dir ) / 25 + velocity
-			else:
-				velocity = (conveyor_power * conveyor_area_dir ) + velocity
-			
-				
-				
-		if skates_on == true and (conveyor_area_dir.x) < abs(conveyor_area_dir.y) :
-			if wall_cling == false:
-				velocity = (conveyor_power * conveyor_area_dir ) / 100 + velocity
-			else:
-				velocity = (conveyor_power * conveyor_area_dir ) / 25 + velocity
-			
-		if conveyor_input_offset >= 0:
-			conveyor_input_offset -= delta
-			
-		#print(conveyor_input_offset)
-	if conveyor_power != 0:
-		if not is_on_floor() and not is_on_wall() and not is_on_wall():
-			conveyor_power = 0
+	if not is_on_wall():
+		global_position.x += (conveyor_power/100) * conveyor_area_dir.x
+	if not is_on_ceiling() and conveyor_area_dir.x != 0 or not is_on_floor() and conveyor_area_dir.x != 0:
+		global_position.y += (conveyor_power/100) * conveyor_area_dir.y
+	
 
+
+func _conveyor_exit():
+	velocity += conveyor_power * conveyor_area_dir
+	print(mode)
+	if mode == MovementMode.WALL_CLING:
+		mode = MovementMode.NORMAL
 
 
 var pellets_on_screen := []
